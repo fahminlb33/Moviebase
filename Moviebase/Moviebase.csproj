@@ -127,6 +127,12 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Moviebase.Core\Moviebase.Core.csproj">
+      <Project>{6f0e212f-8080-4da7-bca7-26062d8c81e8}</Project>
+      <Name>Moviebase.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
