@@ -9,17 +9,17 @@ download poster, and create folder thumbnail.
 
 ## Features
 
-+ Move movies into folders
-+ Automatic movie rename
-+ Automatic poster downloading
-+ Automatic folder thumbnail creation
-+ Export to CSV
-+ Works both online and offline
-+ Find movie's alternative name(s)
-+ Poster selector (select from availiable posters)
-- Series movie support (currently only support for single movie)
-- Automatic subtitle download from Subscene
-- Create hardsub movie (burn video+subtitle)
+- [x] Move movies into folders
+- [x] Automatic movie rename
+- [x] Automatic poster downloading
+- [x] Automatic folder thumbnail creation
+- [x] Export to CSV
+- [x] Works both online and offline
+- [x] Find movie's alternative name(s)
+- [x] Poster selector (select from availiable posters)
+- [ ] Series movie support (currently only support for single movie)
+- [ ] Automatic subtitle download from Subscene
+- [ ] Create hardsub movie (burn video+subtitle)
 
 ## Release
 
