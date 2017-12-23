@@ -1,46 +1,19 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
+﻿using System.Threading.Tasks;
 
 namespace Moviebase.Core
 {
     public class ComponentManager : IComponentManager
     {
-        public bool CheckPythonInstallation()
+        public async Task<bool> CheckPythonInstallation()
         {
-            var vp = new ProcessStartInfo
-            {
-                Arguments = "-V",
-                CreateNoWindow = true,
-                FileName = "python",
-                RedirectStandardError = true,
-                UseShellExecute = false
-            };
-
-            var proc = Process.Start(vp);
-            Debug.Assert(proc != null);
-            var output = proc.StandardError.ReadToEnd();
-            proc.WaitForExit();
-            return output.Contains("Python");
+            var result = await AsyncProcess.StartWithOuput("python", "-V", ProcessRedirectStream.StandardError);
+            return result.Contains("Python");
         }
 
-        public bool CheckGuessItInstallation()
+        public async Task<bool> CheckGuessItInstallation()
         {
-            var vp = new ProcessStartInfo
-            {
-                Arguments = "--version",
-                CreateNoWindow = true,
-                FileName = "guessit",
-                RedirectStandardOutput = true,
-                UseShellExecute = false
-            };
-
-            var proc = Process.Start(vp);
-            Debug.Assert(proc != null);
-            var output = proc.StandardOutput.ReadToEnd();
-            proc.WaitForExit();
-            return output.Contains("GuessIt");
+            var result = await AsyncProcess.StartWithOuput("guessit", "--version", ProcessRedirectStream.StandardOuput);
+            return result.Contains("GuessIt");
         }
     }
 }

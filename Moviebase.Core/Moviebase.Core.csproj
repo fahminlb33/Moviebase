@@ -89,6 +89,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsyncProcess.cs" />
     <Compile Include="Commons.cs" />
     <Compile Include="ComponentManager.cs" />
     <Compile Include="Contracts\CsvExportMap.cs" />
@@ -101,6 +102,7 @@
     <Compile Include="IComponentManager.cs" />
     <Compile Include="IReturningWorker.cs" />
     <Compile Include="IThumbnailFolder.cs" />
+    <Compile Include="ProcessRedirectStream.cs" />
     <Compile Include="ThumbnailFolder.cs" />
     <Compile Include="IniFile.cs" />
     <Compile Include="Native\NativeMethods.cs" />

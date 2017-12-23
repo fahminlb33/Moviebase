@@ -1,8 +1,10 @@
-﻿namespace Moviebase.Core
+﻿using System.Threading.Tasks;
+
+namespace Moviebase.Core
 {
     public interface IComponentManager
     {
-        bool CheckGuessItInstallation();
-        bool CheckPythonInstallation();
+        Task<bool> CheckGuessItInstallation();
+        Task<bool> CheckPythonInstallation();
     }
 }

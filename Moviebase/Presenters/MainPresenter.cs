@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -81,6 +80,7 @@ namespace Moviebase.Presenters
                 Model.LblPercentageText = $"{progressPercentage}%";
             }
 
+            if (state == null) return;
             if (state.GetType() == typeof(MovieEntryState))
             {
                 var arg = (MovieEntryState)state;
