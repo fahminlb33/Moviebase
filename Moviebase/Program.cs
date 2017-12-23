@@ -35,12 +35,14 @@ namespace Moviebase
             var appSettings = Settings.Default;
 
             // services
-            AppKernel.Rebind<ITmdb>().To<Tmdb>().InSingletonScope().WithConstructorArgument("apiKey", appSettings.TmdbApiKey);
+            AppKernel.Rebind<ITmdb>().To<Tmdb>().InSingletonScope();
             AppKernel.Rebind<IGuessit>().To<Guessit>().InSingletonScope();
             AppKernel.Rebind<IPersistentDataManager>().To<PersistentDataManager>().InSingletonScope();
             AppKernel.Rebind<IThumbnailFolder>().To<ThumbnailFolder>().InSingletonScope();
             AppKernel.Rebind<IComponentManager>().To<ComponentManager>().InSingletonScope();
             AppKernel.Rebind<IWorkerPool>().To<WorkerPool>();
+            AppKernel.Rebind<ITmdbWebRequest>().To<TmdbWebRequest>()
+                .WithConstructorArgument("apiKey", appSettings.TmdbApiKey);
 
             // workers
             AppKernel.Rebind<IMoveMovieWorker>().To<MoveMoviesWorker>();
