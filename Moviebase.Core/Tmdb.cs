@@ -10,11 +10,11 @@ namespace Moviebase.Core
 {
     public class Tmdb : ITmdb, IDisposable
     {
-        private readonly TmdbWebRequest _webApi;
+        private readonly ITmdbWebRequest _webApi;
 
-        public Tmdb(string apiKey)
+        public Tmdb(ITmdbWebRequest tmdbWebRequest)
         {
-            _webApi = new TmdbWebRequest(apiKey);
+            _webApi = tmdbWebRequest;
         }
 
         #region ITmdb Implementation

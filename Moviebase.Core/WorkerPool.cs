@@ -22,27 +22,43 @@ namespace Moviebase.Core
             _cancellationToken = new CancellationTokenSource();
         }
 
-        public void Start(IWorker worker)
+        public void Start(INonReturningWorker worker)
         {
-            
+            if (_isWorking)
+                throw new InvalidOperationException("Could not start another task. Existing task is currently running.");
 
             RecreateCancellationToken();
-            Task.Run(() => RunWorkerStarted?.Invoke())
-                .ContinueWith(x=> RunTasks(worker.CreateTasks()))
-                .ContinueWith(x=>RunWorkerCompleted?.Invoke());
+            Task.Run(() => RunWorkerStartedCallback())
+                .ContinueWith(x => RunTasks(worker.CreateTasks()))
+                .ContinueWith(x => RunWorkerCompletedCallback());
         }
 
         public void Start<T>(IReturningWorker<T> worker)
         {
+            if (_isWorking)
+                throw new InvalidOperationException("Could not start another task. Existing task is currently running.");
+
             RecreateCancellationToken();
-            Task.Run(() => RunWorkerStarted?.Invoke())
+            Task.Run(() => RunWorkerStartedCallback())
                 .ContinueWith(x => RunTasks(worker.CreateTasks()))
-                .ContinueWith(x => RunWorkerCompleted?.Invoke());
+                .ContinueWith(x => RunWorkerCompletedCallback());
         }
 
         public void Stop()
         {
-            _cancellationToken?.Cancel();
+            if (_isWorking) _cancellationToken?.Cancel();
+        }
+
+        private void RunWorkerStartedCallback()
+        {
+            _isWorking = true;
+            RunWorkerStarted?.Invoke();
+        }
+
+        private void RunWorkerCompletedCallback()
+        {
+            _isWorking = false;
+            RunWorkerCompleted?.Invoke();
         }
 
         private void RecreateCancellationToken()

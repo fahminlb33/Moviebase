@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Moviebase.Core.Contracts;
 using Moviebase.Entities;
@@ -10,40 +11,37 @@ using NLog;
 
 namespace Moviebase.Core.Workers
 {
-    public class PosterDownloadWorker : IPosterDownloadWorker, IDisposable
+    public class PosterDownloadWorker : IPosterDownloadWorker
     {
         private static Logger _log = LogManager.GetCurrentClassLogger();
-        private readonly ITmdb _tmdb;
-        private readonly WebClient _wc;
+        private readonly ITmdbWebRequest _tmdbWebRequest;
 
         public List<MovieEntryFacade> MovieEntries { get; set; }
         public string FileName { get; set; }
         public bool OverwritePoster { get; set; }
 
-        public PosterDownloadWorker(ITmdb tmdb)
+        public PosterDownloadWorker(ITmdbWebRequest tmdbWebRequest)
         {
-            _tmdb = tmdb;
-            _wc = new WebClient();
+            _tmdbWebRequest = tmdbWebRequest;
         }
         
         public IEnumerable<Task> CreateTasks()
         {
             foreach (var entry in MovieEntries)
             {
-                yield return new Task(() =>
+                yield return Task.Run(() =>
                 {
-                    _log.Info("Processing: " + entry.Title);
-
                     try
                     {
-                        var url = _tmdb.GetPosterUrl(entry.InternalMovieData.PosterPath, PosterSize.original);
+                        _log.Info("Processing: " + entry.Title);
+                        var url = _tmdbWebRequest.BuildPosterUrl(entry.InternalMovieData.PosterPath, PosterSize.original);
 
                         var destFolder = new PowerPath(entry.FullPath).GetDirectoryPath();
                         var destFile = Path.Combine(destFolder, FileName);
 
                         var isExist = File.Exists(destFile);
                         if (isExist && OverwritePoster) File.Delete(destFile);
-                        if (!isExist || OverwritePoster) _wc.DownloadFile(url, destFile);
+                        if (!isExist || OverwritePoster) _tmdbWebRequest.DownloadFile(url, destFile);
 
                         _log.Info("Processed: " + entry.Title);
                     }
@@ -54,29 +52,5 @@ namespace Moviebase.Core.Workers
                 });
             }
         }
-
-        #region IDisposable Support
-        private bool _disposedValue; // To detect redundant calls
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposedValue) return;
-            if (disposing)
-            {
-                if (_wc != null) _wc.Dispose();
-                if (MovieEntries != null) MovieEntries.Clear();
-                    
-            }
-
-            MovieEntries = null;
-
-            _disposedValue = true;
-        }
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-        #endregion
-
     }
 }

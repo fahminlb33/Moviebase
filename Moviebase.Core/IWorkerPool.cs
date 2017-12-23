@@ -8,7 +8,7 @@ namespace Moviebase.Core
         Action RunWorkerCompleted { get; set; }
         Action<int, object> ProgressChanged { get; set; }
 
-        void Start(IWorker worker);
+        void Start(INonReturningWorker worker);
         void Start<T>(IReturningWorker<T> worker);
         void Stop();
     }

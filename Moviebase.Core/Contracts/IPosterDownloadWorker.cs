@@ -3,7 +3,7 @@ using Moviebase.Entities;
 
 namespace Moviebase.Core.Contracts
 {
-    public interface IPosterDownloadWorker : IWorker
+    public interface IPosterDownloadWorker : INonReturningWorker
     {
         List<MovieEntryFacade> MovieEntries { get; set; }
         string FileName { get; set; }

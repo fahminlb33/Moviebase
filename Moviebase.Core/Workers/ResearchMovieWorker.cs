@@ -29,17 +29,21 @@ namespace Moviebase.Core.Workers
 
         public IEnumerable<Task<ResearchMovieEntryState>> CreateTasks()
         {
-            yield return new Task<ResearchMovieEntryState>(() =>
+            yield return Task.Run(async () =>
             {
                 _log.Debug("Task started.");
 
                 try
                 {
                     var name = _guessit.RealGuessName(Path.GetFileName(FullPath));
-                    var found = _tmdb.SearchMovies(name.Title, 0);
+                    var found = await _tmdb.SearchMovies(name.Title, 0);
 
-                    var movieTitles = found.Select(movieId => _tmdb.GetByTmdbId(movieId))
-                        .ToDictionary(result => result.Id.ToString());
+                    var movieTitles = new Dictionary<string, TmdbResult>();
+                    foreach (var movieId in found)
+                    {
+                        var task = await _tmdb.GetByTmdbId(movieId);
+                        movieTitles.Add(task.Id.ToString(), task);
+                    }
                     var movieTitleSelection = movieTitles.Values.Select(x => $"{x.Id}:   {x.Title} ({x.Year})").ToArray();
 
                     var choose = View.ShowComboBoxInput("Select alternative.", movieTitleSelection, out string choosenName);

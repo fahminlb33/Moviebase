@@ -7,7 +7,7 @@ using NLog;
 
 namespace Moviebase.Core.Workers
 {
-    public class MoveMoviesWorker : IMoveMovieWorker, IDisposable
+    public class MoveMoviesWorker : IMoveMovieWorker
     {
         private static Logger _log = LogManager.GetCurrentClassLogger();
 
@@ -46,27 +46,5 @@ namespace Moviebase.Core.Workers
                 });
             }
         }
-
-        #region IDisposable Support
-        private bool _disposedValue; // To detect redundant calls
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposedValue) return;
-            if (disposing)
-            {
-                if (FileExtensions != null) FileExtensions.Clear();
-            }
-
-            FileExtensions = null;
-
-            _disposedValue = true;
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-        #endregion
     }
 }

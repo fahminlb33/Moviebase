@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Specialized;
+using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,7 +10,7 @@ using NLog;
 
 namespace Moviebase.Core
 {
-    internal class TmdbWebRequest : IDisposable
+    public class TmdbWebRequest : IDisposable, ITmdbWebRequest
     {
         public const string ApiEndpoint = "api.themoviedb.org";
         public const string PosterEndPoint = "https://image.tmdb.org/t/p/";
@@ -38,12 +39,30 @@ namespace Moviebase.Core
             try
             {
                 var response = await _wc.GetAsync(uri);
+                response.EnsureSuccessStatusCode();
                 return JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync());
             }
             catch (Exception e)
             {
                 _log.Error(e, "Error requesting API.");
                 return default(T);
+            }
+        }
+
+        public async Task DownloadFile(string url, string outputPath)
+        {
+            FileStream fs = null;
+            try
+            {
+                var response = await _wc.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+                fs = new FileStream(outputPath, FileMode.Create, FileAccess.Write, FileShare.None);
+                await response.Content.CopyToAsync(fs).ContinueWith(t => fs.Close());
+            }
+            catch (Exception e)
+            {
+                fs?.Close();
+                _log.Error(e, "Error requesting API.");
             }
         }
 

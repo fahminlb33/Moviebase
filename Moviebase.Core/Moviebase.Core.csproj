@@ -95,6 +95,7 @@
     <Compile Include="Contracts\ICsvExportWorker.cs" />
     <Compile Include="Contracts\IResearchMovieWorker.cs" />
     <Compile Include="Contracts\IThumbnailFolderWorker.cs" />
+    <Compile Include="ITmdbWebRequest.cs" />
     <Compile Include="IWorkerPool.cs" />
     <Compile Include="MovieEntryState.cs" />
     <Compile Include="IComponentManager.cs" />
@@ -108,7 +109,7 @@
     <Compile Include="IGuessit.cs" />
     <Compile Include="Contracts\IMoveMovieWorker.cs" />
     <Compile Include="Contracts\ISavePresistDataWorker.cs" />
-    <Compile Include="IWorker.cs" />
+    <Compile Include="INonReturningWorker.cs" />
     <Compile Include="ITmdb.cs" />
     <Compile Include="TmdbWebRequest.cs" />
     <Compile Include="IPersistentDataManager.cs" />

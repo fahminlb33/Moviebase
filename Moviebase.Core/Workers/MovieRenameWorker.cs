@@ -9,7 +9,7 @@ using NLog;
 
 namespace Moviebase.Core.Workers
 {
-    public class MovieRenameWorker : IMovieRenameWorker, IDisposable
+    public class MovieRenameWorker : IMovieRenameWorker
     {
         private static Logger _log = LogManager.GetCurrentClassLogger();
 
@@ -24,7 +24,7 @@ namespace Moviebase.Core.Workers
         {
             foreach (var entry in MovieEntries)
             {
-                yield return new Task(() =>
+                yield return Task.Run(() =>
                 {
                     try
                     {
@@ -75,27 +75,5 @@ namespace Moviebase.Core.Workers
             Debug.Assert(name != null);
             entry.FullPath = Path.Combine(directoryPath, name);
         }
-
-        #region IDisposable Support
-        private bool _disposedValue; // To detect redundant calls
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposedValue) return;
-            if (disposing)
-            {
-                if (MovieEntries != null) MovieEntries.Clear();
-            }
-
-            MovieEntries = null;
-
-            _disposedValue = true;
-        }
-        
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-        #endregion
     }
 }

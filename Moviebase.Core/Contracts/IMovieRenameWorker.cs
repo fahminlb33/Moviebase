@@ -3,7 +3,7 @@ using Moviebase.Entities;
 
 namespace Moviebase.Core.Contracts
 {
-    public interface IMovieRenameWorker : IWorker
+    public interface IMovieRenameWorker : INonReturningWorker
     {
         List<MovieEntryFacade> MovieEntries { get; set; }
         string FileRenamePattern { get; set; }

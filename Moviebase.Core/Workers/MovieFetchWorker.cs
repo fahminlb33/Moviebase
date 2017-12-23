@@ -9,7 +9,7 @@ using NLog;
 
 namespace Moviebase.Core.Workers
 {
-    public class MovieFetchWorker : IMovieFetchWorker, IDisposable
+    public class MovieFetchWorker : IMovieFetchWorker
     {
         private static Logger _log = LogManager.GetCurrentClassLogger();
         private readonly ITmdb _tmdb;
@@ -27,7 +27,7 @@ namespace Moviebase.Core.Workers
         {
             foreach (var analyzeItem in AnalyzeItems)
             {
-                yield return new Task<MovieEntryState>(() =>
+                yield return Task.Run(async () =>
                 {
                     _log.Info("Processing: " + analyzeItem);
                     TmdbResult newData = null;
@@ -36,11 +36,12 @@ namespace Moviebase.Core.Workers
                         var name = _guessit.RealGuessName(Path.GetFileName(analyzeItem));
                         if (name?.ImdbId != null)
                         {
-                            newData = _tmdb.GetByImdbId(name.ImdbId);
+                            newData = await _tmdb.GetByImdbId(name.ImdbId);
                         }
                         else if (name?.Title != null)
                         {
-                            newData = _tmdb.GetByTmdbId(_tmdb.SearchMovies(name.Title, name.Year).First());
+                            var movies = await _tmdb.SearchMovies(name.Title, name.Year);
+                            newData = await _tmdb.GetByTmdbId(movies.First());
                         }
                     }
                     catch (Exception e)
@@ -59,28 +60,5 @@ namespace Moviebase.Core.Workers
                 });
             }
         }
-
-        #region IDisposable Support
-        private bool _disposedValue; // To detect redundant calls
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposedValue) return;
-            if (disposing)
-            {
-                if (AnalyzeItems != null) AnalyzeItems.Clear();
-            }
-
-            AnalyzeItems = null;
-
-            _disposedValue = true;
-        }
-        
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-        #endregion
-
     }
 }

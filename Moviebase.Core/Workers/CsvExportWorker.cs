@@ -18,12 +18,11 @@ namespace Moviebase.Core.Workers
 
         public IEnumerable<Task> CreateTasks()
         {
-            yield return new Task(() =>
+            yield return Task.Run(() =>
             {
-                _log.Debug("Task started.");
-
                 try
                 {
+                    _log.Debug("Task started.");
                     using (var textStream = new StreamWriter(OutputPath, false))
                     using (var csvWriter = new CsvWriter(textStream))
                     {

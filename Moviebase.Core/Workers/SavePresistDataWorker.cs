@@ -8,7 +8,7 @@ using NLog;
 
 namespace Moviebase.Core.Workers
 {
-    public class SavePresistDataWorker : ISavePresistDataWorker, IDisposable
+    public class SavePresistDataWorker : ISavePresistDataWorker
     {
         private static Logger _log = LogManager.GetCurrentClassLogger();
         private readonly IPersistentDataManager _persistentDataManager;
@@ -24,12 +24,11 @@ namespace Moviebase.Core.Workers
         {
             foreach (var entry in SaveItems)
             {
-                yield return new Task(() =>
+                yield return Task.Run(() =>
                 {
-                    _log.Info("Processing: " + entry.Title);
-
                     try
                     {
+                        _log.Info("Processing: " + entry.Title);
                         _persistentDataManager.SaveData(entry.InternalMovieData, Path.GetDirectoryName(entry.FullPath));
 
                         _log.Info("Processed: " + entry.Title);
@@ -41,28 +40,5 @@ namespace Moviebase.Core.Workers
                 });
             }
         }
-
-        #region IDisposable Support
-        private bool _disposedValue; // To detect redundant calls
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposedValue) return;
-            if (disposing)
-            {
-                if (SaveItems != null) SaveItems.Clear();
-            }
-
-            SaveItems = null;
-
-            _disposedValue = true;
-        }
-        
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-        #endregion
-
     }
 }

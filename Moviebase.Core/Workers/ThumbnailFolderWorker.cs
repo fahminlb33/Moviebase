@@ -7,7 +7,7 @@ using NLog;
 
 namespace Moviebase.Core.Workers
 {
-    public class ThumbnailFolderWorker : IThumbnailFolderWorker, IDisposable
+    public class ThumbnailFolderWorker : IThumbnailFolderWorker
     {
         private static Logger _log = LogManager.GetCurrentClassLogger();
         private readonly IThumbnailFolder _thumbnailFolder;
@@ -24,12 +24,11 @@ namespace Moviebase.Core.Workers
         {
             foreach (var dirPath in MovieDirectories)
             {
-                yield return new Task(() =>
+                yield return Task.Run(() =>
                 {
-                    _log.Info("Processing: " + dirPath);
-
                     try
                     {
+                        _log.Info("Processing: " + dirPath);
                         var posterPath = Path.Combine(dirPath, PosterName + Commons.JpgFileExtension);
                         if (!File.Exists(posterPath)) return;
 
@@ -45,27 +44,5 @@ namespace Moviebase.Core.Workers
                 });
             }
         }
-
-        #region IDisposable Support
-        private bool _disposedValue; // To detect redundant calls
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposedValue) return;
-            if (disposing)
-            {
-                if (MovieDirectories != null) MovieDirectories.Clear();
-            }
-            MovieDirectories = null;
-
-            _disposedValue = true;
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-        #endregion
-
     }
 }
