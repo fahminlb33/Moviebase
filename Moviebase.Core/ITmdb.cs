@@ -11,7 +11,7 @@ namespace Moviebase.Core
 
         Task<TmdbResult> GetByImdbId(string id);
         Task<TmdbResult> GetByTmdbId(string id);
-        TmdbResult GetByFilename(string filename);
+        Task<TmdbResult> GetByFilename(string filename);
 
         Task<List<string>> GetPosterUris(string id);
         string GetPosterUrl(string path, PosterSize size);

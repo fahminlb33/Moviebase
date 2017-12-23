@@ -31,8 +31,9 @@ namespace Moviebase.Core
             return response.total_results <= 0 ? null : response.results.Select(x => x.id.ToString()).ToList();
         }
 
-        public TmdbResult GetByFilename(string filename)
+        public async Task<TmdbResult> GetByFilename(string filename)
         {
+            await Task.Yield();
             return new TmdbResult
             {
                 Title = filename,
