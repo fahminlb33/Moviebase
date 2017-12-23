@@ -27,6 +27,7 @@ namespace Moviebase.Views
 
             var versionPart = version.FileVersion.Split('.');
             lblVersion.Text = string.Format(StringResources.VersionStringPattern, versionPart[0], versionPart[1], versionPart[2], versionPart[3]);
+            button1.Focus();
         }
 
         private void button1_Click(object sender, EventArgs e)

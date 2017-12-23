@@ -55,8 +55,7 @@ namespace Moviebase.Views
                 cmdSearch.Enabled = true;
             }, null);
         }
-
-        private void cmdBrowse_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private void btnBrowse_Click(object sender, EventArgs e)
         {
             if (folderBrowser.ShowDialog() != DialogResult.OK) return;
             txtPath.Text = folderBrowser.SelectedPath;
