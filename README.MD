@@ -7,7 +7,7 @@
 Moviebase is all-in-one movie management tool. Simply organize, rename, 
 download poster, and create folder thumbnail.
 
-![Main](https://image.ibb.co/hDNBPm/Moviebase_2017_12_20_13_21_52.png)
+![Main](https://image.ibb.co/eWPqN6/Shoot000.png)
 
 ## Features
 

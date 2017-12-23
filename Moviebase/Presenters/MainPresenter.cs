@@ -254,10 +254,10 @@ namespace Moviebase.Presenters
 
         public void CheckComponents()
         {
-            Task.Run(async () =>
+            Task.Run(  () =>
             {
                 var comp = _kernel.Get<IComponentManager>();
-                if (await comp.CheckPythonInstallation() && await comp.CheckGuessItInstallation()) return;
+                if (  comp.CheckPythonInstallation().Result &&   comp.CheckGuessItInstallation().Result) return;
 
                 View.ShowMessageBox(StringResources.ComponentMissingMessage, StringResources.AppName,
                     icon: MessageBoxIcon.Exclamation);

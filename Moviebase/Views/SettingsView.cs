@@ -98,11 +98,11 @@ namespace Moviebase.Views
                 {
                     var comp = Program.AppKernel.Get<IComponentManager>();
 
-                    var python = comp.CheckPythonInstallation();
-                    Invoke(new  Action(async () => picPython.Image = await python ? Resources.tick : Resources.cross));
+                    var python = comp.CheckPythonInstallation().Result;
+                    Invoke(new  Action(  () => picPython.Image =   python ? Resources.tick : Resources.cross));
 
-                    var guessit = comp.CheckGuessItInstallation();
-                    Invoke(new Action(async () => picGuessit.Image = await guessit ? Resources.tick : Resources.cross));
+                    var guessit = comp.CheckGuessItInstallation().Result;
+                    Invoke(new Action(  () => picGuessit.Image =   guessit ? Resources.tick : Resources.cross));
                 }
                 catch (Exception er)
                 {
