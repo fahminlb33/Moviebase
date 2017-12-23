@@ -1,6 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,10 +7,11 @@ using Moviebase.Entities;
 using System.Windows.Forms;
 using BlastMVP;
 using NLog;
+using System.Collections.Generic;
 
 namespace Moviebase.Core.Workers
 {
-    public class ResearchMovieWorker : WorkerBase, IResearchMovieWorker
+    public class ResearchMovieWorker : IResearchMovieWorker
     {
         private static Logger _log = LogManager.GetCurrentClassLogger();
         private readonly ITmdb _tmdb;
@@ -28,50 +27,42 @@ namespace Moviebase.Core.Workers
             _guessit = guessit;
         }
 
-        public override void RunWorker()
+        public IEnumerable<Task<ResearchMovieEntryState>> CreateTasks()
         {
-            Task.Run(() => InternalRunWorker(null));
-        }
-
-        protected override void InternalRunWorker(object arg)
-        {
-            _log.Debug("Task started.");
-            OnRunWorkerStarted(this, EventArgs.Empty);
-
-            try
+            yield return Task.Run(async () =>
             {
-                OnProgressChanged(this, new ProgressChangedEventArgs(-1, null));
-                var name = _guessit.RealGuessName(Path.GetFileName(FullPath));
-                var found = _tmdb.SearchMovies(name.Title, 0);
+                _log.Debug("Task started.");
 
-                var movieTitles = found.Select(movieId => _tmdb.GetByTmdbId(movieId))
-                    .ToDictionary(result => result.Id.ToString());
-                var movieTitleSelection = movieTitles.Values.Select(x => $"{x.Id}:   {x.Title} ({x.Year})").ToArray();
-
-                var choose = View.ShowComboBoxInput("Select alternative.", movieTitleSelection, out string choosenName);
-                if (choose != DialogResult.OK) goto finish;
-
-                foreach (var movieTitle in movieTitles)
+                try
                 {
-                    if (movieTitle.Value.Id.ToString() == choosenName.Split(':')[0])
+                    var name = await _guessit.RealGuessName(Path.GetFileName(FullPath));
+                    var found = await _tmdb.SearchMovies(name.Title, 0);
+
+                    var movieTitles = new Dictionary<string, TmdbResult>();
+                    foreach (var movieId in found)
                     {
-                        OnProgressChanged(this, new ProgressChangedEventArgs(-1, new ResearchMovieWorkerState
+                        var task = await _tmdb.GetByTmdbId(movieId);
+                        movieTitles.Add(task.Id.ToString(), task);
+                    }
+                    var movieTitleSelection = movieTitles.Values.Select(x => $"{x.Id}:   {x.Title} ({x.Year})").ToArray();
+
+                    var choose = View.ShowComboBoxInput("Select alternative.", movieTitleSelection, out string choosenName);
+                    if (choose != DialogResult.OK) return null;
+
+                    return (from movieTitle in movieTitles
+                        where movieTitle.Value.Id.ToString() == choosenName.Split(':')[0]
+                        select new ResearchMovieEntryState
                         {
                             Entry = new MovieEntryFacade(movieTitle.Value, FullPath),
                             Index = Index
-                        }));
-                    }
+                        }).FirstOrDefault();
                 }
-                
-                finish:
-                _log.Debug("Task finished.");
-                OnRunWorkerCompleted(this, new RunWorkerCompletedEventArgs(null, null, false));
-            }
-            catch (Exception e)
-            {
-                _log.Error(e, "Task finished with error.");
-                OnRunWorkerCompleted(this, new RunWorkerCompletedEventArgs(null, e, true));
-            }
+                catch (Exception e)
+                {
+                    _log.Error(e, "Task finished with error.");
+                    return null;
+                }
+            });
         }
     }
 }

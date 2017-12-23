@@ -2,7 +2,7 @@
 
 namespace Moviebase.Core.Contracts
 {
-    public interface IThumbnailFolderWorker : IWorker
+    public interface IThumbnailFolderWorker : INonReturningWorker
     {
         List<string> MovieDirectories { get; set; }
         string PosterName { get; set; }

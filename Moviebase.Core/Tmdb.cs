@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading.Tasks;
 using Moviebase.Entities;
 using Moviebase.Entities.Web;
 
@@ -9,20 +10,15 @@ namespace Moviebase.Core
 {
     public class Tmdb : ITmdb, IDisposable
     {
-        private const string ApiEndpoint = "https://api.themoviedb.org/3";
-        private const string PosterEndPoint = "https://image.tmdb.org/t/p/";
+        private readonly ITmdbWebRequest _webApi;
 
-        private readonly UriBuilderHelper _uriBuilder;
-        private readonly HttpWebRequester _webApi;
-
-        public Tmdb(string apiKey)
+        public Tmdb(ITmdbWebRequest tmdbWebRequest)
         {
-            _uriBuilder = new UriBuilderHelper(ApiEndpoint, apiKey);
-            _webApi = new HttpWebRequester();
+            _webApi = tmdbWebRequest;
         }
 
         #region ITmdb Implementation
-        public List<string> SearchMovies(string query, int year = 0)
+        public async Task<List<string>> SearchMovies(string query, int year = 0)
         {
             var param = new NameValueCollection
             {
@@ -31,31 +27,29 @@ namespace Moviebase.Core
             };
             if (year > 0) param.Add("year", year.ToString());
 
-            var uri = _uriBuilder.BuildUri("/search/movie", param);
-            var response = _webApi.GetRequestBody<MovieSearchRoot>(uri);
-
+            var response = await _webApi.GetRequestBody<MovieSearchRoot>(TmdbWebRequest.SearchMoviePath, param);
             return response.total_results <= 0 ? null : response.results.Select(x => x.id.ToString()).ToList();
         }
 
-        public TmdbResult GetByFilename(string filename)
+        public async Task<TmdbResult> GetByFilename(string filename)
         {
+            await Task.Yield();
             return new TmdbResult
             {
                 Title = filename,
             };
         }
 
-        public TmdbResult GetByTmdbId(string id)
+        public async Task<TmdbResult> GetByTmdbId(string id)
         {
             if (id == "-1") return null;
             var col = new NameValueCollection
             {
                 { "append_to_response", "alternative_titles" }
             };
-            var uri = _uriBuilder.BuildUri($"/movie/{id}", col);
-            var response = _webApi.GetRequestBody<MovieDetailsRoot>(uri);
 
-            // parse
+            // get
+            var response = await _webApi.GetRequestBody<MovieDetailsRoot>(string.Format(TmdbWebRequest.MoviePath, id), col);
             var data = new TmdbResult
             {
                 Id = response.id,
@@ -71,37 +65,35 @@ namespace Moviebase.Core
             return data;
         }
 
-        public TmdbResult GetByImdbId(string id)
+        public async Task<TmdbResult> GetByImdbId(string id)
         {
             var col = new NameValueCollection
             {
                 { "external_source", "imdb_id" }
             };
-            var uri = _uriBuilder.BuildUri($"/find/{id}", col);
-            var response = _webApi.GetRequestBody<FindRoot>(uri);
 
+            var response = await _webApi.GetRequestBody<FindRoot>(string.Format(TmdbWebRequest.FindPath, id), col);
             if (response.movie_results != null && response.movie_results.Count > 0)
             {
-                return GetByTmdbId(response.movie_results.First().id.ToString());
+                return await GetByTmdbId(response.movie_results.First().id.ToString());
             }
             return null;
         }
 
-        public string[] GetPosterUris(string id)
+        public async Task<List<string>> GetPosterUris(string id)
         {
             var col = new NameValueCollection
             {
                 { "include_image_language", "en,null" }
             };
-            var uri = _uriBuilder.BuildUri($"/movie/{id}/images", col);
-            var response = _webApi.GetRequestBody<PosterFindRoot>(uri);
 
-            return response.posters.Select(x => x.file_path).ToArray();
+            var response = await _webApi.GetRequestBody<PosterFindRoot>(string.Format(TmdbWebRequest.PostersPath, id), col);
+            return response.posters.Select(x => x.file_path).ToList();
         }
 
         public string GetPosterUrl(string path, PosterSize size)
         {
-            return PosterEndPoint + size + path;
+            return _webApi.BuildPosterUrl(path, size);
         }
         
         #endregion

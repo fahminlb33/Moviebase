@@ -1,128 +1,158 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using NLog;
 
 namespace Moviebase.Core
 {
-    public class WorkerPool : IDisposable
+    public class WorkerPool : IWorkerPool
     {
         private static Logger _log = LogManager.GetCurrentClassLogger();
-        private readonly Queue<IWorker> _waitingWorkers;
-        private WorkerBase _worker;
-        private bool _isWorkerRunning;
-
-        public event EventHandler<ProgressChangedEventArgs> ProgressChanged;
-        public event EventHandler RunWorkerCompleted;
-        public event EventHandler RunWorkerStarted;
+        private CancellationTokenSource _cancellationToken;
+        private bool _isWorking;
+        
+        public Action RunWorkerStarted { get; set; }
+        public Action RunWorkerCompleted { get; set; }
+        public Action<int, object> ProgressChanged { get; set; }
 
         public WorkerPool()
         {
-            _waitingWorkers = new Queue<IWorker>();
+            _cancellationToken = new CancellationTokenSource();
         }
 
-        public void RunWorker(IWorker worker)
+        public void Start(INonReturningWorker worker)
         {
-            if (worker == null) throw new ArgumentNullException(nameof(worker));
-            if (_isWorkerRunning)
-            {
-                _waitingWorkers.Enqueue(worker);
-                _log.Debug("Work queued.");
-            }
-            else
-            {
-                if (_worker != null)
-                {
-                    _worker.ProgressChanged -= worker_ProgressChanged;
-                    _worker.RunWorkerCompleted -= worker_RunWorkerCompleted;
-                    _worker.RunWorkerStarted -= worker_RunWorkerStarted;
-                    _worker.Dispose();
-                }
+            if (_isWorking)
+                throw new InvalidOperationException("Could not start another task. Existing task is currently running.");
 
-                _worker = (WorkerBase)worker;
-                _worker.ProgressChanged += worker_ProgressChanged;
-                _worker.RunWorkerCompleted += worker_RunWorkerCompleted;
-                _worker.RunWorkerStarted += worker_RunWorkerStarted;
+            RecreateCancellationToken();
+            Task.Run(() => RunWorkerStartedCallback())
+                .ContinueWith(x => RunTasks(worker.CreateTasks()))
+                .ContinueWith(x => RunWorkerCompletedCallback());
+        }
 
-                _log.Debug("Running work...");
-                _worker.RunWorker();
-                _isWorkerRunning = true;
-            }
+        public void Start<T>(IReturningWorker<T> worker)
+        {
+            if (_isWorking)
+                throw new InvalidOperationException("Could not start another task. Existing task is currently running.");
+
+            RecreateCancellationToken();
+            Task.Run(() => RunWorkerStartedCallback())
+                .ContinueWith(x => RunTasks(worker.CreateTasks()))
+                .ContinueWith(x => RunWorkerCompletedCallback());
         }
 
         public void Stop()
         {
-            _worker?.Cancel();
-            _waitingWorkers.Clear();
+            if (_isWorking) _cancellationToken?.Cancel();
         }
 
-        #region Event Invocator
-        private void worker_RunWorkerCompleted(object sender, EventArgs e)
+        private void RunWorkerStartedCallback()
         {
-            _isWorkerRunning = false;
-            if (_waitingWorkers.Count > 0)
+            _isWorking = true;
+            RunWorkerStarted?.Invoke();
+        }
+
+        private void RunWorkerCompletedCallback()
+        {
+            _isWorking = false;
+            RunWorkerCompleted?.Invoke();
+        }
+
+        private void RecreateCancellationToken()
+        {
+            _cancellationToken?.Dispose();
+            _cancellationToken = new CancellationTokenSource();
+        }
+
+        private async void RunTasks<T>(IEnumerable<Task<T>> tasks)
+        {
+            foreach (var bucket in Interleaved(tasks))
             {
-                RunWorker(_waitingWorkers.Dequeue());
-            }
-            else
-            {
-                OnRunWorkerCompleted();
-            }
-        }
-
-        private void worker_RunWorkerStarted(object sender, EventArgs e)
-        {
-            OnRunWorkerStarted();
-        }
-
-        private void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            OnProgressChanged(e);
-        }
-
-        protected virtual void OnProgressChanged(ProgressChangedEventArgs e)
-        {
-            ProgressChanged?.Invoke(this, e);
-        }
-
-        protected virtual void OnRunWorkerCompleted()
-        {
-            RunWorkerCompleted?.Invoke(this, EventArgs.Empty);
-        }
-
-        protected virtual void OnRunWorkerStarted()
-        {
-            RunWorkerStarted?.Invoke(this, EventArgs.Empty);
-        }
-        #endregion
-
-        #region IDisposable Support
-        private bool _disposedValue; // To detect redundant calls
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposedValue) return;
-            if (disposing)
-            {
-                if (_worker != null) _worker.Dispose();
-                if (_waitingWorkers != null)
+                var t = await bucket;
+                try
                 {
-                    foreach (var waitingWorker in _waitingWorkers)
-                    {
-                        ((IDisposable) waitingWorker)?.Dispose();
-                    }
-
-                    _waitingWorkers.Clear();
+                    ProgressChanged?.Invoke(0, await t);
+                }
+                catch (OperationCanceledException)
+                {
+                }
+                catch (Exception exc)
+                {
+                    _log.Error(exc);
                 }
             }
-            
-            _disposedValue = true;
         }
 
-        public void Dispose()
+        private async void RunTasks(IEnumerable<Task> tasks)
         {
-            Dispose(true);
+            foreach (var bucket in Interleaved(tasks))
+            {
+                var t = await bucket;
+                try
+                {
+                    await t;
+                }
+                catch (OperationCanceledException)
+                {
+                }
+                catch (Exception exc)
+                {
+                    _log.Error(exc);
+                }
+            }
         }
-        #endregion
+
+        private Task<Task<T>>[] Interleaved<T>(IEnumerable<Task<T>> tasks)
+        {
+            var inputTasks = tasks.ToList();
+
+            var buckets = new TaskCompletionSource<Task<T>>[inputTasks.Count];
+            var results = new Task<Task<T>>[buckets.Length];
+            for (int i = 0; i < buckets.Length; i++)
+            {
+                buckets[i] = new TaskCompletionSource<Task<T>>();
+                results[i] = buckets[i].Task;
+            }
+
+            int nextTaskIndex = -1;
+            Action<Task<T>> continuation = completed =>
+            {
+                var bucket = buckets[Interlocked.Increment(ref nextTaskIndex)];
+                bucket.TrySetResult(completed);
+            };
+
+            foreach (var inputTask in inputTasks)
+                inputTask.ContinueWith(continuation, _cancellationToken.Token, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
+
+            return results;
+        }
+
+        private Task<Task>[] Interleaved(IEnumerable<Task> tasks)
+        {
+            var inputTasks = tasks.ToList();
+
+            var buckets = new TaskCompletionSource<Task>[inputTasks.Count];
+            var results = new Task<Task>[buckets.Length];
+            for (int i = 0; i < buckets.Length; i++)
+            {
+                buckets[i] = new TaskCompletionSource<Task>();
+                results[i] = buckets[i].Task;
+            }
+
+            int nextTaskIndex = -1;
+            Action<Task> continuation = completed =>
+            {
+                var bucket = buckets[Interlocked.Increment(ref nextTaskIndex)];
+                bucket.TrySetResult(completed);
+            };
+
+            foreach (var inputTask in inputTasks)
+                inputTask.ContinueWith(continuation, _cancellationToken.Token, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
+
+            return results;
+        }
     }
 }

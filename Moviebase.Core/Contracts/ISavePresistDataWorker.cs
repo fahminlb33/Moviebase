@@ -3,7 +3,7 @@ using Moviebase.Entities;
 
 namespace Moviebase.Core.Contracts
 {
-    public interface ISavePresistDataWorker : IWorker
+    public interface ISavePresistDataWorker : INonReturningWorker
     {
         List<MovieEntryFacade> SaveItems { get; set; }
     }

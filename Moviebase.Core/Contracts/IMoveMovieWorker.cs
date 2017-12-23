@@ -2,7 +2,7 @@
 
 namespace Moviebase.Core.Contracts
 {
-    public interface IMoveMovieWorker : IWorker
+    public interface IMoveMovieWorker : IReturningWorker<string>
     {
         string AnalyzePath { get; set; }
         List<string> FileExtensions { get; set; }
