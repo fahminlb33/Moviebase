@@ -1,6 +1,8 @@
 # Moviebase
 
-![version](https://img.shields.io/badge/version-2.1-brightgreen.svg) ![build](https://img.shields.io/badge/build-38805-brightgreen.svg)
+![version](https://img.shields.io/badge/version-2.1-brightgreen.svg) 
+![build](https://img.shields.io/badge/build-38805-brightgreen.svg)
+[![Build Status](https://travis-ci.org/fahminlb33/Moviebase.svg?branch=master)](https://travis-ci.org/fahminlb33/Moviebase)
 
 Moviebase is all-in-one movie management tool. Simply organize, rename, 
 download poster, and create folder thumbnail.
