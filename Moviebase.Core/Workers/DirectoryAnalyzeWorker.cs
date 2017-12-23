@@ -26,7 +26,7 @@ namespace Moviebase.Core.Workers
             var dirEnumbEnumerable = Directory.EnumerateDirectories(AnalyzePath, "*", SearchOption.TopDirectoryOnly);
             foreach (var dirPath in dirEnumbEnumerable)
             {
-                yield return Task.Run(() =>
+                yield return Task.Run(async () =>
                 {
                     _log.Info("Processing: " + dirPath);
                     var currentFolder = new PowerPath(dirPath);
@@ -57,7 +57,7 @@ namespace Moviebase.Core.Workers
                     else
                     {
                         _log.Debug("Creating new data using GetByFilename.");
-                        entry = _tmdb.GetByFilename(currentMoviePath.GetFileNameWithoutExtension());
+                        entry = await _tmdb.GetByFilename(currentMoviePath.GetFileNameWithoutExtension());
                     }
 
                     // pop to event

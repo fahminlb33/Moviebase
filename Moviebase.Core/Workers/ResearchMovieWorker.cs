@@ -35,7 +35,7 @@ namespace Moviebase.Core.Workers
 
                 try
                 {
-                    var name = _guessit.RealGuessName(Path.GetFileName(FullPath));
+                    var name = await _guessit.RealGuessName(Path.GetFileName(FullPath));
                     var found = await _tmdb.SearchMovies(name.Title, 0);
 
                     var movieTitles = new Dictionary<string, TmdbResult>();

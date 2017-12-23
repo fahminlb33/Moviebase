@@ -33,7 +33,7 @@ namespace Moviebase.Core.Workers
                     TmdbResult newData = null;
                     try
                     {
-                        var name = _guessit.RealGuessName(Path.GetFileName(analyzeItem));
+                        var name = await _guessit.RealGuessName(Path.GetFileName(analyzeItem));
                         if (name?.ImdbId != null)
                         {
                             newData = await _tmdb.GetByImdbId(name.ImdbId);
@@ -49,7 +49,7 @@ namespace Moviebase.Core.Workers
                         _log.Error(e, "Process error: " + analyzeItem);
                     }
 
-                    newData = newData ?? _tmdb.GetByFilename(Path.GetFileName(analyzeItem));
+                    newData = newData ?? await _tmdb.GetByFilename(Path.GetFileName(analyzeItem));
                     var result = new MovieEntryFacade(newData, analyzeItem);
 
                     _log.Info("Processed: " + analyzeItem);
