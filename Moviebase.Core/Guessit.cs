@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Moviebase.Entities;
 using Newtonsoft.Json;
 using NLog;
@@ -17,28 +17,16 @@ namespace Moviebase.Core
             _imdbRegex = new Regex("[0-9]{7}", RegexOptions.Compiled);
         }
 
-        public GuessitResult RealGuessName(string filename)
+        public async Task<GuessitResult> RealGuessName(string filename)
         {
-            return GuessImdbId(filename) ?? GuessName(filename);
+            return await GuessImdbId(filename) ?? await GuessName(filename);
         }
 
-        public GuessitResult GuessName(string filename)
+        public async Task<GuessitResult> GuessName(string filename)
         {
             try
             {
-                var vp = new ProcessStartInfo
-                {
-                    Arguments = "-j \"" + filename + "\"",
-                    CreateNoWindow = true,
-                    FileName = "guessit",
-                    RedirectStandardOutput = true,
-                    UseShellExecute = false
-                };
-
-                var proc = Process.Start(vp);
-                Debug.Assert(proc != null);
-                var output = proc.StandardOutput.ReadToEnd();
-                proc.WaitForExit();
+                var output = await AsyncProcess.StartWithOuput("guessit", "-j \"" + filename + "\"", ProcessRedirectStream.StandardOuput);
                 return JsonConvert.DeserializeObject<GuessitResult>(output);
             }
             catch (Exception e)
@@ -48,8 +36,9 @@ namespace Moviebase.Core
             }
         }
 
-        public GuessitResult GuessImdbId(string filename)
+        public async Task<GuessitResult> GuessImdbId(string filename)
         {
+            await Task.Yield(); // TODO: is this the right usage of Task.Yield()?
             var matched = _imdbRegex.Match(filename);
             return matched.Success
                 ? new GuessitResult {ImdbId = matched.Value}
