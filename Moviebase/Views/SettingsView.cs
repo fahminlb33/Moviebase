@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -75,19 +76,13 @@ namespace Moviebase.Views
         {
             txtLastOpenDir.Text = "";
         }
-
-        private void cmdRemoveExt_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            if (lstExtensions.SelectedItem == null) return;
-            lstExtensions.Items.Remove(lstExtensions.SelectedItem);
-        }
-
+         
         private void cmdAddExt_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             var result = this.ShowInputBox(StringResources.AddExtensionMessage, StringResources.AddExtensionTitle, out string ext);
             if (result != DialogResult.OK) return;
 
-            if (!ext.StartsWith(".")) ext = "." + ext;
+            if (!ext.StartsWith(".", StringComparison.Ordinal)) ext = "." + ext;
             lstExtensions.Items.Add(Commons.StripWhitespace(ext));
         }
 
@@ -104,14 +99,14 @@ namespace Moviebase.Views
                     var comp = Program.AppKernel.Get<IComponentManager>();
 
                     var python = comp.CheckPythonInstallation();
-                    Invoke(new Action(() => picPython.Image = python ? Resources.tick : Resources.cross));
+                    Invoke(new  Action(async () => picPython.Image = await python ? Resources.tick : Resources.cross));
 
                     var guessit = comp.CheckGuessItInstallation();
-                    Invoke(new Action(() => picGuessit.Image = guessit ? Resources.tick : Resources.cross));
+                    Invoke(new Action(async () => picGuessit.Image = await guessit ? Resources.tick : Resources.cross));
                 }
-                catch
+                catch (Exception er)
                 {
-                    // ignored
+                    Debug.Print(er.ToString());
                 }
             }).ContinueWith(x =>
             {
@@ -119,9 +114,9 @@ namespace Moviebase.Views
                 {
                     Invoke(new Action(() => cmdDetect.Enabled = true));
                 }
-                catch
+                catch (Exception er)
                 {
-                    // ignored
+                    Debug.Print(er.ToString());
                 }
             });
         }
@@ -136,6 +131,31 @@ namespace Moviebase.Views
             {
                 Console.WriteLine(exception);
             }
+        }
+
+        private void cmdAdd_Click(object sender, EventArgs e)
+        {
+            var ext = txtExt.Text;
+            if (String.IsNullOrEmpty(ext))
+            {
+                MessageBox.Show("No Extension to Add", "Setting");
+                return;
+            }
+            if (!ext.StartsWith(".", StringComparison.Ordinal)) ext = "." + ext;
+            lstExtensions.Items.Add(Commons.StripWhitespace(ext));
+        }
+
+        private void cmdRemove_Click(object sender, EventArgs e)
+        { 
+            if (lstExtensions.SelectedItem == null) return;
+            lstExtensions.Items.Remove(lstExtensions.SelectedItem);
+        }
+
+        private void lstExtensions_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var a = lstExtensions.SelectedItem.ToString();
+            if(!string.IsNullOrEmpty(a))
+            txtExt.Text = a;
         }
     }
 }

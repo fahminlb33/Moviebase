@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using BlastMVP;
@@ -36,7 +37,9 @@ namespace Moviebase.Views
             var model = _presenter.Model;
             grdMovies.DataSource = model.DataView;
             
-            cmdDirectories.Bind(c => c.Enabled).To(model, m => m.CmdDirectoriesEnabled);
+            cmdFolderRecent.Bind(c => c.Enabled).To(model, m => m.CmdDirectoriesEnabled);
+            cmdFolderClose.Bind(c => c.Enabled).To(model, m => m.CmdDirectoriesEnabled);
+            cmdFolderOpen.Bind(c => c.Enabled).To(model, m => m.CmdDirectoriesEnabled);
             cmdActions.Bind(c => c.Enabled).To(model, m => m.CmdActionsEnabled);
             cmdTools.Bind(c => c.Enabled).To(model, m => m.CmdToolsEnabled);
             cmdStop.Bind(c => c.Enabled).To(model, m => m.CmdStopEnabled);
@@ -82,47 +85,7 @@ namespace Moviebase.Views
 
         #region Event Subscribers
 
-        // --------- FOLDERS 
-        private void mnuOpenDirectory_Click(object sender, EventArgs e)
-        {
-            if (_presenter.Model.DataView.Count > 0)
-            {
-                var result = this.ShowMessageBox(StringResources.AlreadyOpenedFolderMessage, StringResources.AppName,
-                    icon: MessageBoxIcon.Question);
-                if (result == DialogResult.OK)
-                {
-                    _presenter.CloseFolder();
-                }
-                else
-                {
-                    return;
-                }
-            }
 
-            _presenter.OpenDirectory(false);
-        }
-
-        private void mnuCloseFolder_Click(object sender, EventArgs e)
-        {
-            _presenter.CloseFolder();
-        }
-
-        private void mnuOpenLast_Click(object sender, EventArgs e)
-        {
-            if (_presenter.Model.DataView.Count > 0)
-            {
-                var result = this.ShowMessageBox(StringResources.AlreadyOpenedFolderMessage, StringResources.AppName, icon: MessageBoxIcon.Question);
-                if (result == DialogResult.OK)
-                {
-                    _presenter.CloseFolder();
-                }
-                else
-                {
-                    return;
-                }
-            }
-            _presenter.OpenDirectory(true);
-        }
 
         // --------- TOOLS
         private void mnuSettings_Click(object sender, EventArgs e)
@@ -248,9 +211,48 @@ namespace Moviebase.Views
         }
         #endregion
 
-        private void pictureBox1_LoadCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
+        private void cmdFolderOpen_Click(object sender, EventArgs e)
         {
-            
+            if (_presenter.Model.DataView.Count > 0)
+            {
+                var result = this.ShowMessageBox(StringResources.AlreadyOpenedFolderMessage, StringResources.AppName,
+                    icon: MessageBoxIcon.Question);
+                if (result == DialogResult.OK)
+                {
+                    _presenter.CloseFolder();
+                }
+                else
+                {
+                    return;
+                }
+            }
+
+            _presenter.OpenDirectory(false);
+        }
+
+        private void cmdFolderClose_Click(object sender, EventArgs e)
+        {
+            _presenter.CloseFolder();
+        }
+
+        private void cmdFolderRecent_Click(object sender, EventArgs e)
+        {
+            if (_presenter.Model.DataView.Count > 0)
+            {
+                var result = this.ShowMessageBox(StringResources.AlreadyOpenedFolderMessage, StringResources.AppName, icon: MessageBoxIcon.Question);
+                if (result != DialogResult.OK)
+                    return;
+                _presenter.CloseFolder();
+            }
+            _presenter.OpenDirectory(true);
+        }
+
+        private void toolTip1_Draw(object sender, DrawToolTipEventArgs e)
+        {
+            e.Graphics.Clear(Color.FromArgb(255, 32, 32, 32));
+            e.Graphics.DrawRectangle(new System.Drawing.Pen(new SolidBrush(Color.FromArgb(255,32, 32, 32))), e.Bounds);
+            e.DrawBorder();
+            e.DrawText(); 
         }
     }
 }
