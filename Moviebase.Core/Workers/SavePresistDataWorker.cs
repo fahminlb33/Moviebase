@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Threading.Tasks;
 using Moviebase.Core.Contracts;
@@ -9,7 +8,7 @@ using NLog;
 
 namespace Moviebase.Core.Workers
 {
-    public class SavePresistDataWorker : WorkerBase, ISavePresistDataWorker
+    public class SavePresistDataWorker : ISavePresistDataWorker, IDisposable
     {
         private static Logger _log = LogManager.GetCurrentClassLogger();
         private readonly IPersistentDataManager _persistentDataManager;
@@ -20,64 +19,50 @@ namespace Moviebase.Core.Workers
         {
             _persistentDataManager = persistentDataManager;
         }
-
-        public override void RunWorker()
+        
+        public IEnumerable<Task> CreateTasks()
         {
-            Task.Run(() =>
+            foreach (var entry in SaveItems)
             {
-                _log.Debug("Task started.");
-                OnRunWorkerStarted(this, EventArgs.Empty);
-
-                try
+                yield return new Task(() =>
                 {
-                    ProcessedWork = 0;
-                    TotalWork = SaveItems.Count;
-                    var options = new ParallelOptions
+                    _log.Info("Processing: " + entry.Title);
+
+                    try
                     {
-                        CancellationToken = CancellationToken.Token,
-                        MaxDegreeOfParallelism = Commons.MaxDegreeOfParallelism
-                    };
-                    
-                    Parallel.ForEach(SaveItems, options, InternalRunWorker);
+                        _persistentDataManager.SaveData(entry.InternalMovieData, Path.GetDirectoryName(entry.FullPath));
 
-                    _log.Debug("Task finished.");
-                    OnRunWorkerCompleted(this, new RunWorkerCompletedEventArgs(null, null, false));
-                }
-                catch (Exception e)
-                {
-                    _log.Error(e, "Task finished with error.");
-                    OnRunWorkerCompleted(this, new RunWorkerCompletedEventArgs(null, e, true));
-                }
-            });
-        }
-
-        protected override void InternalRunWorker(object arg)
-        {
-            var entry = (MovieEntryFacade)arg;
-            _log.Info("Processing: " + entry.Title);
-
-            try
-            {
-                _persistentDataManager.SaveData(entry.InternalMovieData, Path.GetDirectoryName(entry.FullPath));
-
-                _log.Info("Processed: " + entry.Title);
-                IncrementWorkDone();
-                OnProgressChanged(this, new ProgressChangedEventArgs(GetPercentage(), null));
-            }
-            catch (Exception e)
-            {
-                _log.Error(e, "Error processing: " + entry.Title);
+                        _log.Info("Processed: " + entry.Title);
+                    }
+                    catch (Exception e)
+                    {
+                        _log.Error(e, "Error processing: " + entry.Title);
+                    }
+                });
             }
         }
 
-        protected override void Dispose(bool disposing)
+        #region IDisposable Support
+        private bool _disposedValue; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
         {
+            if (_disposedValue) return;
             if (disposing)
             {
-                SaveItems?.Clear();
-                SaveItems = null;
+                if (SaveItems != null) SaveItems.Clear();
             }
-            base.Dispose(disposing);
+
+            SaveItems = null;
+
+            _disposedValue = true;
         }
+        
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+        #endregion
+
     }
 }

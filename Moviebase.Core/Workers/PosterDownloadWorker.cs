@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
@@ -11,7 +10,7 @@ using NLog;
 
 namespace Moviebase.Core.Workers
 {
-    public class PosterDownloadWorker : WorkerBase, IPosterDownloadWorker
+    public class PosterDownloadWorker : IPosterDownloadWorker, IDisposable
     {
         private static Logger _log = LogManager.GetCurrentClassLogger();
         private readonly ITmdb _tmdb;
@@ -26,72 +25,58 @@ namespace Moviebase.Core.Workers
             _tmdb = tmdb;
             _wc = new WebClient();
         }
-
-        public override void RunWorker()
+        
+        public IEnumerable<Task> CreateTasks()
         {
-            Task.Run(() =>
+            foreach (var entry in MovieEntries)
             {
-                _log.Debug("Task started.");
-                OnRunWorkerStarted(this, EventArgs.Empty);
-
-                try
+                yield return new Task(() =>
                 {
-                    ProcessedWork = 0;
-                    TotalWork = MovieEntries.Count;
-                    var options = new ParallelOptions
+                    _log.Info("Processing: " + entry.Title);
+
+                    try
                     {
-                        CancellationToken = CancellationToken.Token,
-                        MaxDegreeOfParallelism = Commons.MaxDegreeOfParallelism
-                    };
+                        var url = _tmdb.GetPosterUrl(entry.InternalMovieData.PosterPath, PosterSize.original);
 
-                    Parallel.ForEach(MovieEntries, options, InternalRunWorker);
+                        var destFolder = new PowerPath(entry.FullPath).GetDirectoryPath();
+                        var destFile = Path.Combine(destFolder, FileName);
 
-                    _log.Debug("Task finished.");
-                    OnRunWorkerCompleted(this, new RunWorkerCompletedEventArgs(null, null, false));
-                }
-                catch (Exception e)
-                {
-                    _log.Error(e, "Task finished with error.");
-                    OnRunWorkerCompleted(this, new RunWorkerCompletedEventArgs(null, e, true));
-                }
-            });
-        }
+                        var isExist = File.Exists(destFile);
+                        if (isExist && OverwritePoster) File.Delete(destFile);
+                        if (!isExist || OverwritePoster) _wc.DownloadFile(url, destFile);
 
-        protected override void InternalRunWorker(object arg)
-        {
-            var movieEntry = (MovieEntryFacade)arg;
-            _log.Info("Processing: " + movieEntry.Title);
-
-            try
-            {
-                var url = _tmdb.GetPosterUrl(movieEntry.InternalMovieData.PosterPath, PosterSize.original);
-
-                var destFolder = new PowerPath(movieEntry.FullPath).GetDirectoryPath();
-                var destFile = Path.Combine(destFolder, FileName);
-
-                var isExist = File.Exists(destFile);
-                if (isExist && OverwritePoster) File.Delete(destFile);
-                if (!isExist || OverwritePoster) _wc.DownloadFile(url, destFile);
-
-                _log.Info("Processed: " + movieEntry.Title);
-                IncrementWorkDone();
-                OnProgressChanged(this, new ProgressChangedEventArgs(GetPercentage(), null));
-            }
-            catch (Exception e)
-            {
-                _log.Error(e, "Error processing: " + movieEntry.Title);
+                        _log.Info("Processed: " + entry.Title);
+                    }
+                    catch (Exception e)
+                    {
+                        _log.Error(e, "Error processing: " + entry.Title);
+                    }
+                });
             }
         }
 
-        protected override void Dispose(bool disposing)
+        #region IDisposable Support
+        private bool _disposedValue; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
         {
+            if (_disposedValue) return;
             if (disposing)
             {
-                _wc?.Dispose();
-                MovieEntries?.Clear();
-                MovieEntries = null;
+                if (_wc != null) _wc.Dispose();
+                if (MovieEntries != null) MovieEntries.Clear();
+                    
             }
-            base.Dispose(disposing);
+
+            MovieEntries = null;
+
+            _disposedValue = true;
         }
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+        #endregion
+
     }
 }

@@ -2,8 +2,9 @@
 
 namespace Moviebase.Core
 {
-    public class DirectoryAnalyzeWorkerState
+    public class ResearchMovieEntryState
     {
+        public int Index { get; set; }
         public MovieEntryFacade Entry { get; set; }
     }
 }

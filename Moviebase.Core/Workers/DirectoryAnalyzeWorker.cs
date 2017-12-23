@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Moviebase.Core.Contracts;
@@ -8,7 +7,7 @@ using NLog;
 
 namespace Moviebase.Core.Workers
 {
-    public class DirectoryAnalyzeWorker : WorkerBase, IDirectoryAnalyzeWorker
+    public class DirectoryAnalyzeWorker : IDirectoryAnalyzeWorker
     {
         private readonly ITmdb _tmdb;
         private readonly IPersistentDataManager _persistentDataManager;
@@ -21,84 +20,53 @@ namespace Moviebase.Core.Workers
             _tmdb = tmdb;
             _persistentDataManager = persistentDataManager;
         }
-        
-        public override void RunWorker()
-        {
-            Task.Run(() =>
-            {
-                _log.Debug("Task started.");
-                OnRunWorkerStarted(this, EventArgs.Empty);
 
-                try
+        public IEnumerable<Task<MovieEntryState>> CreateTasks()
+        {
+            var dirEnumbEnumerable = Directory.EnumerateDirectories(AnalyzePath, "*", SearchOption.TopDirectoryOnly);
+            foreach (var dirPath in dirEnumbEnumerable)
+            {
+                yield return Task.Run(() =>
                 {
-                    var options = new ParallelOptions
+                    _log.Info("Processing: " + dirPath);
+                    var currentFolder = new PowerPath(dirPath);
+
+                    // check for ignore pattern
+                    var lastName = currentFolder.GetLastDirectoryName();
+                    if (lastName.StartsWith("[") && lastName.EndsWith("]"))
                     {
-                        CancellationToken = CancellationToken.Token,
-                        MaxDegreeOfParallelism = Commons.MaxDegreeOfParallelism
+                        _log.Debug("Process skipped due to directory name.");
+                        return null;
+                    }
+
+                    // find first movie
+                    var currentMoviePath = _persistentDataManager.FindFirstMovieFile(dirPath);
+                    if (currentMoviePath == null)
+                    {
+                        _log.Debug("Process skipped due to unavaliable movie file.");
+                        return null;
+                    }
+
+                    // find metadata
+                    TmdbResult entry;
+                    if (_persistentDataManager.HasPersistentData(currentMoviePath.GetDirectoryPath()))
+                    {
+                        _log.Debug("Using saved presist data.");
+                        entry = _persistentDataManager.LoadData(currentMoviePath);
+                    }
+                    else
+                    {
+                        _log.Debug("Creating new data using GetByFilename.");
+                        entry = _tmdb.GetByFilename(currentMoviePath.GetFileNameWithoutExtension());
+                    }
+
+                    // pop to event
+                    var result = new MovieEntryFacade(entry, currentMoviePath);
+                    return new MovieEntryState
+                    {
+                        Entry = result
                     };
-                    var dirEnumbEnumerable = Directory.EnumerateDirectories(AnalyzePath, "*", SearchOption.TopDirectoryOnly);
-                    
-                    Parallel.ForEach(dirEnumbEnumerable, options, InternalRunWorker);
-
-                    _log.Debug("Task finished.");
-                    OnRunWorkerCompleted(this, new RunWorkerCompletedEventArgs(null, null, false));
-                }
-                catch (Exception e)
-                {
-                    _log.Error(e, "Task finished with error.");
-                    OnRunWorkerCompleted(this, new RunWorkerCompletedEventArgs(null, e, true));
-                }
-            });
-        }
-
-        protected override void InternalRunWorker(object arg)
-        {
-            try
-            {
-                _log.Info("Processing: " + arg);
-                var currentFolder = new PowerPath(arg.ToString());
-
-                // check for ignore pattern
-                var lastName = currentFolder.GetLastDirectoryName();
-                if (lastName.StartsWith("[") && lastName.EndsWith("]"))
-                {
-                    _log.Debug("Process skipped due to directory name.");
-                    return;
-                }
-
-                // find first movie
-                var currentMoviePath = _persistentDataManager.FindFirstMovieFile(arg.ToString());
-                if (currentMoviePath == null)
-                {
-                    _log.Debug("Process skipped due to unavaliable movie file.");
-                    return;
-                }
-
-                // find metadata
-                TmdbResult entry;
-                if (_persistentDataManager.HasPersistentData(currentMoviePath.GetDirectoryPath()))
-                {
-                    _log.Debug("Using saved presist data.");
-                    entry = _persistentDataManager.LoadData(currentMoviePath);
-                }
-                else
-                {
-                    _log.Debug("Creating new data using GetByFilename.");
-                    entry = _tmdb.GetByFilename(currentMoviePath.GetFileNameWithoutExtension());
-                }
-
-                // pop to event
-                var result = new MovieEntryFacade(entry, currentMoviePath);
-                OnProgressChanged(this, new ProgressChangedEventArgs(-1, new DirectoryAnalyzeWorkerState
-                {
-                    Entry = result
-                }));
-
-                _log.Info("Processed: " + arg);
-            }
-            catch (Exception e)
-            {
-                _log.Error(e, "Process error. Path: " + arg);
+                });
             }
         }
     }

@@ -2,7 +2,7 @@
 
 namespace Moviebase.Core.Contracts
 {
-    public interface IMovieFetchWorker : IWorker
+    public interface IMovieFetchWorker : IReturningWorker<MovieEntryState>
     {
         List<string> AnalyzeItems { get; set; }
     }

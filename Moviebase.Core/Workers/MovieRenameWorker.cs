@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
@@ -10,7 +9,7 @@ using NLog;
 
 namespace Moviebase.Core.Workers
 {
-    public class MovieRenameWorker : WorkerBase, IMovieRenameWorker
+    public class MovieRenameWorker : IMovieRenameWorker, IDisposable
     {
         private static Logger _log = LogManager.GetCurrentClassLogger();
 
@@ -21,57 +20,28 @@ namespace Moviebase.Core.Workers
         public bool SwapThe { get; set; }
         #endregion
 
-
-        public override void RunWorker()
+        public IEnumerable<Task> CreateTasks()
         {
-            Task.Run(() =>
+            foreach (var entry in MovieEntries)
             {
-                _log.Debug("Task started.");
-                OnRunWorkerStarted(this, EventArgs.Empty);
-
-                try
+                yield return new Task(() =>
                 {
-                    ProcessedWork = 0;
-                    TotalWork = MovieEntries.Count;
-                    var options = new ParallelOptions
+                    try
                     {
-                        CancellationToken = CancellationToken.Token,
-                        MaxDegreeOfParallelism = Commons.MaxDegreeOfParallelism
-                    };
-                    
-                    Parallel.ForEach(MovieEntries, options, InternalRunWorker);
+                        _log.Info("Processing: " + entry.Title);
+                        using (var fileInfo = new PowerPath(entry.FullPath))
+                        {
+                            RenameFile(fileInfo, entry);
+                            RenameDirectory(fileInfo, entry);
+                        }
 
-                    _log.Debug("Task finished.");
-                    OnRunWorkerCompleted(this, new RunWorkerCompletedEventArgs(null, null, false));
-                }
-                catch (Exception e)
-                {
-                    _log.Error(e, "Task finished with error.");
-                    OnRunWorkerCompleted(this, new RunWorkerCompletedEventArgs(null, e, true));
-                }
-            });
-        }
-
-        protected override void InternalRunWorker(object arg)
-        {
-            var entry = (MovieEntryFacade)arg;
-
-            try
-            {
-                _log.Info("Processing: " + entry.Title);
-                using (var fileInfo = new PowerPath(entry.FullPath))
-                {
-                    RenameFile(fileInfo, entry);
-                    RenameDirectory(fileInfo, entry);
-                }
-
-                _log.Info("Processed: " + entry.Title);
-                IncrementWorkDone();
-                OnProgressChanged(this, new ProgressChangedEventArgs(GetPercentage(), null));
-            }
-            catch (Exception e)
-            {
-                _log.Error(e, "Error processing: " + entry.Title);
+                        _log.Info("Processed: " + entry.Title);
+                    }
+                    catch (Exception e)
+                    {
+                        _log.Error(e, "Error processing: " + entry.Title);
+                    }
+                });
             }
         }
 
@@ -106,14 +76,26 @@ namespace Moviebase.Core.Workers
             entry.FullPath = Path.Combine(directoryPath, name);
         }
 
-        protected override void Dispose(bool disposing)
+        #region IDisposable Support
+        private bool _disposedValue; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
         {
+            if (_disposedValue) return;
             if (disposing)
             {
-                MovieEntries?.Clear();
-                MovieEntries = null;
+                if (MovieEntries != null) MovieEntries.Clear();
             }
-            base.Dispose(disposing);
+
+            MovieEntries = null;
+
+            _disposedValue = true;
         }
+        
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+        #endregion
     }
 }

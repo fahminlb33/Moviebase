@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 
 namespace Moviebase.Core
 {
-    public interface IWorker
+    public interface IReturningWorker<T>
     {
-        IEnumerable<Task> CreateTasks();
+        IEnumerable<Task<T>> CreateTasks();
     }
 }
