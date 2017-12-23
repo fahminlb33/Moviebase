@@ -18,9 +18,8 @@ namespace Moviebase.Presenters
     class MainPresenter
     {
         private readonly StandardKernel _kernel = Program.AppKernel;
-        private readonly SynchronizationContext _context;
         private readonly FolderBrowserDialog _folderBrowserDialog;
-        private readonly WorkerPool _workerPool;
+        private readonly IWorkerPool _workerPool;
 
         public Action CloseFolderCallback;
         public MainModel Model { get; }
@@ -30,12 +29,11 @@ namespace Moviebase.Presenters
         {
             View = view;
             Model = new MainModel(SynchronizationContext.Current);
-            _context = SynchronizationContext.Current;
 
-            _workerPool = new WorkerPool();
-            _workerPool.ProgressChanged += Worker_ProgressChanged;
-            _workerPool.RunWorkerCompleted += Worker_RunWorkerCompleted;
-            _workerPool.RunWorkerStarted += Worker_RunWorkerStarted;
+            _workerPool = _kernel.Get<IWorkerPool>();
+            _workerPool.RunWorkerStarted = Worker_RunWorkerStarted;
+            _workerPool.ProgressChanged = Worker_ProgressChanged;
+            _workerPool.RunWorkerCompleted = Worker_RunWorkerCompleted;
 
             _folderBrowserDialog = new FolderBrowserDialog
             {
@@ -46,7 +44,7 @@ namespace Moviebase.Presenters
 
         #region Worker Subscriber
 
-        private void Worker_RunWorkerStarted(object sender, EventArgs e)
+        private void Worker_RunWorkerStarted()
         {
             Model.CmdDirectoriesEnabled = false;
             Model.CmdToolsEnabled = false;
@@ -55,7 +53,7 @@ namespace Moviebase.Presenters
             Model.LblStatusText = "Working...";
         }
 
-        private void Worker_RunWorkerCompleted(object sender, EventArgs e)
+        private void Worker_RunWorkerCompleted()
         {
             Model.PrgStatusValue = 0;
             Model.LblPercentageText = "0%";
@@ -68,9 +66,9 @@ namespace Moviebase.Presenters
             Model.CmdStopEnabled = false;
         }
 
-        private void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        private void Worker_ProgressChanged(int progressPercentage, object state)
         {
-            if (e.ProgressPercentage == -1)
+            if (progressPercentage == -1)
             {
                 Model.PrgStatusStyle = ProgressBarStyle.Marquee;
                 Model.PrgStatusValue = 0;
@@ -79,20 +77,14 @@ namespace Moviebase.Presenters
             else
             {
                 Model.PrgStatusStyle = ProgressBarStyle.Blocks;
-                Model.PrgStatusValue = e.ProgressPercentage;
-                Model.LblPercentageText = $"{e.ProgressPercentage}%";
+                Model.PrgStatusValue = progressPercentage;
+                Model.LblPercentageText = $"{progressPercentage}%";
             }
 
-            if (e.UserState == null) return;
-            if (e.UserState.GetType() == typeof(DirectoryAnalyzeWorkerState))
+            if (state.GetType() == typeof(MovieEntryState))
             {
-                var state = (DirectoryAnalyzeWorkerState) e.UserState;
-                _context.Post(d => Model.DataView.Add((MovieEntryFacade)d), state.Entry);
-            }
-            else if (e.UserState.GetType() == typeof(ResearchMovieWorkerState))
-            {
-                var state = (ResearchMovieWorkerState)e.UserState;
-                _context.Post(d => Model.DataView[state.Index] = (MovieEntryFacade) d, state.Entry);
+                var arg = (MovieEntryState)state;
+                Model.Invoke(() => Model.DataView.Add(arg.Entry));
             }
         }
 
@@ -166,7 +158,7 @@ namespace Moviebase.Presenters
                 worker.AnalyzePath = _folderBrowserDialog.SelectedPath;
             }
           
-            _workerPool.RunWorker(worker);
+            _workerPool.Start(worker);
         }
 
         public void CloseFolder()
@@ -183,7 +175,8 @@ namespace Moviebase.Presenters
             worker.FileRenamePattern = Settings.Default.FileRenamePattern;
             worker.FolderRenamePattern = Settings.Default.FolderRenamePattern;
             worker.SwapThe = Settings.Default.SwapThe;
-            _workerPool.RunWorker(worker);
+
+            _workerPool.Start(worker);
         }
 
         public void DownloadMoviePoster()
@@ -192,7 +185,8 @@ namespace Moviebase.Presenters
             worker.MovieEntries = Model.DataView.Where(w => w.InternalMovieData.PosterPath != null).ToList();
             worker.FileName = Settings.Default.PosterFileName + Commons.JpgFileExtension;
             worker.OverwritePoster = Settings.Default.OverwritePoster;
-            _workerPool.RunWorker(worker);
+
+            _workerPool.Start(worker);
         }
 
         public void FetchMovieData()
@@ -206,14 +200,14 @@ namespace Moviebase.Presenters
             {
                 Model.DataView.Remove(item);
             }
-            _workerPool.RunWorker(worker);
+            _workerPool.Start(worker);
         }
 
         public void SavePresistData()
         {
             var worker = _kernel.Get<ISavePresistDataWorker>();
             worker.SaveItems = Model.DataView.ToList();
-            _workerPool.RunWorker(worker);
+            _workerPool.Start(worker);
         }
 
         public void SingleSavePersistData(MovieEntryFacade entry)
@@ -229,7 +223,7 @@ namespace Moviebase.Presenters
             worker.Index = index;
             worker.FullPath = Model.DataView[index].FullPath;
             worker.View = View;
-            _workerPool.RunWorker(worker);
+            _workerPool.Start(worker);
         }
 
         public void ExportCsv()
@@ -237,7 +231,7 @@ namespace Moviebase.Presenters
             var worker = _kernel.Get<ICsvExportWorker>();
             worker.Movies = Model.DataView.ToList();
             worker.OutputPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), Commons.ExportFileName);
-            _workerPool.RunWorker(worker);
+            _workerPool.Start(worker);
         }
 
         public void ThumbnailFolder()
@@ -245,7 +239,7 @@ namespace Moviebase.Presenters
             var worker = _kernel.Get<IThumbnailFolderWorker>();
             worker.MovieDirectories = Model.DataView.Select(x => Path.GetDirectoryName(x.FullPath)).ToList();
             worker.PosterName = Settings.Default.PosterFileName;
-            _workerPool.RunWorker(worker);
+            _workerPool.Start(worker);
         }
 
         #endregion

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -17,28 +16,28 @@ namespace Moviebase.Views
     {
         private readonly StandardKernel _kernel = Program.AppKernel;
         private readonly SynchronizationContext _synchronizationContext;
-        private readonly IWorker _worker;
+        private readonly IWorkerPool _workerPool;
         private int _processed;
 
         public MoveMoviesView()
         {
             InitializeComponent();
             _synchronizationContext = SynchronizationContext.Current;
-            _worker = _kernel.Get<IMoveMovieWorker>();
+            _workerPool = _kernel.Get<IWorkerPool>();
             PrepareView();
         }
 
         private void PrepareView()
         {
-            _worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
-            _worker.ProgressChanged += Worker_ProgressChanged;
+            _workerPool.RunWorkerCompleted = Worker_RunWorkerCompleted;
+            _workerPool.ProgressChanged = Worker_ProgressChanged;
         }
 
-        private void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        private void Worker_ProgressChanged(int progressPercentage, object state)
         {
             _synchronizationContext.Post(d =>
             {
-                using (var path = new PowerPath(e.UserState.ToString()))
+                using (var path = new PowerPath(state.ToString()))
                 {
                     Interlocked.Increment(ref _processed);
                     lblCount.Text = string.Format(StringResources.MoveMoviesCount, Interlocked.CompareExchange(ref _processed, 0, 0));
@@ -48,7 +47,7 @@ namespace Moviebase.Views
             }, null);
         }
 
-        private void Worker_RunWorkerCompleted(object sender, EventArgs e)
+        private void Worker_RunWorkerCompleted()
         {
             _synchronizationContext.Post(d =>
             {
@@ -72,15 +71,15 @@ namespace Moviebase.Views
             }
             if (cmdSearch.Text == StringResources.MoveMovieCommandText)
             {
-                var worker = (IMoveMovieWorker) _worker;
+                var worker = Program.AppKernel.Get<IMoveMovieWorker>();
                 worker.AnalyzePath = folderBrowser.SelectedPath;
                 worker.FileExtensions = Settings.Default.MovieExtensions.Cast<string>().ToList();
-                worker.RunWorker();
+                _workerPool.Start(worker);
                 cmdSearch.Text = StringResources.StopText;
             }
             else
             {
-                _worker.Cancel();
+                _workerPool.Stop();
                 cmdSearch.Enabled = false;
             }
         }

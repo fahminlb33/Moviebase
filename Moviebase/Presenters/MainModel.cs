@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows.Forms;
@@ -131,6 +132,11 @@ namespace Moviebase.Presenters
         }
 
         public BindingList<MovieEntryFacade> DataView { get; }
+
+        public void Invoke(Action action)
+        {
+            _syncContext.Post(x => action.Invoke(), null);
+        }
         
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)

@@ -40,6 +40,7 @@ namespace Moviebase
             AppKernel.Rebind<IPersistentDataManager>().To<PersistentDataManager>().InSingletonScope();
             AppKernel.Rebind<IThumbnailFolder>().To<ThumbnailFolder>().InSingletonScope();
             AppKernel.Rebind<IComponentManager>().To<ComponentManager>().InSingletonScope();
+            AppKernel.Rebind<IWorkerPool>().To<WorkerPool>();
 
             // workers
             AppKernel.Rebind<IMoveMovieWorker>().To<MoveMoviesWorker>();
