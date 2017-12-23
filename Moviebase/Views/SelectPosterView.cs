@@ -15,48 +15,50 @@ namespace Moviebase.Views
     public partial class SelectPosterView : Form
     {
         private string _tempDir;
+        private ITmdbWebRequest _tmdbWebRequest;
+        private ITmdb _tmdb;
+        private SynchronizationContext _synchronizationContext;
 
         public string SelectedPath { get; set; }
 
         public SelectPosterView(string id)
         {
             InitializeComponent();
-            FindPoster(id);
+
+            _tmdbWebRequest = Program.AppKernel.Get<ITmdbWebRequest>();
+            _tmdb = Program.AppKernel.Get<ITmdb>();
+            _synchronizationContext = SynchronizationContext.Current;
+
+            Task.Run(() => FindPoster(id));
         }
 
-        private void FindPoster(string id)
+        private async void FindPoster(string id)
         {
-            var wc = new WebClient();
-            var tmdb = Program.AppKernel.Get<ITmdb>();
-            var synchronizationContext = SynchronizationContext.Current;
             _tempDir = Path.Combine(Path.GetTempPath(), Commons.TempFolderName, DateTime.Now.Ticks.ToString());
             Directory.CreateDirectory(_tempDir);
 
-            Task.Run(() =>
+            var posterUris = await _tmdb.GetPosterUris(id);
+            var total = posterUris.Count;
+            var processed = 0;
+
+            for (var i = 0; i < total; i++)
             {
-                var posterUris = tmdb.GetPosterUris(id);
-                var total = posterUris.Length;
-                var processed = 0;
+                var currentPath = _tmdbWebRequest.BuildPosterUrl(posterUris[i], PosterSize.w154);
+                var currentSavePath = Path.Combine(_tempDir, posterUris[i].Remove(0, 1));
+                await _tmdbWebRequest.DownloadFile(currentPath, currentSavePath);
 
-                for (var i = 0; i < total; i++)
+                ++processed;
+                var percent = (int) (processed / (double) total * 100);
+                _synchronizationContext.Post(x =>
                 {
-                    var currentPath = tmdb.GetPosterUrl(posterUris[i], PosterSize.w154);
-                    var currentSavePath = Path.Combine(_tempDir, posterUris[i].Remove(0, 1));
-                    wc.DownloadFile(currentPath, currentSavePath);
+                    lblStatus.Text = string.Format(StringResources.PercentagePattern, percent);
+                    prgDownload.Value = percent;
+                }, null);
+            }
+            _synchronizationContext.Post(x => lblStatus.Text = StringResources.CompletedText, null);
 
-                    ++processed;
-                    var percent = (int)(processed / (double)total * 100);
-                    synchronizationContext.Post(x =>
-                    {
-                        lblStatus.Text = string.Format(StringResources.PercentagePattern, percent);
-                        prgDownload.Value = percent;
-                    }, null);
-                }
-                synchronizationContext.Post(x => lblStatus.Text = StringResources.CompletedText, null);
-
-                var files = Directory.GetFiles(_tempDir, Commons.JpgSearchPattern, SearchOption.TopDirectoryOnly);
-                synchronizationContext.Post(x => lvPosters.Items.AddRange((string[])x), files);
-            });
+            var files = Directory.GetFiles(_tempDir, Commons.JpgSearchPattern, SearchOption.TopDirectoryOnly);
+            _synchronizationContext.Post(x => lvPosters.Items.AddRange((string[]) x), files);
         }
 
         private void SelectPosterView_FormClosing(object sender, FormClosingEventArgs e)
