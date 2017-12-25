@@ -85,15 +85,16 @@ namespace Moviebase.Core
             return uri.ToString();
         }
 
-        private string BuildQueryString(NameValueCollection col)
+        public string BuildQueryString(NameValueCollection col)
         {
             if (col == null) return String.Empty;
             var sb = new StringBuilder();
-
+            
             for (int i = 0; i < col.Count; i++)
             {
                 var key = col.GetKey(i);
-                sb.AppendFormat("&{0}={1}", key, col.Get(key));
+                if (i > 0) sb.Append("&");
+                sb.AppendFormat("{0}={1}", key, col.Get(key));
             }
             return sb.ToString();
         }
