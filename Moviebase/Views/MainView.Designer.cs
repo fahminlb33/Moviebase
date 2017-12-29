@@ -68,9 +68,9 @@
             this.cmdFolderClose = new System.Windows.Forms.Button();
             this.cmdFolderOpen = new System.Windows.Forms.Button();
             this.cmdStop = new System.Windows.Forms.Button();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.cmdActions = new Moviebase.Views.DropDownButton();
             this.cmdTools = new Moviebase.Views.DropDownButton();
-            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.grdMovies)).BeginInit();
             this.ctDatagrid.SuspendLayout();
             this.ctActions.SuspendLayout();
@@ -115,38 +115,39 @@
             this.mnuSelectPoster,
             this.mnuAlternativeName});
             this.ctDatagrid.Name = "ctDatagrid";
-            this.ctDatagrid.Size = new System.Drawing.Size(231, 98);
+            this.ctDatagrid.ShowImageMargin = false;
+            this.ctDatagrid.Size = new System.Drawing.Size(206, 98);
             // 
             // mnuReSearch
             // 
             this.mnuReSearch.Name = "mnuReSearch";
-            this.mnuReSearch.Size = new System.Drawing.Size(230, 22);
+            this.mnuReSearch.Size = new System.Drawing.Size(205, 22);
             this.mnuReSearch.Text = "Search movie metadata again";
             this.mnuReSearch.Click += new System.EventHandler(this.mnuReSearch_Click);
             // 
             // mnuIgnore
             // 
             this.mnuIgnore.Name = "mnuIgnore";
-            this.mnuIgnore.Size = new System.Drawing.Size(230, 22);
+            this.mnuIgnore.Size = new System.Drawing.Size(205, 22);
             this.mnuIgnore.Text = "Ignore this file from fetch";
             this.mnuIgnore.Click += new System.EventHandler(this.mnuIgnore_Click);
             // 
             // toolStripSeparator5
             // 
             this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(227, 6);
+            this.toolStripSeparator5.Size = new System.Drawing.Size(202, 6);
             // 
             // mnuSelectPoster
             // 
             this.mnuSelectPoster.Name = "mnuSelectPoster";
-            this.mnuSelectPoster.Size = new System.Drawing.Size(230, 22);
+            this.mnuSelectPoster.Size = new System.Drawing.Size(205, 22);
             this.mnuSelectPoster.Text = "Select poster";
             this.mnuSelectPoster.Click += new System.EventHandler(this.mnuSelectPoster_Click);
             // 
             // mnuAlternativeName
             // 
             this.mnuAlternativeName.Name = "mnuAlternativeName";
-            this.mnuAlternativeName.Size = new System.Drawing.Size(230, 22);
+            this.mnuAlternativeName.Size = new System.Drawing.Size(205, 22);
             this.mnuAlternativeName.Text = "Find alternative name(s)";
             this.mnuAlternativeName.Click += new System.EventHandler(this.mnuAlternativeNames_Click);
             // 
@@ -174,13 +175,14 @@
             this.toolStripSeparator3,
             this.mnuSavePresistData});
             this.ctActions.Name = "ctActions";
-            this.ctActions.Size = new System.Drawing.Size(192, 126);
+            this.ctActions.ShowImageMargin = false;
+            this.ctActions.Size = new System.Drawing.Size(167, 126);
             // 
             // mnuFetchAll
             // 
             this.mnuFetchAll.ForeColor = System.Drawing.Color.White;
             this.mnuFetchAll.Name = "mnuFetchAll";
-            this.mnuFetchAll.Size = new System.Drawing.Size(191, 22);
+            this.mnuFetchAll.Size = new System.Drawing.Size(166, 22);
             this.mnuFetchAll.Text = "Fetch from internet all";
             this.mnuFetchAll.Click += new System.EventHandler(this.mnuFetchAll_Click);
             // 
@@ -188,13 +190,13 @@
             // 
             this.toolStripSeparator2.ForeColor = System.Drawing.Color.White;
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(188, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(163, 6);
             // 
             // mnuDownloadAll
             // 
             this.mnuDownloadAll.ForeColor = System.Drawing.Color.White;
             this.mnuDownloadAll.Name = "mnuDownloadAll";
-            this.mnuDownloadAll.Size = new System.Drawing.Size(191, 22);
+            this.mnuDownloadAll.Size = new System.Drawing.Size(166, 22);
             this.mnuDownloadAll.Text = "Download poster all";
             this.mnuDownloadAll.Click += new System.EventHandler(this.mnuDownloadAll_Click);
             // 
@@ -202,7 +204,7 @@
             // 
             this.mnuRenameAll.ForeColor = System.Drawing.Color.White;
             this.mnuRenameAll.Name = "mnuRenameAll";
-            this.mnuRenameAll.Size = new System.Drawing.Size(191, 22);
+            this.mnuRenameAll.Size = new System.Drawing.Size(166, 22);
             this.mnuRenameAll.Text = "Rename all";
             this.mnuRenameAll.Click += new System.EventHandler(this.mnuRenameAll_Click);
             // 
@@ -210,7 +212,7 @@
             // 
             this.mnuFolderThumbnail.ForeColor = System.Drawing.Color.White;
             this.mnuFolderThumbnail.Name = "mnuFolderThumbnail";
-            this.mnuFolderThumbnail.Size = new System.Drawing.Size(191, 22);
+            this.mnuFolderThumbnail.Size = new System.Drawing.Size(166, 22);
             this.mnuFolderThumbnail.Text = "Folder thumbnail all";
             this.mnuFolderThumbnail.Click += new System.EventHandler(this.mnuFolderThumbnail_Click);
             // 
@@ -218,13 +220,13 @@
             // 
             this.toolStripSeparator3.ForeColor = System.Drawing.Color.White;
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(188, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(163, 6);
             // 
             // mnuSavePresistData
             // 
             this.mnuSavePresistData.ForeColor = System.Drawing.Color.White;
             this.mnuSavePresistData.Name = "mnuSavePresistData";
-            this.mnuSavePresistData.Size = new System.Drawing.Size(191, 22);
+            this.mnuSavePresistData.Size = new System.Drawing.Size(166, 22);
             this.mnuSavePresistData.Text = "Save presist data";
             this.mnuSavePresistData.Click += new System.EventHandler(this.mnuSavePresistData_Click);
             // 
@@ -236,7 +238,8 @@
             this.mnuMovieToFolder,
             this.mnuExportCsv});
             this.ctTools.Name = "ctTools";
-            this.ctTools.Size = new System.Drawing.Size(165, 48);
+            this.ctTools.ShowImageMargin = false;
+            this.ctTools.Size = new System.Drawing.Size(140, 48);
             // 
             // mnuMovieToFolder
             // 
@@ -244,7 +247,7 @@
             this.mnuMovieToFolder.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.mnuMovieToFolder.ForeColor = System.Drawing.Color.White;
             this.mnuMovieToFolder.Name = "mnuMovieToFolder";
-            this.mnuMovieToFolder.Size = new System.Drawing.Size(164, 22);
+            this.mnuMovieToFolder.Size = new System.Drawing.Size(139, 22);
             this.mnuMovieToFolder.Text = "Movie to folder...";
             this.mnuMovieToFolder.TextImageRelation = System.Windows.Forms.TextImageRelation.TextAboveImage;
             this.mnuMovieToFolder.Click += new System.EventHandler(this.mnuMoveVies_Click);
@@ -255,7 +258,7 @@
             this.mnuExportCsv.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.mnuExportCsv.ForeColor = System.Drawing.Color.White;
             this.mnuExportCsv.Name = "mnuExportCsv";
-            this.mnuExportCsv.Size = new System.Drawing.Size(164, 22);
+            this.mnuExportCsv.Size = new System.Drawing.Size(139, 22);
             this.mnuExportCsv.Text = "Export to CSV...";
             this.mnuExportCsv.TextImageRelation = System.Windows.Forms.TextImageRelation.TextAboveImage;
             this.mnuExportCsv.Click += new System.EventHandler(this.mnuExportCsv_Click);
@@ -547,6 +550,13 @@
             this.cmdStop.UseVisualStyleBackColor = false;
             this.cmdStop.Click += new System.EventHandler(this.cmdStop_Click);
             // 
+            // toolTip1
+            // 
+            this.toolTip1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(28)))), ((int)(((byte)(28)))));
+            this.toolTip1.ForeColor = System.Drawing.Color.White;
+            this.toolTip1.OwnerDraw = true;
+            this.toolTip1.Draw += new System.Windows.Forms.DrawToolTipEventHandler(this.toolTip1_Draw);
+            // 
             // cmdActions
             // 
             this.cmdActions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -584,13 +594,6 @@
             this.cmdTools.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.toolTip1.SetToolTip(this.cmdTools, "Tool Collections");
             this.cmdTools.UseVisualStyleBackColor = true;
-            // 
-            // toolTip1
-            // 
-            this.toolTip1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(28)))), ((int)(((byte)(28)))));
-            this.toolTip1.ForeColor = System.Drawing.Color.White;
-            this.toolTip1.OwnerDraw = true;
-            this.toolTip1.Draw += new System.Windows.Forms.DrawToolTipEventHandler(this.toolTip1_Draw);
             // 
             // MainView
             // 
