@@ -50,6 +50,7 @@ namespace Moviebase.Presenters
             Model.CmdActionsEnabled = false;
             Model.CmdStopEnabled = true;
             Model.LblStatusText = "Working...";
+            Model.GridViewEnabled = false;
         }
 
         private void Worker_RunWorkerCompleted()
@@ -63,6 +64,7 @@ namespace Moviebase.Presenters
             Model.CmdToolsEnabled = true;
             Model.CmdActionsEnabled = true;
             Model.CmdStopEnabled = false;
+            Model.GridViewEnabled = true;
         }
 
         private void Worker_ProgressChanged(int progressPercentage, object state)

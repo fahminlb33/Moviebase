@@ -23,20 +23,27 @@ namespace Moviebase.Views
             GlueBindings();
         }
 
+        private void LoadImage(string uri)
+        {
+            pictureBox1.Image?.Dispose();
+            pictureBox1.Image = null;
+            if (uri != null) pictureBox1.LoadAsync(uri);
+        }
+
         private void CloseFolderCallback()
         {
             lblTitle.Text = StringResources.ThreeDots;
             lblExtraInfo.Text = StringResources.ThreeDots;
             txtPlot.Text = string.Empty;
-            pictureBox1.Image?.Dispose();
-            pictureBox1.Image = null;
+            LoadImage(null);
         }
 
         private void GlueBindings()
         {
             var model = _presenter.Model;
             grdMovies.DataSource = model.DataView;
-            
+            grdMovies.Bind(c => c.Enabled).To(model, m => m.GridViewEnabled);
+
             cmdFolderRecent.Bind(c => c.Enabled).To(model, m => m.CmdDirectoriesEnabled);
             cmdFolderClose.Bind(c => c.Enabled).To(model, m => m.CmdDirectoriesEnabled);
             cmdFolderOpen.Bind(c => c.Enabled).To(model, m => m.CmdDirectoriesEnabled);
@@ -66,10 +73,10 @@ namespace Moviebase.Views
             lblExtraInfo.Text = string.Format(StringResources.MovieExtraInfoPattern, dataItem.Genre, dataItem.ImdbId);
             txtPlot.Text = dataItem.Plot;
 
-            if (dataItem.InternalMovieData.Id <= 0) return;
+            //if (dataItem.InternalMovieData.Id <= 0) return;
             var movieDir = Path.GetDirectoryName(dataItem.FullPath);
             var posterPath = _presenter.GetPosterPath(dataItem.InternalMovieData, movieDir);
-            pictureBox1.LoadAsync(posterPath);
+            LoadImage(posterPath);
         }
 
         private void grdMovies_MouseDown(object sender, MouseEventArgs e)
@@ -119,7 +126,7 @@ namespace Moviebase.Views
             }
 
             _presenter.FetchMovieData();
-            _presenter.SavePresistData();
+            //_presenter.SavePresistData();
         }
 
         private void mnuRenameAll_Click(object sender, EventArgs e)
@@ -130,7 +137,7 @@ namespace Moviebase.Views
                 return;
             }
 
-            _presenter.SavePresistData();
+            //_presenter.SavePresistData();
             _presenter.RenameMovieFiles();
         }
 
@@ -142,7 +149,7 @@ namespace Moviebase.Views
                 return;
             }
 
-            _presenter.SavePresistData();
+            //_presenter.SavePresistData();
             _presenter.DownloadMoviePoster();
         }
 

@@ -11,17 +11,12 @@ namespace Moviebase.Core
     {
         private static Logger _log = LogManager.GetCurrentClassLogger();
         private CancellationTokenSource _cancellationToken;
-        private bool _isWorking;
+        private volatile bool _isWorking;
         
         public Action RunWorkerStarted { get; set; }
         public Action RunWorkerCompleted { get; set; }
         public Action<int, object> ProgressChanged { get; set; }
-
-        public WorkerPool()
-        {
-            _cancellationToken = new CancellationTokenSource();
-        }
-
+        
         public void Start(INonReturningWorker worker)
         {
             if (_isWorking)
@@ -46,7 +41,8 @@ namespace Moviebase.Core
 
         public void Stop()
         {
-            if (_isWorking) _cancellationToken?.Cancel();
+            if (!_isWorking) return;
+            _cancellationToken?.Cancel();
         }
 
         private void RunWorkerStartedCallback()
