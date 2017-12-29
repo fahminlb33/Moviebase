@@ -21,6 +21,7 @@ namespace Moviebase.Presenters
         private ProgressBarStyle _prgStatusStyle;
         private string _lblPercentageText;
         private bool _cmdStopEnabled;
+        private bool _gridViewEnabled;
 
         public MainModel(SynchronizationContext context)
         {
@@ -41,6 +42,17 @@ namespace Moviebase.Presenters
             PrgStatusValue = 0;
             PrgStatusStyle = ProgressBarStyle.Blocks;
             LblPercentageText = "0%";
+        }
+
+        public bool GridViewEnabled
+        {
+            get => _gridViewEnabled;
+            set
+            {
+                if (value == _gridViewEnabled) return;
+                _gridViewEnabled = value; 
+                OnPropertyChanged();
+            }
         }
 
         public bool CmdDirectoriesEnabled
@@ -135,13 +147,13 @@ namespace Moviebase.Presenters
 
         public void Invoke(Action action)
         {
-            _syncContext.Post(x => action.Invoke(), null);
+            _syncContext.Send(x => action.Invoke(), null);
         }
         
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            _syncContext.Post(d => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)), null);
+            _syncContext.Send(d => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)), null);
         }
     }
 }
