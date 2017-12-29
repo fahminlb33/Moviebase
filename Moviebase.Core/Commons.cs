@@ -16,6 +16,7 @@ namespace Moviebase.Core
         public const string IconFileName = "icon.ico";
         public const string TempIconFileName = "converted.jpg";
 
+        public const int TmdbWebRequestTries = 3;
         public const string TheName = "The";
         public const int MaxDegreeOfParallelism = 1;
         public const string ShellClassInfoSection = ".ShellClassInfo";

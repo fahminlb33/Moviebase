@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Specialized;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,9 +39,33 @@ namespace Moviebase.Core
         {
             try
             {
-                var response = await _wc.GetAsync(uri);
-                response.EnsureSuccessStatusCode();
-                return JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync());
+                string responseBody = null;
+                var tryTimes = 0;
+                do
+                {
+                    var response = await _wc.GetAsync(uri);
+                    if (response.StatusCode != (HttpStatusCode)429)
+                    {
+                        var retryAfter = response.Headers.RetryAfter?.Delta;
+                        if (retryAfter.HasValue && retryAfter.Value.TotalSeconds > 0)
+                        {
+                            await Task.Delay(retryAfter.Value);
+                        }
+                        else
+                        {
+                            await Task.Delay(1000);
+                        }
+                    }
+                    else if (response.IsSuccessStatusCode)
+                    {
+                        responseBody = await response.Content.ReadAsStringAsync();
+                        break;
+                    }
+
+                    ++tryTimes;
+                } while (tryTimes < Commons.TmdbWebRequestTries);
+
+                return responseBody == null ? default(T) : JsonConvert.DeserializeObject<T>(responseBody);
             }
             catch (Exception e)
             {
