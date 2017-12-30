@@ -40,7 +40,7 @@ namespace Moviebase.Core.Workers
                     }
 
                     // find first movie
-                    var currentMoviePath = _persistentDataManager.FindFirstMovieFile(dirPath);
+                    var currentMoviePath = _persistentDataManager.SearchFirstFile(dirPath);
                     if (currentMoviePath == null)
                     {
                         _log.Debug("Process skipped due to unavaliable movie file.");
@@ -49,7 +49,7 @@ namespace Moviebase.Core.Workers
 
                     // find metadata
                     TmdbResult entry;
-                    if (_persistentDataManager.HasPersistentData(currentMoviePath.GetDirectoryPath()))
+                    if (_persistentDataManager.HasPersistentData(Path.GetDirectoryName(currentMoviePath)))
                     {
                         _log.Debug("Using saved presist data.");
                         entry = _persistentDataManager.LoadData(currentMoviePath);
@@ -57,7 +57,7 @@ namespace Moviebase.Core.Workers
                     else
                     {
                         _log.Debug("Creating new data using GetByFilename.");
-                        entry = await _tmdb.GetByFilename(currentMoviePath.GetFileNameWithoutExtension());
+                        entry = await _tmdb.GetByFilename(Path.GetFileNameWithoutExtension(currentMoviePath));
                     }
 
                     // pop to event

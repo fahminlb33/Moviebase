@@ -1,4 +1,3 @@
-using System.IO;
 using Moviebase.Entities;
 
 namespace Moviebase.Core
@@ -9,8 +8,8 @@ namespace Moviebase.Core
         string PersistentFileName { get; set; }
         bool HidePresistFile { get; set; }
 
-        PowerPath FindFirstMovieFile(string dir);
-        TmdbResult LoadData(PowerPath info);
+        string SearchFirstFile(string dir);
+        TmdbResult LoadData(string info);
         void SaveData(TmdbResult entry, string dirPath);
         bool HasPersistentData(string dirPath);
         string GetPosterUri(TmdbResult result, string dir, string filename);

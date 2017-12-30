@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Moviebase.Entities;
@@ -22,13 +23,13 @@ namespace Moviebase.Core
             _tmdb = tmdb;
         }
 
-        public PowerPath FindFirstMovieFile(string dir)
+        public string SearchFirstFile(string dir)
         {
             try
             {
                 var searcher = Directory.EnumerateFiles(dir, "*.*", SearchOption.TopDirectoryOnly);
                 var path = searcher.FirstOrDefault(x => FileExtensions.Contains(Path.GetExtension(x)));
-                return path != null ? new PowerPath(path) : null;
+                return path;
             }
             catch (Exception e)
             {
@@ -53,10 +54,13 @@ namespace Moviebase.Core
             return posterPath;
         }
 
-        public TmdbResult LoadData(PowerPath info)
+        public TmdbResult LoadData(string info)
         {
-            var persistFile = Path.Combine(info.GetDirectoryPath(), PersistentFileName);
-            return HasPersistentData(info.GetDirectoryPath())
+            var dirPath = Path.GetDirectoryName(info);
+            Debug.Assert(dirPath != null);
+
+            var persistFile = Path.Combine(dirPath, PersistentFileName);
+            return HasPersistentData(dirPath)
                 ? JsonConvert.DeserializeObject<TmdbResult>(File.ReadAllText(persistFile))
                 : null;
         }
