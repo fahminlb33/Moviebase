@@ -1,25 +1,30 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Moviebase.Core
 {
     public class Commons
-    { 
+    {
         public const string TempFolderName = "moviebase";
         public const string PersistentFileName = "moviebase.persist";
         public const string ExportFileName = "moviebase.csv";
-        public const string JpgSearchPattern = "*.jpg";
-        public const string JpgFileExtension = ".jpg";
-        public const string Mp4FileExtension = ".mp4";
         public const string IconFileName = "icon.ico";
         public const string TempIconFileName = "converted.jpg";
+
+        public const string JpgFileExtension = ".jpg";
+        public const string Mp4FileExtension = ".mp4";
+        public const string AllFilesSearchPattern = "*";
+        public const string JpgSearchPattern = "*.jpg";
 
         public const int TmdbWebRequestTries = 3;
         public const string TheName = "The";
         public const int MaxDegreeOfParallelism = 1;
         public const string ShellClassInfoSection = ".ShellClassInfo";
+
+        public static readonly Bitmap DefaultImage = new Bitmap(1, 1);
         private static readonly string[] SizeSuffix = { "B", "KB", "MB", "GB", "TB", "PB", "EB" }; //Longs run out around EB
 
         [Obsolete]
