@@ -76,7 +76,7 @@ namespace Moviebase.Views
             if (_presenter.Model.DataView.Count > 0)
             {
                 var result = this.ShowMessageBox(StringResources.AlreadyOpenedFolderMessage, StringResources.AppName,
-                    icon: MessageBoxIcon.Question);
+                    MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
                 if (result == DialogResult.OK)
                 {
                     _presenter.CloseFolder();
