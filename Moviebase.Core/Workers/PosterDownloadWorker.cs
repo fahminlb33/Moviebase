@@ -14,7 +14,7 @@ namespace Moviebase.Core.Workers
         private static Logger _log = LogManager.GetCurrentClassLogger();
         private readonly ITmdbWebRequest _tmdbWebRequest;
 
-        public List<MovieEntryFacade> MovieEntries { get; set; }
+        public List<MovieEntry> MovieEntries { get; set; }
         public string FileName { get; set; }
         public bool OverwritePoster { get; set; }
 

@@ -13,7 +13,7 @@ namespace Moviebase.Core.Workers
         private static Logger _log = LogManager.GetCurrentClassLogger();
         private readonly IPersistentDataManager _persistentDataManager;
 
-        public List<MovieEntryFacade> SaveItems { get; set; }
+        public List<MovieEntry> SaveItems { get; set; }
 
         public SavePresistDataWorker(IPersistentDataManager persistentDataManager)
         {

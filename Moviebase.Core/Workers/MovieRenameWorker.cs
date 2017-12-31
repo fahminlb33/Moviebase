@@ -14,10 +14,12 @@ namespace Moviebase.Core.Workers
         private static Logger _log = LogManager.GetCurrentClassLogger();
 
         #region Properties
-        public List<MovieEntryFacade> MovieEntries { get; set; }
+
+        public List<MovieEntry> MovieEntries { get; set; }
         public string FileRenamePattern { get; set; }
         public string FolderRenamePattern { get; set; }
         public bool SwapThe { get; set; }
+
         #endregion
 
         public IEnumerable<Task> CreateTasks()
@@ -29,11 +31,9 @@ namespace Moviebase.Core.Workers
                     try
                     {
                         _log.Info("Processing: " + entry.Title);
-                        using (var fileInfo = new PowerPath(entry.FullPath))
-                        {
-                            RenameFile(fileInfo, entry);
-                            RenameDirectory(fileInfo, entry);
-                        }
+                        var fileInfo = new PowerPath(entry.FullPath);
+                        RenameFile(fileInfo, entry);
+                        RenameDirectory(fileInfo, entry);
 
                         _log.Info("Processed: " + entry.Title);
                     }
@@ -45,14 +45,14 @@ namespace Moviebase.Core.Workers
             }
         }
 
-        private void RenameFile(PowerPath fileInfo, MovieEntryFacade entry)
+        private void RenameFile(PowerPath fileInfo, MovieEntry entry)
         {
             var originalFilePath = fileInfo.GetFullPath();
             var renamedFile = fileInfo.RenameFileByPattern(FileRenamePattern, entry);
 
             if (SwapThe) renamedFile.SwapFileName(Commons.TheName);
             var name = renamedFile.GetFileName();
-                    
+
             var destFilePath = Path.Combine(fileInfo.GetDirectoryPath(), name);
 
             if (originalFilePath == destFilePath) return;
@@ -60,7 +60,7 @@ namespace Moviebase.Core.Workers
             entry.FullPath = destFilePath;
         }
 
-        private void RenameDirectory(PowerPath fileInfo, MovieEntryFacade entry)
+        private void RenameDirectory(PowerPath fileInfo, MovieEntry entry)
         {
             var originalFilePath = fileInfo.GetDirectoryPath();
             var renamedPath = fileInfo.RenameLastDirectoryByPattern(FolderRenamePattern, entry);

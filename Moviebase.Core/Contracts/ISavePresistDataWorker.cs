@@ -5,6 +5,6 @@ namespace Moviebase.Core.Contracts
 {
     public interface ISavePresistDataWorker : INonReturningWorker
     {
-        List<MovieEntryFacade> SaveItems { get; set; }
+        List<MovieEntry> SaveItems { get; set; }
     }
 }

@@ -3,7 +3,7 @@ using Moviebase.Entities;
 
 namespace Moviebase.Core.Contracts
 {
-    public sealed class CsvExportMap : ClassMap<MovieEntryFacade>
+    public sealed class CsvExportMap : ClassMap<MovieEntry>
     {
         public CsvExportMap()
         {

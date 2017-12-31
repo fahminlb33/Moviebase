@@ -13,7 +13,7 @@ namespace Moviebase.Core.Workers
     {
         private static Logger _log = LogManager.GetCurrentClassLogger();
 
-        public List<MovieEntryFacade> Movies { get; set; }
+        public List<MovieEntry> Movies { get; set; }
         public string OutputPath { get; set; }
 
         public IEnumerable<Task> CreateTasks()

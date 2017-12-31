@@ -53,7 +53,7 @@ namespace Moviebase.Core.Workers
                         where movieTitle.Value.Id.ToString() == choosenName.Split(':')[0]
                         select new ResearchMovieEntryState
                         {
-                            Entry = new MovieEntryFacade(movieTitle.Value, FullPath),
+                            Entry = new MovieEntry(movieTitle.Value, FullPath),
                             Index = Index
                         }).FirstOrDefault();
                 }

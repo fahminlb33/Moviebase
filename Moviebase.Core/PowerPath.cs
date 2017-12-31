@@ -6,7 +6,7 @@ using System.Text;
 // ReSharper disable once CheckNamespace
 namespace System.IO
 {
-    public sealed class PowerPath : IDisposable, ICloneable
+    public sealed class PowerPath : ICloneable
     {
         private string _root;
         private readonly List<string> _dirLevels;
@@ -310,25 +310,13 @@ namespace System.IO
         
         #endregion
 
-        #region IDisposable Support
-        private bool _disposedValue;
-
-        private void Dispose(bool disposing)
+        public void Clear()
         {
-            if (_disposedValue) return;
-            if (disposing)
-            {
-                _dirLevels?.Clear();
-            }
-
-            _disposedValue = true;
+            _dirLevels.Clear();
+            _root = null;
+            _extension = null;
+            _filename = null;
         }
-
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-        #endregion
 
         private static class ArgumentContract
         {

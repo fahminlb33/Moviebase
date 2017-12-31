@@ -50,7 +50,7 @@ namespace Moviebase.Core.Workers
                     }
 
                     newData = newData ?? await _tmdb.GetByFilename(Path.GetFileName(analyzeItem));
-                    var result = new MovieEntryFacade(newData, analyzeItem);
+                    var result = new MovieEntry(newData, analyzeItem);
 
                     _log.Info("Processed: " + analyzeItem);
                     return new MovieEntryState

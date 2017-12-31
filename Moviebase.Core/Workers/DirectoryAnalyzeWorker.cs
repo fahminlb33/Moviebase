@@ -61,7 +61,7 @@ namespace Moviebase.Core.Workers
                     }
 
                     // pop to event
-                    var result = new MovieEntryFacade(entry, currentMoviePath);
+                    var result = new MovieEntry(entry, currentMoviePath);
                     return new MovieEntryState
                     {
                         Entry = result

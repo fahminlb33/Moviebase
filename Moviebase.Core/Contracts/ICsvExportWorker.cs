@@ -5,7 +5,7 @@ namespace Moviebase.Core.Contracts
 {
     public interface ICsvExportWorker : INonReturningWorker
     {
-        List<MovieEntryFacade> Movies { get; set; }
+        List<MovieEntry> Movies { get; set; }
         string OutputPath { get; set; }
     }
 }

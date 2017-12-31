@@ -4,6 +4,6 @@ namespace Moviebase.Core
 {
     public class MovieEntryState
     {
-        public MovieEntryFacade Entry { get; set; }
+        public MovieEntry Entry { get; set; }
     }
 }

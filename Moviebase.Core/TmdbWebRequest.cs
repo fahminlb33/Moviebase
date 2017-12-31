@@ -21,13 +21,12 @@ namespace Moviebase.Core
         public const string PostersPath = "/movie/{0}/images";
 
         private static Logger _log = LogManager.GetCurrentClassLogger();
-        private readonly HttpClient _wc;
+        private static HttpClient HttpClientInstance = new HttpClient();
         private readonly string _apiKey;
 
         public TmdbWebRequest(string apiKey)
         {
             _apiKey = apiKey;
-            _wc = new HttpClient();
         }
 
         public async Task<T> GetRequestBody<T>(string path, NameValueCollection col)
@@ -43,7 +42,7 @@ namespace Moviebase.Core
                 var tryTimes = 0;
                 do
                 {
-                    var response = await _wc.GetAsync(uri);
+                    var response = await HttpClientInstance.GetAsync(uri);
                     if (response.StatusCode != (HttpStatusCode)429)
                     {
                         var retryAfter = response.Headers.RetryAfter?.Delta;
@@ -79,7 +78,7 @@ namespace Moviebase.Core
             FileStream fs = null;
             try
             {
-                var response = await _wc.GetAsync(url);
+                var response = await HttpClientInstance.GetAsync(url);
                 response.EnsureSuccessStatusCode();
                 fs = new FileStream(outputPath, FileMode.Create, FileAccess.Write, FileShare.None);
                 await response.Content.CopyToAsync(fs).ContinueWith(t => fs.Close());
@@ -132,7 +131,7 @@ namespace Moviebase.Core
             if (_disposedValue) return;
             if (disposing)
             {
-                if(_wc!=null) _wc.Dispose();
+                if(HttpClientInstance!=null) HttpClientInstance.Dispose();
             }
             
             _disposedValue = true;
