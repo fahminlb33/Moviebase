@@ -27,7 +27,7 @@ namespace Moviebase.Core
         {
             try
             {
-                var searcher = Directory.EnumerateFiles(dir, "*.*", SearchOption.TopDirectoryOnly);
+                var searcher = Directory.EnumerateFiles(dir, Commons.AllFilesSearchPattern, SearchOption.TopDirectoryOnly);
                 var path = searcher.FirstOrDefault(x => FileExtensions.Contains(Path.GetExtension(x)));
                 return path;
             }

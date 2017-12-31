@@ -1,12 +1,13 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows.Forms;
-using Moviebase.Annotations;
+using Moviebase.Core;
 using Moviebase.Entities;
 
-namespace Moviebase.Presenters
+namespace Moviebase.Models
 {
     class MainModel : INotifyPropertyChanged
     { 
@@ -21,18 +22,23 @@ namespace Moviebase.Presenters
         private ProgressBarStyle _prgStatusStyle;
         private string _lblPercentageText;
         private bool _cmdStopEnabled;
-        private bool _gridViewEnabled;
+        private Image _picPosterImage;
 
         public MainModel(SynchronizationContext context)
         {
             _syncContext = context;
-            DataView = new BindingList<MovieEntryFacade>();
-
             InitializeValues();
         }
 
         private void InitializeValues()
         {
+            DataView = new BindingList<MovieEntryFacade>();
+
+            PicPosterImage = Commons.DefaultImage;
+            LblTitleText = StringResources.ThreeDots;
+            LblExtraInfoText = StringResources.ThreeDots;
+            LblPlotText = StringResources.ThreeDots;
+            
             CmdDirectoriesEnabled = true;
             CmdToolsEnabled = true;
             CmdActionsEnabled = true;
@@ -44,16 +50,25 @@ namespace Moviebase.Presenters
             LblPercentageText = "0%";
         }
 
-        public bool GridViewEnabled
+        public BindingList<MovieEntryFacade> DataView { get; private set; }
+
+        public string LblTitleText { get; set; }
+
+        public string LblExtraInfoText { get; set; }
+
+        public string LblPlotText { get; set; }
+        
+        public Image PicPosterImage
         {
-            get => _gridViewEnabled;
+            get => _picPosterImage;
             set
             {
-                if (value == _gridViewEnabled) return;
-                _gridViewEnabled = value; 
+                if (value == _picPosterImage) return;
+                _picPosterImage = value;
                 OnPropertyChanged();
             }
         }
+
 
         public bool CmdDirectoriesEnabled
         {
@@ -143,14 +158,11 @@ namespace Moviebase.Presenters
             }
         }
 
-        public BindingList<MovieEntryFacade> DataView { get; }
-
         public void Invoke(Action action)
         {
             _syncContext.Send(x => action.Invoke(), null);
         }
         
-        [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             _syncContext.Send(d => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)), null);

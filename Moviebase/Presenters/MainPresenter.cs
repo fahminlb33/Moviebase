@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -10,6 +11,7 @@ using Moviebase.Entities;
 using BlastMVP;
 using Moviebase.Core;
 using Moviebase.Core.Contracts;
+using Moviebase.Models;
 using Ninject;
 
 namespace Moviebase.Presenters
@@ -19,8 +21,7 @@ namespace Moviebase.Presenters
         private readonly StandardKernel _kernel = Program.AppKernel;
         private readonly FolderBrowserDialog _folderBrowserDialog;
         private readonly IWorkerPool _workerPool;
-
-        public Action CloseFolderCallback;
+        
         public MainModel Model { get; }
         public MainView View { get; }
 
@@ -39,6 +40,8 @@ namespace Moviebase.Presenters
                 Description = StringResources.BrowseFolderDescription,
                 ShowNewFolderButton = false
             };
+
+            CheckComponents();
         }
 
         #region Worker Subscriber
@@ -50,7 +53,6 @@ namespace Moviebase.Presenters
             Model.CmdActionsEnabled = false;
             Model.CmdStopEnabled = true;
             Model.LblStatusText = "Working...";
-            Model.GridViewEnabled = false;
         }
 
         private void Worker_RunWorkerCompleted()
@@ -64,7 +66,6 @@ namespace Moviebase.Presenters
             Model.CmdToolsEnabled = true;
             Model.CmdActionsEnabled = true;
             Model.CmdStopEnabled = false;
-            Model.GridViewEnabled = true;
         }
 
         private void Worker_ProgressChanged(int progressPercentage, object state)
@@ -87,6 +88,11 @@ namespace Moviebase.Presenters
             {
                 var arg = (MovieEntryState)state;
                 Model.Invoke(() => Model.DataView.Add(arg.Entry));
+            }
+            else if (state.GetType() == typeof(ResearchMovieEntryState))
+            {
+                var arg = (ResearchMovieEntryState)state;
+                Model.Invoke(()=> Model.DataView[arg.Index] = arg.Entry);
             }
         }
 
@@ -166,7 +172,7 @@ namespace Moviebase.Presenters
         public void CloseFolder()
         {
             Model.DataView.Clear();
-            CloseFolderCallback?.Invoke();
+            ResetDetails();
         }
 
         // -------- ACTIONS
@@ -244,22 +250,88 @@ namespace Moviebase.Presenters
             _workerPool.Start(worker);
         }
 
+        // -------- GRID VIEW
+        public void GridSelectionChanged(int rowIndex)
+        {
+            var dataItem = Model.DataView[rowIndex];
+            Model.LblTitleText = string.Format(StringResources.MovieTitleInfoPattern, dataItem.Title, dataItem.Year);
+            Model.LblExtraInfoText = string.Format(StringResources.MovieExtraInfoPattern, dataItem.Genre, dataItem.ImdbId);
+            Model.LblPlotText = dataItem.Plot;
+
+            var movieDir = Path.GetDirectoryName(dataItem.FullPath);
+            var posterPath = GetPosterPath(dataItem.InternalMovieData, movieDir);
+            LoadImage(posterPath);
+        }
+
+        public void GridCellFormatting(ref DataGridViewCellFormattingEventArgs e)
+        {
+            var item = Model.DataView[e.RowIndex];
+
+            switch (item.InternalMovieData.Id)
+            {
+                case 0:
+                    e.CellStyle.BackColor = Color.Crimson;
+                    break;
+                case -2:
+                    e.CellStyle.BackColor = Color.Yellow;
+                    break;
+            }
+        }
         #endregion
 
         #region Methods
 
-        public string GetPosterPath(TmdbResult result, string dir)
+        public void ResetDetails()
+        {
+            Model.LblTitleText = StringResources.ThreeDots;
+            Model.LblExtraInfoText = StringResources.ThreeDots;
+            Model.LblPlotText = string.Empty;
+            LoadImage(null);
+        }
+        
+        private string GetPosterPath(TmdbResult result, string dir)
         {
             var manager = _kernel.Get<IPersistentDataManager>();
             return manager.GetPosterUri(result, dir, Settings.Default.PosterFileName + Commons.JpgFileExtension);
         }
 
-        public void CheckComponents()
+        private void LoadImage(string uri)
         {
-            Task.Run(  () =>
+            Task.Run(async () =>
+            {
+                // remove old pict
+                if (Model.PicPosterImage != Commons.DefaultImage) Model.PicPosterImage?.Dispose(); 
+                Model.PicPosterImage = Commons.DefaultImage;
+                if (uri == null) return;
+
+                // download if not availiable
+                var loadPath = uri;
+                var deleteAfter = false;
+                if (uri.ToUpperInvariant().StartsWith("HTTP"))
+                {
+                    deleteAfter = true;
+                    var requester = _kernel.Get<ITmdbWebRequest>();
+                    loadPath = Path.GetTempFileName();
+                    await requester.DownloadFile(uri, loadPath);
+                }
+
+                // load from file
+                using (var stream = new FileStream(loadPath, FileMode.Open))
+                {
+                    Model.PicPosterImage = Image.FromStream(stream);
+                }
+
+                // delete temp file
+                if (deleteAfter) File.Delete(loadPath);
+            });
+        }
+
+        private void CheckComponents()
+        {
+            Task.Run(() =>
             {
                 var comp = _kernel.Get<IComponentManager>();
-                if (  comp.CheckPythonInstallation().Result &&   comp.CheckGuessItInstallation().Result) return;
+                if (comp.CheckPythonInstallation().Result && comp.CheckGuessItInstallation().Result) return;
 
                 View.ShowMessageBox(StringResources.ComponentMissingMessage, StringResources.AppName,
                     icon: MessageBoxIcon.Exclamation);
