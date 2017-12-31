@@ -77,6 +77,7 @@
     <Compile Include="DataBinderExtensions.cs" />
     <Compile Include="IBindingTarget.cs" />
     <Compile Include="FormExtensions.cs" />
+    <Compile Include="ModelBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
