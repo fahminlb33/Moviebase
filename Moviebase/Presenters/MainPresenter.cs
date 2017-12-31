@@ -142,15 +142,9 @@ namespace Moviebase.Presenters
             if (isLastDir)
             {
                 var path = settings.LastOpenDirectory;
-                if (path == null)
+                if (path == null || !Directory.Exists(path))
                 {
                     View.ShowMessageBox(StringResources.OpenDirNoRecord, StringResources.AppName,
-                        icon: MessageBoxIcon.Exclamation);
-                    return;
-                }
-                if (!Directory.Exists(path))
-                {
-                    View.ShowMessageBox(StringResources.OpenDirNotExist, StringResources.AppName,
                         icon: MessageBoxIcon.Exclamation);
                     return;
                 }
