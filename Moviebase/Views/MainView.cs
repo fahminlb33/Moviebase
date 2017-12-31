@@ -210,7 +210,7 @@ namespace Moviebase.Views
         private void mnuIgnore_Click(object sender, EventArgs e)
         {
             if (grdMovies.CurrentRow == null) return;
-            var dataItem = (MovieEntryFacade)grdMovies.CurrentRow.DataBoundItem;
+            var dataItem = (MovieEntry)grdMovies.CurrentRow.DataBoundItem;
 
             _presenter.SingleSavePersistData(dataItem);
             this.ShowMessageBox(StringResources.ItemExcludedMessage, StringResources.AppName);
@@ -219,7 +219,7 @@ namespace Moviebase.Views
         private void mnuSelectPoster_Click(object sender, EventArgs e)
         {
             if (grdMovies.CurrentRow == null) return;
-            var dataItem = (MovieEntryFacade)grdMovies.CurrentRow.DataBoundItem;
+            var dataItem = (MovieEntry)grdMovies.CurrentRow.DataBoundItem;
 
             var path = _presenter.ShowSelectPosterWindow(dataItem.InternalMovieData.Id.ToString());
             if (path != null) dataItem.InternalMovieData.PosterPath = path;
@@ -228,7 +228,7 @@ namespace Moviebase.Views
         private void mnuAlternativeNames_Click(object sender, EventArgs e)
         {
             if (grdMovies.CurrentRow == null) return;
-            var dataItem = (MovieEntryFacade)grdMovies.CurrentRow.DataBoundItem;
+            var dataItem = (MovieEntry)grdMovies.CurrentRow.DataBoundItem;
 
             var name = _presenter.ShowAlternativeNameWindow(dataItem.InternalMovieData.AlternativeNames);
             if (name != null) dataItem.Title = name;

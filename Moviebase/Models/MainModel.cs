@@ -1,19 +1,15 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Drawing;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows.Forms;
+using BlastMVP;
 using Moviebase.Core;
 using Moviebase.Entities;
 
 namespace Moviebase.Models
 {
-    class MainModel : INotifyPropertyChanged
+    class MainModel : ModelBase
     { 
-        private readonly SynchronizationContext _syncContext;
-        public event PropertyChangedEventHandler PropertyChanged;
-
         private bool _cmdDirectoriesEnabled;
         private bool _cmdToolsEnabled;
         private bool _cmdActionsEnabled;
@@ -24,33 +20,32 @@ namespace Moviebase.Models
         private bool _cmdStopEnabled;
         private Image _picPosterImage;
 
-        public MainModel(SynchronizationContext context)
+        public MainModel(SynchronizationContext context) : base(context)
         {
-            _syncContext = context;
             InitializeValues();
         }
 
         private void InitializeValues()
         {
-            DataView = new BindingList<MovieEntryFacade>();
+            DataView = new BindingList<MovieEntry>();
 
             PicPosterImage = Commons.DefaultImage;
-            LblTitleText = StringResources.ThreeDots;
-            LblExtraInfoText = StringResources.ThreeDots;
-            LblPlotText = StringResources.ThreeDots;
+            LblTitleText = StringResources.LiteralThreeDots;
+            LblExtraInfoText = StringResources.LiteralThreeDots;
+            LblPlotText = StringResources.LiteralThreeDots;
             
             CmdDirectoriesEnabled = true;
             CmdToolsEnabled = true;
             CmdActionsEnabled = true;
             CmdStopEnabled = false;
 
-            LblStatusText = StringResources.ReadyText;
+            LblStatusText = StringResources.LiteralReadyText;
             PrgStatusValue = 0;
             PrgStatusStyle = ProgressBarStyle.Blocks;
             LblPercentageText = "0%";
         }
 
-        public BindingList<MovieEntryFacade> DataView { get; private set; }
+        public BindingList<MovieEntry> DataView { get; private set; }
 
         public string LblTitleText { get; set; }
 
@@ -156,16 +151,6 @@ namespace Moviebase.Models
                 _lblPercentageText = value;
                 OnPropertyChanged();
             }
-        }
-
-        public void Invoke(Action action)
-        {
-            _syncContext.Send(x => action.Invoke(), null);
-        }
-        
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            _syncContext.Send(d => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)), null);
         }
     }
 }

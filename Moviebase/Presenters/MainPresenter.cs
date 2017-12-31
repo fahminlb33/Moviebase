@@ -218,7 +218,7 @@ namespace Moviebase.Presenters
             _workerPool.Start(worker);
         }
 
-        public void SingleSavePersistData(MovieEntryFacade entry)
+        public void SingleSavePersistData(MovieEntry entry)
         {
             var manager = _kernel.Get<IPersistentDataManager>();
             entry.InternalMovieData.Id = -2;
@@ -283,8 +283,8 @@ namespace Moviebase.Presenters
 
         public void ResetDetails()
         {
-            Model.LblTitleText = StringResources.ThreeDots;
-            Model.LblExtraInfoText = StringResources.ThreeDots;
+            Model.LblTitleText = StringResources.LiteralThreeDots;
+            Model.LblExtraInfoText = StringResources.LiteralThreeDots;
             Model.LblPlotText = string.Empty;
             LoadImage(null);
         }

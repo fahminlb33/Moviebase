@@ -35,17 +35,15 @@ namespace Moviebase.Views
             this.txtPath = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.lblCount = new System.Windows.Forms.Label();
-            this.cmdBrowse = new System.Windows.Forms.LinkLabel();
-            this.lvMovies = new System.Windows.Forms.ListView();
-            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.cmdSearch = new System.Windows.Forms.Button();
             this.folderBrowser = new System.Windows.Forms.FolderBrowserDialog();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.panel2 = new System.Windows.Forms.Panel();
             this.btnBrowse = new System.Windows.Forms.Button();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -97,47 +95,6 @@ namespace Moviebase.Views
             this.lblCount.Text = "Count:";
             this.lblCount.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // cmdBrowse
-            // 
-            this.cmdBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.cmdBrowse.AutoSize = true;
-            this.cmdBrowse.Location = new System.Drawing.Point(350, 22);
-            this.cmdBrowse.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.cmdBrowse.Name = "cmdBrowse";
-            this.cmdBrowse.Size = new System.Drawing.Size(42, 13);
-            this.cmdBrowse.TabIndex = 4;
-            this.cmdBrowse.TabStop = true;
-            this.cmdBrowse.Text = "Browse"; 
-            // 
-            // lvMovies
-            // 
-            this.lvMovies.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lvMovies.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader1,
-            this.columnHeader2});
-            this.lvMovies.FullRowSelect = true;
-            this.lvMovies.GridLines = true;
-            this.lvMovies.Location = new System.Drawing.Point(18, 124);
-            this.lvMovies.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.lvMovies.Name = "lvMovies";
-            this.lvMovies.Size = new System.Drawing.Size(553, 217);
-            this.lvMovies.Sorting = System.Windows.Forms.SortOrder.Ascending;
-            this.lvMovies.TabIndex = 5;
-            this.lvMovies.UseCompatibleStateImageBehavior = false;
-            this.lvMovies.View = System.Windows.Forms.View.Details;
-            // 
-            // columnHeader1
-            // 
-            this.columnHeader1.Text = "Name";
-            this.columnHeader1.Width = 149;
-            // 
-            // columnHeader2
-            // 
-            this.columnHeader2.Text = "Path";
-            this.columnHeader2.Width = 315;
-            // 
             // cmdSearch
             // 
             this.cmdSearch.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -148,7 +105,7 @@ namespace Moviebase.Views
             this.cmdSearch.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(55)))), ((int)(((byte)(55)))), ((int)(((byte)(60)))));
             this.cmdSearch.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmdSearch.ForeColor = System.Drawing.Color.White;
-            this.cmdSearch.Location = new System.Drawing.Point(487, 9);
+            this.cmdSearch.Location = new System.Drawing.Point(487, 10);
             this.cmdSearch.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.cmdSearch.Name = "cmdSearch";
             this.cmdSearch.Size = new System.Drawing.Size(89, 46);
@@ -167,7 +124,6 @@ namespace Moviebase.Views
             this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(28)))), ((int)(((byte)(28)))));
             this.panel1.Controls.Add(this.btnBrowse);
             this.panel1.Controls.Add(this.cmdSearch);
-            this.panel1.Controls.Add(this.cmdBrowse);
             this.panel1.Controls.Add(this.txtPath);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
@@ -175,17 +131,6 @@ namespace Moviebase.Views
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(584, 64);
             this.panel1.TabIndex = 7;
-            // 
-            // panel2
-            // 
-            this.panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
-            this.panel2.Controls.Add(this.label2);
-            this.panel2.Controls.Add(this.lblCount);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel2.Location = new System.Drawing.Point(0, 64);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(584, 43);
-            this.panel2.TabIndex = 8;
             // 
             // btnBrowse
             // 
@@ -205,14 +150,39 @@ namespace Moviebase.Views
             this.btnBrowse.UseVisualStyleBackColor = false;
             this.btnBrowse.Click += new System.EventHandler(this.btnBrowse_Click);
             // 
+            // panel2
+            // 
+            this.panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
+            this.panel2.Controls.Add(this.label2);
+            this.panel2.Controls.Add(this.lblCount);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel2.Location = new System.Drawing.Point(0, 64);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(584, 43);
+            this.panel2.TabIndex = 8;
+            // 
+            // dataGridView1
+            // 
+            this.dataGridView1.AllowUserToAddRows = false;
+            this.dataGridView1.AllowUserToDeleteRows = false;
+            this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView1.Location = new System.Drawing.Point(15, 126);
+            this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.ReadOnly = true;
+            this.dataGridView1.Size = new System.Drawing.Size(553, 217);
+            this.dataGridView1.TabIndex = 9;
+            // 
             // MoveMoviesView
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(584, 361);
+            this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
-            this.Controls.Add(this.lvMovies);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.MaximizeBox = false;
@@ -223,6 +193,7 @@ namespace Moviebase.Views
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -234,14 +205,11 @@ namespace Moviebase.Views
         private System.Windows.Forms.TextBox txtPath;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label lblCount;
-        private System.Windows.Forms.LinkLabel cmdBrowse;
-        private System.Windows.Forms.ListView lvMovies;
         private System.Windows.Forms.Button cmdSearch;
-        private System.Windows.Forms.ColumnHeader columnHeader1;
-        private System.Windows.Forms.ColumnHeader columnHeader2;
         private System.Windows.Forms.FolderBrowserDialog folderBrowser;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Button btnBrowse;
+        private System.Windows.Forms.DataGridView dataGridView1;
     }
 }

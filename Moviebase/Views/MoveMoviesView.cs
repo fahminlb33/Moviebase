@@ -1,86 +1,42 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
-using System.Threading;
 using System.Windows.Forms;
 using BlastMVP;
-using Moviebase.Core;
-using Moviebase.Core.Contracts;
-using Moviebase.Entities;
-using Moviebase.Properties;
-using Ninject;
+using Moviebase.Presenters;
 
 namespace Moviebase.Views
 {
     public partial class MoveMoviesView : Form
     {
-        private readonly StandardKernel _kernel = Program.AppKernel;
-        private readonly SynchronizationContext _synchronizationContext;
-        private readonly IWorkerPool _workerPool;
-        private int _processed;
+        private MoveMoviesPresenter _presenter;
 
         public MoveMoviesView()
         {
             InitializeComponent();
-            _synchronizationContext = SynchronizationContext.Current;
-            _workerPool = _kernel.Get<IWorkerPool>();
-            PrepareView();
+            _presenter = new MoveMoviesPresenter(this);
+            GlueBindings();
         }
 
-        private void PrepareView()
+        public void GlueBindings()
         {
-            _workerPool.RunWorkerCompleted = Worker_RunWorkerCompleted;
-            _workerPool.ProgressChanged = Worker_ProgressChanged;
+            var model = _presenter.Model;
+            dataGridView1.DataSource = model.DataView;
+
+            btnBrowse.Bind(c => c.Enabled).To(model, m => m.CmdBrowseEnabled);
+            cmdSearch.Bind(c => c.Text).To(model, m => m.CmdExecuteText);
+            cmdSearch.Bind(c => c.Enabled).To(model, m => m.CmdExecuteEnabled);
+
+            lblCount.Bind(c => c.Text).To(model, m => m.LblCountText);
+            txtPath.Bind(c => c.Text).To(model, m => m.TxtBrowseText);
         }
 
-        private void Worker_ProgressChanged(int progressPercentage, object state)
-        {
-            _synchronizationContext.Post(d =>
-            {
-                using (var path = new PowerPath(state.ToString()))
-                {
-                    Interlocked.Increment(ref _processed);
-                    lblCount.Text = string.Format(StringResources.MoveMoviesCount, Interlocked.CompareExchange(ref _processed, 0, 0));
-                    var item = lvMovies.Items.Add(path.GetFileName());
-                    item.SubItems.Add(path.GetDirectoryPath());
-                }
-            }, null);
-        }
-
-        private void Worker_RunWorkerCompleted()
-        {
-            _synchronizationContext.Post(d =>
-            {
-                cmdSearch.Text = StringResources.MoveMovieCommandText;
-                cmdSearch.Enabled = true;
-            }, null);
-        }
         private void btnBrowse_Click(object sender, EventArgs e)
         {
-            if (folderBrowser.ShowDialog() != DialogResult.OK) return;
-            txtPath.Text = folderBrowser.SelectedPath;
+            _presenter.BrowseFolder();
         }
 
         private void cmdSearch_Click(object sender, EventArgs e)
         {
-            if (txtPath.TextLength == 0)
-            {
-                this.ShowMessageBox(StringResources.SelectFolderMessage, StringResources.AppName, icon: MessageBoxIcon.Exclamation);
-                return;
-            }
-            if (cmdSearch.Text == StringResources.MoveMovieCommandText)
-            {
-                var worker = Program.AppKernel.Get<IMoveMovieWorker>();
-                worker.AnalyzePath = folderBrowser.SelectedPath;
-                worker.FileExtensions = Settings.Default.MovieExtensions.Cast<string>().ToList();
-                _workerPool.Start(worker);
-                cmdSearch.Text = StringResources.StopText;
-            }
-            else
-            {
-                _workerPool.Stop();
-                cmdSearch.Enabled = false;
-            }
+            _presenter.SearchMovies();
         }
     }
 }

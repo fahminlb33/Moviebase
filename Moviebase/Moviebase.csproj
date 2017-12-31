@@ -92,6 +92,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\MoveMoviesModel.cs" />
+    <Compile Include="Models\SelectPosterModel.cs" />
+    <Compile Include="Presenters\MoveMoviesPresenter.cs" />
+    <Compile Include="Presenters\SelectPosterPresenter.cs" />
     <Compile Include="Views\AboutView.cs">
       <SubType>Form</SubType>
     </Compile>

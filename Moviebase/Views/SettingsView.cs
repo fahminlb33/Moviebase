@@ -13,7 +13,7 @@ namespace Moviebase.Views
 {
     public partial class SettingsView : Form
     {
-        private static readonly MovieEntryFacade TryitData = new MovieEntryFacade(new TmdbResult
+        private static readonly MovieEntry TryitData = new MovieEntry(new TmdbResult
         {
             Genre = "Science Fiction",
             Id = 1134,
@@ -76,16 +76,7 @@ namespace Moviebase.Views
         {
             txtLastOpenDir.Text = "";
         }
-         
-        private void cmdAddExt_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            var result = this.ShowInputBox(StringResources.AddExtensionMessage, StringResources.AddExtensionTitle, out string ext);
-            if (result != DialogResult.OK) return;
-
-            if (!ext.StartsWith(".", StringComparison.Ordinal)) ext = "." + ext;
-            lstExtensions.Items.Add(Commons.StripWhitespace(ext));
-        }
-
+      
         private void cmdDetect_Click(object sender, EventArgs e)
         {
             cmdDetect.Enabled = false;
@@ -136,9 +127,9 @@ namespace Moviebase.Views
         private void cmdAdd_Click(object sender, EventArgs e)
         {
             var ext = txtExt.Text;
-            if (String.IsNullOrEmpty(ext))
+            if (string.IsNullOrEmpty(ext))
             {
-                MessageBox.Show("No Extension to Add", "Setting");
+                this.ShowMessageBox(StringResources.NoExtensionToAddMessage, StringResources.AppName);
                 return;
             }
             if (!ext.StartsWith(".", StringComparison.Ordinal)) ext = "." + ext;

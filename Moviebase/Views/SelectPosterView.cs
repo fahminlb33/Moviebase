@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -8,69 +7,42 @@ using BlastMVP;
 using Moviebase.Core;
 using Moviebase.Entities;
 using Moviebase.Entities.Web;
+using Moviebase.Presenters;
 using Ninject;
 
 namespace Moviebase.Views
 {
     public partial class SelectPosterView : Form
     {
-        private string _tempDir;
-        private ITmdbWebRequest _tmdbWebRequest;
-        private ITmdb _tmdb;
-        private SynchronizationContext _synchronizationContext;
+        private SelectPosterPresenter _presenter;
 
         public string SelectedPath { get; set; }
 
         public SelectPosterView(string id)
         {
             InitializeComponent();
+            _presenter = new SelectPosterPresenter(this) {FindFinishedCallback = FindFinishedCallback};
+            GlueBindings();
 
-            _tmdbWebRequest = Program.AppKernel.Get<ITmdbWebRequest>();
-            _tmdb = Program.AppKernel.Get<ITmdb>();
-            _synchronizationContext = SynchronizationContext.Current;
-
-            Task.Run(() => FindPoster(id));
+            _presenter.FindPoster(id);
         }
 
-        private async void FindPoster(string id)
+        private void FindFinishedCallback(string[] filePaths)
         {
-            _tempDir = Path.Combine(Path.GetTempPath(), Commons.TempFolderName, DateTime.Now.Ticks.ToString());
-            Directory.CreateDirectory(_tempDir);
-
-            var posterUris = await _tmdb.GetPosterUris(id);
-            var total = posterUris.Count;
-            var processed = 0;
-
-            for (var i = 0; i < total; i++)
-            {
-                var currentPath = _tmdbWebRequest.BuildPosterUrl(posterUris[i], PosterSize.w154);
-                var currentSavePath = Path.Combine(_tempDir, posterUris[i].Remove(0, 1));
-                await _tmdbWebRequest.DownloadFile(currentPath, currentSavePath);
-
-                ++processed;
-                var percent = (int) (processed / (double) total * 100);
-                _synchronizationContext.Post(x =>
-                {
-                    lblStatus.Text = string.Format(StringResources.PercentagePattern, percent);
-                    prgDownload.Value = percent;
-                }, null);
-            }
-            _synchronizationContext.Post(x => lblStatus.Text = StringResources.CompletedText, null);
-
-            var files = Directory.GetFiles(_tempDir, Commons.JpgSearchPattern, SearchOption.TopDirectoryOnly);
-            _synchronizationContext.Post(x => lvPosters.Items.AddRange((string[]) x), files);
+            lvPosters.Items.AddRange(filePaths);
         }
 
+        private void GlueBindings()
+        {
+            var model = _presenter.Model;
+
+            lblStatus.Bind(c => c.Text).To(model, m => m.LblStatusText);
+            prgDownload.Bind(c => c.Value).To(model, m => m.PrgStatusValue);
+        }
+        
         private void SelectPosterView_FormClosing(object sender, FormClosingEventArgs e)
         {
-            try
-            {
-                Directory.Delete(_tempDir, true);
-            }
-            catch
-            {
-              // ignore   
-            }
+            _presenter.FormClosing();
         }
 
         private void cmdOK_Click(object sender, EventArgs e)
