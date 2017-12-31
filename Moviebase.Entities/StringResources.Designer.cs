@@ -115,15 +115,6 @@ namespace Moviebase.Entities {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Completed..
-        /// </summary>
-        public static string CompletedText {
-            get {
-                return ResourceManager.GetString("CompletedText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Some component(s) are missing. Please install before using this application. See Settings..
         /// </summary>
         public static string ComponentMissingMessage {
@@ -160,6 +151,60 @@ namespace Moviebase.Entities {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Completed..
+        /// </summary>
+        public static string LiteralCompletedText {
+            get {
+                return ResourceManager.GetString("LiteralCompletedText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Downloading....
+        /// </summary>
+        public static string LiteralDownloadingText {
+            get {
+                return ResourceManager.GetString("LiteralDownloadingText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move!.
+        /// </summary>
+        public static string LiteralMoveText {
+            get {
+                return ResourceManager.GetString("LiteralMoveText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ready..
+        /// </summary>
+        public static string LiteralReadyText {
+            get {
+                return ResourceManager.GetString("LiteralReadyText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stop.
+        /// </summary>
+        public static string LiteralStopText {
+            get {
+                return ResourceManager.GetString("LiteralStopText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ....
+        /// </summary>
+        public static string LiteralThreeDots {
+            get {
+                return ResourceManager.GetString("LiteralThreeDots", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ImageMagick is not installed. Can not use this feature..
         /// </summary>
         public static string MagickNotInstalled {
@@ -169,20 +214,11 @@ namespace Moviebase.Entities {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Move!.
-        /// </summary>
-        public static string MoveMovieCommandText {
-            get {
-                return ResourceManager.GetString("MoveMovieCommandText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Count: {0}.
         /// </summary>
-        public static string MoveMoviesCount {
+        public static string MoveMoviesCountPattern {
             get {
-                return ResourceManager.GetString("MoveMoviesCount", resourceCulture);
+                return ResourceManager.GetString("MoveMoviesCountPattern", resourceCulture);
             }
         }
         
@@ -201,6 +237,15 @@ namespace Moviebase.Entities {
         public static string MovieTitleInfoPattern {
             get {
                 return ResourceManager.GetString("MovieTitleInfoPattern", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No Extension to Add.
+        /// </summary>
+        public static string NoExtensionToAddMessage {
+            get {
+                return ResourceManager.GetString("NoExtensionToAddMessage", resourceCulture);
             }
         }
         
@@ -268,15 +313,6 @@ namespace Moviebase.Entities {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Ready..
-        /// </summary>
-        public static string ReadyText {
-            get {
-                return ResourceManager.GetString("ReadyText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to No data to rename..
         /// </summary>
         public static string RenameNoDataMessage {
@@ -291,24 +327,6 @@ namespace Moviebase.Entities {
         public static string SelectFolderMessage {
             get {
                 return ResourceManager.GetString("SelectFolderMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Stop.
-        /// </summary>
-        public static string StopText {
-            get {
-                return ResourceManager.GetString("StopText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to ....
-        /// </summary>
-        public static string ThreeDots {
-            get {
-                return ResourceManager.GetString("ThreeDots", resourceCulture);
             }
         }
         

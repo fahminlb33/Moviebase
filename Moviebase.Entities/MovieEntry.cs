@@ -1,11 +1,10 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 namespace Moviebase.Entities
 {
-    public class MovieEntryFacade
+    public class MovieEntry
     {
-        public MovieEntryFacade(TmdbResult data, string fullPath)
+        public MovieEntry(TmdbResult data, string fullPath)
         {
             InternalMovieData = data;
             FullPath = fullPath;

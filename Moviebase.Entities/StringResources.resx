@@ -156,19 +156,19 @@
   <data name="ThumbnailNoDataMessage" xml:space="preserve">
     <value>No data for thumbnail creation.</value>
   </data>
-  <data name="MoveMoviesCount" xml:space="preserve">
+  <data name="MoveMoviesCountPattern" xml:space="preserve">
     <value>Count: {0}</value>
   </data>
-  <data name="MoveMovieCommandText" xml:space="preserve">
+  <data name="LiteralMoveText" xml:space="preserve">
     <value>Move!</value>
   </data>
   <data name="SelectFolderMessage" xml:space="preserve">
     <value>Select a folder to analyze!</value>
   </data>
-  <data name="StopText" xml:space="preserve">
+  <data name="LiteralStopText" xml:space="preserve">
     <value>Stop</value>
   </data>
-  <data name="CompletedText" xml:space="preserve">
+  <data name="LiteralCompletedText" xml:space="preserve">
     <value>Completed.</value>
   </data>
   <data name="PosterNotSelectedMessage" xml:space="preserve">
@@ -177,7 +177,7 @@
   <data name="PercentagePattern" xml:space="preserve">
     <value>{0}%</value>
   </data>
-  <data name="ReadyText" xml:space="preserve">
+  <data name="LiteralReadyText" xml:space="preserve">
     <value>Ready.</value>
   </data>
   <data name="AddExtensionMessage" xml:space="preserve">
@@ -204,7 +204,13 @@
   <data name="MovieExtraInfoPattern" xml:space="preserve">
     <value>{0} | {1}</value>
   </data>
-  <data name="ThreeDots" xml:space="preserve">
+  <data name="LiteralThreeDots" xml:space="preserve">
     <value>...</value>
+  </data>
+  <data name="LiteralDownloadingText" xml:space="preserve">
+    <value>Downloading...</value>
+  </data>
+  <data name="NoExtensionToAddMessage" xml:space="preserve">
+    <value>No Extension to Add</value>
   </data>
 </root>
