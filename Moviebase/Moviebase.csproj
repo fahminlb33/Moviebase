@@ -102,8 +102,9 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Models\MainModel.cs" />
+    <Compile Include="Presenters\MainModel.cs" />
     <Compile Include="Presenters\MainPresenter.cs" />
+    <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Views\SelectPosterView.cs">
       <SubType>Form</SubType>
     </Compile>

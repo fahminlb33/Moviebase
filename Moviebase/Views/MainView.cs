@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
 using BlastMVP;
 using Moviebase.Entities;
@@ -10,22 +11,38 @@ namespace Moviebase.Views
     public partial class MainView : Form
     {
         private readonly MainPresenter _presenter;
-
+        
         public MainView()
         {
             InitializeComponent();
-            _presenter = new MainPresenter(this);
+            _presenter = new MainPresenter(this)
+            {
+                CloseFolderCallback = CloseFolderCallback
+            };
+            _presenter.CheckComponents();
             GlueBindings();
+        }
+
+        private void LoadImage(string uri)
+        {
+            pictureBox1.Image?.Dispose();
+            pictureBox1.Image = null;
+            if (uri != null) pictureBox1.LoadAsync(uri);
+        }
+
+        private void CloseFolderCallback()
+        {
+            lblTitle.Text = StringResources.ThreeDots;
+            lblExtraInfo.Text = StringResources.ThreeDots;
+            txtPlot.Text = string.Empty;
+            LoadImage(null);
         }
 
         private void GlueBindings()
         {
             var model = _presenter.Model;
             grdMovies.DataSource = model.DataView;
-            picPoster.Bind(c => c.Image).To(model, m => m.PicPosterImage);
-            lblTitle.Bind(c => c.Text).To(model, m => m.LblTitleText);
-            lblExtraInfo.Bind(c => c.Text).To(model, m => m.LblExtraInfoText);
-            txtPlot.Bind(x => x.Text).To(model, m => m.LblPlotText);
+            grdMovies.Bind(c => c.Enabled).To(model, m => m.GridViewEnabled);
 
             cmdFolderRecent.Bind(c => c.Enabled).To(model, m => m.CmdDirectoriesEnabled);
             cmdFolderClose.Bind(c => c.Enabled).To(model, m => m.CmdDirectoriesEnabled);
@@ -46,67 +63,36 @@ namespace Moviebase.Views
         {
             if (grdMovies.SelectedCells.Count == 0)
             {
-                _presenter.ResetDetails();
+                CloseFolderCallback();
                 return;
             }
 
-            _presenter.GridSelectionChanged(grdMovies.SelectedCells[0].RowIndex);
-        }
+            var rowIndex = grdMovies.SelectedCells[0].RowIndex;
+            var dataItem = (MovieEntryFacade)grdMovies.Rows[rowIndex].DataBoundItem;
+            lblTitle.Text = string.Format(StringResources.MovieTitleInfoPattern, dataItem.Title, dataItem.Year);
+            lblExtraInfo.Text = string.Format(StringResources.MovieExtraInfoPattern, dataItem.Genre, dataItem.ImdbId);
+            txtPlot.Text = dataItem.Plot;
 
-        private void grdMovies_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
-        {
-            _presenter.GridCellFormatting(ref e);
+            //if (dataItem.InternalMovieData.Id <= 0) return;
+            var movieDir = Path.GetDirectoryName(dataItem.FullPath);
+            var posterPath = _presenter.GetPosterPath(dataItem.InternalMovieData, movieDir);
+            LoadImage(posterPath);
         }
 
         private void grdMovies_MouseDown(object sender, MouseEventArgs e)
         {
-            //if (e.Button != MouseButtons.Right) return;
-            //var hti = grdMovies.HitTest(e.X, e.Y);
-            //if (hti.RowIndex == -1) return;
-            //grdMovies.ClearSelection();
-            //grdMovies.Rows[hti.RowIndex].Selected = true;
+            if (e.Button != MouseButtons.Right) return;
+            var hti = grdMovies.HitTest(e.X, e.Y);
+            if (hti.RowIndex == -1) return;
+            grdMovies.ClearSelection();
+            grdMovies.Rows[hti.RowIndex].Selected = true;
         }
 
         #endregion
 
         #region Event Subscribers
 
-        private void cmdFolderOpen_Click(object sender, EventArgs e)
-        {
-            if (_presenter.Model.DataView.Count > 0)
-            {
-                var result = this.ShowMessageBox(StringResources.AlreadyOpenedFolderMessage, StringResources.AppName,
-                    icon: MessageBoxIcon.Question);
-                if (result == DialogResult.OK)
-                {
-                    _presenter.CloseFolder();
-                }
-                else
-                {
-                    return;
-                }
-            }
 
-            _presenter.OpenDirectory(false);
-        }
-
-        private void cmdFolderClose_Click(object sender, EventArgs e)
-        {
-            _presenter.CloseFolder();
-        }
-
-        private void cmdFolderRecent_Click(object sender, EventArgs e)
-        {
-            if (_presenter.Model.DataView.Count > 0)
-            {
-                var result = this.ShowMessageBox(StringResources.AlreadyOpenedFolderMessage, StringResources.AppName, icon: MessageBoxIcon.Question);
-                if (result != DialogResult.OK)
-                    return;
-                _presenter.CloseFolder();
-            }
-
-            _presenter.OpenDirectory(true);
-        }
 
         // --------- TOOLS
         private void mnuSettings_Click(object sender, EventArgs e)
@@ -211,7 +197,6 @@ namespace Moviebase.Views
         {
             if (grdMovies.CurrentRow == null) return;
             var dataItem = (MovieEntryFacade)grdMovies.CurrentRow.DataBoundItem;
-
             _presenter.SingleSavePersistData(dataItem);
             this.ShowMessageBox(StringResources.ItemExcludedMessage, StringResources.AppName);
         }
@@ -220,7 +205,6 @@ namespace Moviebase.Views
         {
             if (grdMovies.CurrentRow == null) return;
             var dataItem = (MovieEntryFacade)grdMovies.CurrentRow.DataBoundItem;
-
             var path = _presenter.ShowSelectPosterWindow(dataItem.InternalMovieData.Id.ToString());
             if (path != null) dataItem.InternalMovieData.PosterPath = path;
         }
@@ -229,17 +213,51 @@ namespace Moviebase.Views
         {
             if (grdMovies.CurrentRow == null) return;
             var dataItem = (MovieEntryFacade)grdMovies.CurrentRow.DataBoundItem;
-
             var name = _presenter.ShowAlternativeNameWindow(dataItem.InternalMovieData.AlternativeNames);
             if (name != null) dataItem.Title = name;
         }
-
         #endregion
+
+        private void cmdFolderOpen_Click(object sender, EventArgs e)
+        {
+            if (_presenter.Model.DataView.Count > 0)
+            {
+                var result = this.ShowMessageBox(StringResources.AlreadyOpenedFolderMessage, StringResources.AppName,
+                    icon: MessageBoxIcon.Question);
+                if (result == DialogResult.OK)
+                {
+                    _presenter.CloseFolder();
+                }
+                else
+                {
+                    return;
+                }
+            }
+
+            _presenter.OpenDirectory(false);
+        }
+
+        private void cmdFolderClose_Click(object sender, EventArgs e)
+        {
+            _presenter.CloseFolder();
+        }
+
+        private void cmdFolderRecent_Click(object sender, EventArgs e)
+        {
+            if (_presenter.Model.DataView.Count > 0)
+            {
+                var result = this.ShowMessageBox(StringResources.AlreadyOpenedFolderMessage, StringResources.AppName, icon: MessageBoxIcon.Question);
+                if (result != DialogResult.OK)
+                    return;
+                _presenter.CloseFolder();
+            }
+            _presenter.OpenDirectory(true);
+        }
 
         private void toolTip1_Draw(object sender, DrawToolTipEventArgs e)
         {
             e.Graphics.Clear(Color.FromArgb(255, 32, 32, 32));
-            e.Graphics.DrawRectangle(new Pen(new SolidBrush(Color.FromArgb(255,32, 32, 32))), e.Bounds);
+            e.Graphics.DrawRectangle(new System.Drawing.Pen(new SolidBrush(Color.FromArgb(255,32, 32, 32))), e.Bounds);
             e.DrawBorder();
             e.DrawText(); 
         }

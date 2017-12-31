@@ -102,7 +102,6 @@
     <Compile Include="IComponentManager.cs" />
     <Compile Include="IReturningWorker.cs" />
     <Compile Include="IThumbnailFolder.cs" />
-    <Compile Include="NetworkObserver.cs" />
     <Compile Include="ProcessRedirectStream.cs" />
     <Compile Include="ThumbnailFolder.cs" />
     <Compile Include="IniFile.cs" />

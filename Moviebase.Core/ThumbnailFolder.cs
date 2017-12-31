@@ -19,7 +19,6 @@ namespace Moviebase.Core
 
                 var outputSquareFile = Path.Combine(dirPath, Commons.TempIconFileName);
                 InternalGenerateSquareImage(inputFile, outputSquareFile);
-                Commons.RunNoException(() => File.Delete(outputSquareFile));
 
                 var outputIconFile = Path.Combine(dirPath, Commons.IconFileName);
                 InternalGenerateIcon(outputSquareFile, outputIconFile);
@@ -55,8 +54,15 @@ namespace Moviebase.Core
 
         public void RemoveThumbnail(string dirPath)
         {
-            Commons.RunNoException(() => File.Delete(Path.Combine(dirPath, "icon.ico")));
-            Commons.RunNoException(() => File.Delete(Path.Combine(dirPath, "desktop.ini")));
+            try
+            {
+                Commons.RunNoException(() => File.Delete(Path.Combine(dirPath, "icon.ico")));
+                Commons.RunNoException(() => File.Delete(Path.Combine(dirPath, "desktop.ini")));
+            }
+            catch (Exception e)
+            {
+                _log.Error(e, "Error removing thumbnail info.");
+            }
         }
 
         private void InternalGenerateSquareImage(string inputPath, string outputPath)

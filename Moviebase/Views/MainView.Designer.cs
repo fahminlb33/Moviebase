@@ -56,7 +56,7 @@
             this.lblExtraInfo = new System.Windows.Forms.Label();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-            this.picPoster = new System.Windows.Forms.PictureBox();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.txtPlot = new System.Windows.Forms.RichTextBox();
             this.cmdAbout = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -68,9 +68,9 @@
             this.cmdFolderClose = new System.Windows.Forms.Button();
             this.cmdFolderOpen = new System.Windows.Forms.Button();
             this.cmdStop = new System.Windows.Forms.Button();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.cmdActions = new Moviebase.Views.DropDownButton();
             this.cmdTools = new Moviebase.Views.DropDownButton();
-            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.grdMovies)).BeginInit();
             this.ctDatagrid.SuspendLayout();
             this.ctActions.SuspendLayout();
@@ -83,7 +83,7 @@
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.picPoster)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel4.SuspendLayout();
@@ -102,7 +102,6 @@
             this.grdMovies.Name = "grdMovies";
             this.grdMovies.Size = new System.Drawing.Size(532, 302);
             this.grdMovies.TabIndex = 0;
-            this.grdMovies.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.grdMovies_CellFormatting);
             this.grdMovies.SelectionChanged += new System.EventHandler(this.grdMovies_SelectionChanged);
             this.grdMovies.MouseDown += new System.Windows.Forms.MouseEventHandler(this.grdMovies_MouseDown);
             // 
@@ -345,7 +344,7 @@
             // 
             // splitContainer2.Panel1
             // 
-            this.splitContainer2.Panel1.Controls.Add(this.picPoster);
+            this.splitContainer2.Panel1.Controls.Add(this.pictureBox1);
             // 
             // splitContainer2.Panel2
             // 
@@ -356,15 +355,15 @@
             this.splitContainer2.SplitterDistance = 160;
             this.splitContainer2.TabIndex = 1;
             // 
-            // picPoster
+            // pictureBox1
             // 
-            this.picPoster.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.picPoster.Location = new System.Drawing.Point(0, 0);
-            this.picPoster.Name = "picPoster";
-            this.picPoster.Size = new System.Drawing.Size(232, 160);
-            this.picPoster.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.picPoster.TabIndex = 22;
-            this.picPoster.TabStop = false;
+            this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBox1.Location = new System.Drawing.Point(0, 0);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(232, 160);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBox1.TabIndex = 22;
+            this.pictureBox1.TabStop = false;
             // 
             // txtPlot
             // 
@@ -551,6 +550,13 @@
             this.cmdStop.UseVisualStyleBackColor = false;
             this.cmdStop.Click += new System.EventHandler(this.cmdStop_Click);
             // 
+            // toolTip1
+            // 
+            this.toolTip1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(28)))), ((int)(((byte)(28)))));
+            this.toolTip1.ForeColor = System.Drawing.Color.White;
+            this.toolTip1.OwnerDraw = true;
+            this.toolTip1.Draw += new System.Windows.Forms.DrawToolTipEventHandler(this.toolTip1_Draw);
+            // 
             // cmdActions
             // 
             this.cmdActions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -589,13 +595,6 @@
             this.toolTip1.SetToolTip(this.cmdTools, "Tool Collections");
             this.cmdTools.UseVisualStyleBackColor = true;
             // 
-            // toolTip1
-            // 
-            this.toolTip1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(28)))), ((int)(((byte)(28)))));
-            this.toolTip1.ForeColor = System.Drawing.Color.White;
-            this.toolTip1.OwnerDraw = true;
-            this.toolTip1.Draw += new System.Windows.Forms.DrawToolTipEventHandler(this.toolTip1_Draw);
-            // 
             // MainView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -625,7 +624,7 @@
             this.splitContainer2.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.picPoster)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
@@ -635,6 +634,8 @@
         }
 
         #endregion
+
+        private System.Windows.Forms.DataGridView grdMovies;
         private System.Windows.Forms.Label label1;
         private DropDownButton cmdActions;
         private System.Windows.Forms.ContextMenuStrip ctActions;
@@ -653,7 +654,7 @@
         private System.Windows.Forms.ToolStripMenuItem mnuSavePresistData;
         private System.Windows.Forms.ContextMenuStrip ctDatagrid;
         private System.Windows.Forms.ToolStripMenuItem mnuSelectPoster;
-        private System.Windows.Forms.PictureBox picPoster;
+        private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Label lblTitle;
         private System.Windows.Forms.Label lblExtraInfo;
         private System.Windows.Forms.SplitContainer splitContainer1;
@@ -675,7 +676,6 @@
         private System.Windows.Forms.Button cmdFolderClose;
         private System.Windows.Forms.Button cmdFolderOpen;
         private System.Windows.Forms.ToolTip toolTip1;
-        internal System.Windows.Forms.DataGridView grdMovies;
     }
 }
 
