@@ -11,7 +11,7 @@ namespace Moviebase.Core.Workers
 {
     public class PosterDownloadWorker : IPosterDownloadWorker
     {
-        private static Logger _log = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
         private readonly ITmdbWebRequest _tmdbWebRequest;
 
         public List<MovieEntry> MovieEntries { get; set; }
@@ -31,7 +31,7 @@ namespace Moviebase.Core.Workers
                 {
                     try
                     {
-                        _log.Info("Processing: " + entry.Title);
+                        Log.Info("Processing: " + entry.Title);
                         var url = _tmdbWebRequest.BuildPosterUrl(entry.InternalMovieData.PosterPath, PosterSize.original);
 
                         var destFolder = new PowerPath(entry.FullPath).GetDirectoryPath();
@@ -41,11 +41,11 @@ namespace Moviebase.Core.Workers
                         if (isExist && OverwritePoster) File.Delete(destFile);
                         if (!isExist || OverwritePoster) _tmdbWebRequest.DownloadFile(url, destFile);
 
-                        _log.Info("Processed: " + entry.Title);
+                        Log.Info("Processed: " + entry.Title);
                     }
                     catch (Exception e)
                     {
-                        _log.Error(e, "Error processing: " + entry.Title);
+                        Log.Error(e, "Error processing: " + entry.Title);
                     }
                 });
             }

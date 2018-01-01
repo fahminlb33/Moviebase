@@ -10,7 +10,7 @@ namespace Moviebase.Core.Workers
 {
     public class SavePresistDataWorker : ISavePresistDataWorker
     {
-        private static Logger _log = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
         private readonly IPersistentDataManager _persistentDataManager;
 
         public List<MovieEntry> SaveItems { get; set; }
@@ -28,14 +28,14 @@ namespace Moviebase.Core.Workers
                 {
                     try
                     {
-                        _log.Info("Processing: " + entry.Title);
+                        Log.Info("Processing: " + entry.Title);
                         _persistentDataManager.SaveData(entry.InternalMovieData, Path.GetDirectoryName(entry.FullPath));
 
-                        _log.Info("Processed: " + entry.Title);
+                        Log.Info("Processed: " + entry.Title);
                     }
                     catch (Exception e)
                     {
-                        _log.Error(e, "Error processing: " + entry.Title);
+                        Log.Error(e, "Error processing: " + entry.Title);
                     }
                 });
             }

@@ -9,7 +9,7 @@ namespace Moviebase.Views
 {
     public partial class SelectPosterView : Form
     {
-        private SelectPosterPresenter _presenter;
+        private readonly SelectPosterPresenter _presenter;
 
         public string SelectedPath { get; set; }
 

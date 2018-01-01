@@ -14,8 +14,8 @@ namespace Moviebase.Presenters
     class SelectPosterPresenter
     {
         private string _tempDir;
-        private ITmdbWebRequest _tmdbWebRequest;
-        private ITmdb _tmdb;
+        private readonly ITmdbWebRequest _tmdbWebRequest;
+        private readonly ITmdb _tmdb;
 
         public Action<string[]> FindFinishedCallback;
         public SelectPosterView View { get; }

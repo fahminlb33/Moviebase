@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Windows.Forms;
-using BlastMVP;
 using Moviebase.Core;
 using Moviebase.Core.Contracts;
 using Moviebase.Core.Workers;

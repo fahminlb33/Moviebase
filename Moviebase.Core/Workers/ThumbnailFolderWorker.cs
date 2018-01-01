@@ -9,7 +9,7 @@ namespace Moviebase.Core.Workers
 {
     public class ThumbnailFolderWorker : IThumbnailFolderWorker
     {
-        private static Logger _log = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
         private readonly IThumbnailFolder _thumbnailFolder;
 
         public List<string> MovieDirectories { get; set; }
@@ -28,18 +28,18 @@ namespace Moviebase.Core.Workers
                 {
                     try
                     {
-                        _log.Info("Processing: " + dirPath);
+                        Log.Info("Processing: " + dirPath);
                         var posterPath = Path.Combine(dirPath, PosterName + Commons.JpgFileExtension);
                         if (!File.Exists(posterPath)) return;
 
                         _thumbnailFolder.GenerateIcon(posterPath);
                         _thumbnailFolder.WriteDesktopIni(dirPath);
 
-                        _log.Info("Processed: " + dirPath);
+                        Log.Info("Processed: " + dirPath);
                     }
                     catch (Exception e)
                     {
-                        _log.Error(e, "Error processing: " + dirPath);
+                        Log.Error(e, "Error processing: " + dirPath);
                     }
                 });
             }

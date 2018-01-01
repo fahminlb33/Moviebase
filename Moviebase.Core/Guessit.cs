@@ -9,7 +9,7 @@ namespace Moviebase.Core
 {
     public class Guessit : IGuessit
     {
-        private static Logger _log = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
         private readonly Regex _imdbRegex;
 
         public Guessit()
@@ -31,7 +31,7 @@ namespace Moviebase.Core
             }
             catch (Exception e)
             {
-                _log.Error(e, "Error executing GuessIt.");
+                Log.Error(e, "Error executing GuessIt.");
                 return null;
             }
         }

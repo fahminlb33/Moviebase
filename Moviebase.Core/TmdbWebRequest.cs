@@ -20,8 +20,8 @@ namespace Moviebase.Core
         public const string FindPath = "/find/{0}";
         public const string PostersPath = "/movie/{0}/images";
 
-        private static Logger _log = LogManager.GetCurrentClassLogger();
-        private static HttpClient HttpClientInstance = new HttpClient();
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+        private static readonly HttpClient HttpClientInstance = new HttpClient();
         private readonly string _apiKey;
 
         public TmdbWebRequest(string apiKey)
@@ -68,7 +68,7 @@ namespace Moviebase.Core
             }
             catch (Exception e)
             {
-                _log.Error(e, "Error requesting API.");
+                Log.Error(e, "Error requesting API.");
                 return default(T);
             }
         }
@@ -86,7 +86,7 @@ namespace Moviebase.Core
             catch (Exception e)
             {
                 fs?.Close();
-                _log.Error(e, "Error requesting API.");
+                Log.Error(e, "Error requesting API.");
             }
         }
 
@@ -131,6 +131,7 @@ namespace Moviebase.Core
             if (_disposedValue) return;
             if (disposing)
             {
+                // ReSharper disable once UseNullPropagation
                 if(HttpClientInstance!=null) HttpClientInstance.Dispose();
             }
             

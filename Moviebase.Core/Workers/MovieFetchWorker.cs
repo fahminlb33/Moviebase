@@ -11,7 +11,7 @@ namespace Moviebase.Core.Workers
 {
     public class MovieFetchWorker : IMovieFetchWorker
     {
-        private static Logger _log = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
         private readonly ITmdb _tmdb;
         private readonly IGuessit _guessit;
         
@@ -29,7 +29,7 @@ namespace Moviebase.Core.Workers
             {
                 yield return Task.Run(async () =>
                 {
-                    _log.Info("Processing: " + analyzeItem);
+                    Log.Info("Processing: " + analyzeItem);
                     TmdbResult newData = null;
                     try
                     {
@@ -46,13 +46,13 @@ namespace Moviebase.Core.Workers
                     }
                     catch (Exception e)
                     {
-                        _log.Error(e, "Process error: " + analyzeItem);
+                        Log.Error(e, "Process error: " + analyzeItem);
                     }
 
                     newData = newData ?? await _tmdb.GetByFilename(Path.GetFileName(analyzeItem));
                     var result = new MovieEntry(newData, analyzeItem);
 
-                    _log.Info("Processed: " + analyzeItem);
+                    Log.Info("Processed: " + analyzeItem);
                     return new MovieEntryState
                     {
                         Entry = result

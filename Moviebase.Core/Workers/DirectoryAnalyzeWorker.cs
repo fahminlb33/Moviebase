@@ -11,7 +11,7 @@ namespace Moviebase.Core.Workers
     {
         private readonly ITmdb _tmdb;
         private readonly IPersistentDataManager _persistentDataManager;
-        private static Logger _log = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
         public string AnalyzePath { get; set; }
 
@@ -28,14 +28,14 @@ namespace Moviebase.Core.Workers
             {
                 yield return Task.Run(async () =>
                 {
-                    _log.Info("Processing: " + dirPath);
+                    Log.Info("Processing: " + dirPath);
                     var currentFolder = new PowerPath(dirPath);
 
                     // check for ignore pattern
                     var lastName = currentFolder.GetLastDirectoryName();
                     if (lastName.StartsWith("[") && lastName.EndsWith("]"))
                     {
-                        _log.Debug("Process skipped due to directory name.");
+                        Log.Debug("Process skipped due to directory name.");
                         return null;
                     }
 
@@ -43,7 +43,7 @@ namespace Moviebase.Core.Workers
                     var currentMoviePath = _persistentDataManager.SearchFirstFile(dirPath);
                     if (currentMoviePath == null)
                     {
-                        _log.Debug("Process skipped due to unavaliable movie file.");
+                        Log.Debug("Process skipped due to unavaliable movie file.");
                         return null;
                     }
 
@@ -51,12 +51,12 @@ namespace Moviebase.Core.Workers
                     TmdbResult entry;
                     if (_persistentDataManager.HasPersistentData(Path.GetDirectoryName(currentMoviePath)))
                     {
-                        _log.Debug("Using saved presist data.");
+                        Log.Debug("Using saved presist data.");
                         entry = _persistentDataManager.LoadData(currentMoviePath);
                     }
                     else
                     {
-                        _log.Debug("Creating new data using GetByFilename.");
+                        Log.Debug("Creating new data using GetByFilename.");
                         entry = await _tmdb.GetByFilename(Path.GetFileNameWithoutExtension(currentMoviePath));
                     }
 

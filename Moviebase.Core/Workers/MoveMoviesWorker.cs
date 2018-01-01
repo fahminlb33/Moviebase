@@ -9,7 +9,7 @@ namespace Moviebase.Core.Workers
 {
     public class MoveMoviesWorker : IMoveMovieWorker
     {
-        private static Logger _log = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
         public string AnalyzePath { get; set; }
         public List<string> FileExtensions { get; set; }
@@ -23,7 +23,7 @@ namespace Moviebase.Core.Workers
                 {
                     try
                     {
-                        _log.Info("Processing: " + dirPath);
+                        Log.Info("Processing: " + dirPath);
                         var path = new PowerPath(dirPath);
                         if (!FileExtensions.Contains(path.GetExtension())) return null;
 
@@ -33,12 +33,12 @@ namespace Moviebase.Core.Workers
                         var newFile = Path.Combine(newDir, path.GetFileName());
                         File.Move(path.GetFullPath(), newFile);
 
-                        _log.Info("Processed: " + dirPath);
+                        Log.Info("Processed: " + dirPath);
                         return newFile;
                     }
                     catch (Exception e)
                     {
-                        _log.Error(e, "Error processing: " + dirPath);
+                        Log.Error(e, "Error processing: " + dirPath);
                         return null;
                     }
                 });

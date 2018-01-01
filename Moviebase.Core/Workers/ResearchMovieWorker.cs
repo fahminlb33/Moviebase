@@ -13,7 +13,7 @@ namespace Moviebase.Core.Workers
 {
     public class ResearchMovieWorker : IResearchMovieWorker
     {
-        private static Logger _log = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
         private readonly ITmdb _tmdb;
         private readonly IGuessit _guessit;
 
@@ -31,7 +31,7 @@ namespace Moviebase.Core.Workers
         {
             yield return Task.Run(async () =>
             {
-                _log.Debug("Task started.");
+                Log.Debug("Task started.");
 
                 try
                 {
@@ -59,7 +59,7 @@ namespace Moviebase.Core.Workers
                 }
                 catch (Exception e)
                 {
-                    _log.Error(e, "Task finished with error.");
+                    Log.Error(e, "Task finished with error.");
                     return null;
                 }
             });

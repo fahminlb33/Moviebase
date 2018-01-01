@@ -7,7 +7,7 @@ namespace Moviebase.Views
 {
     public partial class MoveMoviesView : Form
     {
-        private MoveMoviesPresenter _presenter;
+        private readonly MoveMoviesPresenter _presenter;
 
         public MoveMoviesView()
         {

@@ -9,7 +9,7 @@ namespace Moviebase.Core
 {
     public class WorkerPool : IWorkerPool, IDisposable
     {
-        private static Logger _log = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
         private CancellationTokenSource _cancellationToken;
         private volatile bool _isWorking;
         
@@ -77,7 +77,7 @@ namespace Moviebase.Core
                 }
                 catch (Exception exc)
                 {
-                    _log.Error(exc);
+                    Log.Error(exc);
                 }
             }
         }
@@ -96,7 +96,7 @@ namespace Moviebase.Core
                 }
                 catch (Exception exc)
                 {
-                    _log.Error(exc);
+                    Log.Error(exc);
                 }
             }
         }
@@ -114,14 +114,14 @@ namespace Moviebase.Core
             }
 
             int nextTaskIndex = -1;
-            Action<Task<T>> continuation = completed =>
+            void Continuation(Task<T> completed)
             {
                 var bucket = buckets[Interlocked.Increment(ref nextTaskIndex)];
                 bucket.TrySetResult(completed);
-            };
+            }
 
             foreach (var inputTask in inputTasks)
-                inputTask.ContinueWith(continuation, _cancellationToken.Token, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
+                inputTask.ContinueWith(Continuation, _cancellationToken.Token, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
 
             return results;
         }
@@ -139,37 +139,36 @@ namespace Moviebase.Core
             }
 
             int nextTaskIndex = -1;
-            Action<Task> continuation = completed =>
+            void Continuation(Task completed)
             {
                 var bucket = buckets[Interlocked.Increment(ref nextTaskIndex)];
                 bucket.TrySetResult(completed);
-            };
+            }
 
             foreach (var inputTask in inputTasks)
-                inputTask.ContinueWith(continuation, _cancellationToken.Token, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
+                inputTask.ContinueWith(Continuation, _cancellationToken.Token, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
 
             return results;
         }
 
         #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
+        private bool _disposedValue; // To detect redundant calls
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (_disposedValue) return;
+            if (disposing)
             {
-                if (disposing)
-                {
-                    if (_cancellationToken != null) _cancellationToken.Dispose();
-                }
-
-                _cancellationToken = null;
-                RunWorkerCompleted = null;
-                RunWorkerStarted = null;
-                ProgressChanged = null;
-
-                disposedValue = true;
+                // ReSharper disable once UseNullPropagation
+                if (_cancellationToken != null) _cancellationToken.Dispose();
             }
+
+            _cancellationToken = null;
+            RunWorkerCompleted = null;
+            RunWorkerStarted = null;
+            ProgressChanged = null;
+
+            _disposedValue = true;
         }
 
         // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.

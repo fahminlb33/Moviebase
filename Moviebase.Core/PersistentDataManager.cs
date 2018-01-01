@@ -11,7 +11,7 @@ namespace Moviebase.Core
 {
     public class PersistentDataManager : IPersistentDataManager
     {
-        private static Logger _log = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
         private readonly ITmdb _tmdb;
 
         public string[] FileExtensions { get; set; }
@@ -33,7 +33,7 @@ namespace Moviebase.Core
             }
             catch (Exception e)
             {
-                _log.Error(e, "Error finding first movie file.");
+                Log.Error(e, "Error finding first movie file.");
                 return null;
             }
         }
@@ -43,12 +43,12 @@ namespace Moviebase.Core
             var posterPath = Path.Combine(dir, filename);
             if (!File.Exists(posterPath))
             {
-                _log.Debug("Using remote poster.");
+                Log.Debug("Using remote poster.");
                 posterPath = _tmdb.GetPosterUrl(result.PosterPath, PosterSize.w154);
             }
             else
             {
-                _log.Debug("Using local poster file.");
+                Log.Debug("Using local poster file.");
             }
 
             return posterPath;

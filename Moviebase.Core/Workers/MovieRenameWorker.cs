@@ -11,7 +11,7 @@ namespace Moviebase.Core.Workers
 {
     public class MovieRenameWorker : IMovieRenameWorker
     {
-        private static Logger _log = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
         #region Properties
 
@@ -30,16 +30,16 @@ namespace Moviebase.Core.Workers
                 {
                     try
                     {
-                        _log.Info("Processing: " + entry.Title);
+                        Log.Info("Processing: " + entry.Title);
                         var fileInfo = new PowerPath(entry.FullPath);
                         RenameFile(fileInfo, entry);
                         RenameDirectory(fileInfo, entry);
 
-                        _log.Info("Processed: " + entry.Title);
+                        Log.Info("Processed: " + entry.Title);
                     }
                     catch (Exception e)
                     {
-                        _log.Error(e, "Error processing: " + entry.Title);
+                        Log.Error(e, "Error processing: " + entry.Title);
                     }
                 });
             }

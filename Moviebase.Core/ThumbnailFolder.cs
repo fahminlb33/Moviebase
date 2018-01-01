@@ -8,7 +8,7 @@ namespace Moviebase.Core
 {
     public class ThumbnailFolder : IThumbnailFolder
     {
-        private static Logger _log = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
         
         public void GenerateIcon(string inputFile)
         {
@@ -22,7 +22,7 @@ namespace Moviebase.Core
             }
             catch (Exception e)
             {
-                _log.Error(e, "Error executing Magick.");
+                Log.Error(e, "Error executing Magick.");
             }
         }
 
@@ -45,7 +45,7 @@ namespace Moviebase.Core
             }
             catch (Exception e)
             {
-                _log.Error(e, "Error writing desktop.ini file.");
+                Log.Error(e, "Error writing desktop.ini file.");
             }
         }
 

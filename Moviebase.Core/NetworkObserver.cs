@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Moviebase.Core
 {
     class NetworkObserver
     {
+        public NetworkObserver()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
