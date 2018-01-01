@@ -12,7 +12,6 @@ namespace Moviebase.Core
         public const string PersistentFileName = "moviebase.persist";
         public const string ExportFileName = "moviebase.csv";
         public const string IconFileName = "icon.ico";
-        public const string TempIconFileName = "converted.jpg";
 
         public const string JpgFileExtension = ".jpg";
         public const string Mp4FileExtension = ".mp4";

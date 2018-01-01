@@ -17,12 +17,8 @@ namespace Moviebase.Core
                 var dirPath = Path.GetDirectoryName(inputFile);
                 Debug.Assert(dirPath != null);
 
-                var outputSquareFile = Path.Combine(dirPath, Commons.TempIconFileName);
+                var outputSquareFile = Path.Combine(dirPath, Commons.IconFileName);
                 InternalGenerateSquareImage(inputFile, outputSquareFile);
-                Commons.RunNoException(() => File.Delete(outputSquareFile));
-
-                var outputIconFile = Path.Combine(dirPath, Commons.IconFileName);
-                InternalGenerateIcon(outputSquareFile, outputIconFile);
             }
             catch (Exception e)
             {
@@ -83,10 +79,27 @@ namespace Moviebase.Core
             }
         }
 
-        private void InternalGenerateIcon(string inputPath, string outputPath)
+        public void TestIcon(string inputPath, string outputPath)
         {
             using (var image = new MagickImage(inputPath))
             {
+                image.VirtualPixelMethod = VirtualPixelMethod.Background;
+                image.BackgroundColor = MagickColors.White;
+
+                // square out
+                int size = Math.Max(image.Width, image.Height);
+                int x = -Math.Max((image.Height - image.Width) / 2, 0);
+                int y = -Math.Max((image.Width - image.Height) / 2, 0);
+                var geometry = new MagickGeometry(x, y, size, size);
+                image.SetArtifact("distort:viewport", geometry.ToString());
+
+                // filter
+                image.FilterType = FilterType.Point;
+                image.Distort(DistortMethod.ScaleRotateTranslate, 0);
+
+                image.RePage();
+                image.Resize(new MagickGeometry(256, 256));
+
                 image.Format = MagickFormat.Icon;
                 image.Write(outputPath);
             }
