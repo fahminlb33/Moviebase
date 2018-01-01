@@ -23,9 +23,7 @@ namespace Moviebase.Core
                 throw new InvalidOperationException("Could not start another task. Existing task is currently running.");
 
             RecreateCancellationToken();
-            Task.Run(() => RunWorkerStartedCallback())
-                .ContinueWith(x => RunTasks(worker.CreateTasks()))
-                .ContinueWith(x => RunWorkerCompletedCallback());
+            Task.Run(() => RunTasks(worker.CreateTasks()));
         }
 
         public void Start<T>(IReturningWorker<T> worker)
@@ -34,9 +32,7 @@ namespace Moviebase.Core
                 throw new InvalidOperationException("Could not start another task. Existing task is currently running.");
 
             RecreateCancellationToken();
-            Task.Run(() => RunWorkerStartedCallback())
-                .ContinueWith(x => RunTasks(worker.CreateTasks()))
-                .ContinueWith(x => RunWorkerCompletedCallback());
+            Task.Run(() => RunTasks(worker.CreateTasks()));
         }
 
         public void Stop()
@@ -65,6 +61,7 @@ namespace Moviebase.Core
 
         private async void RunTasks<T>(IEnumerable<Task<T>> tasks)
         {
+            RunWorkerStartedCallback();
             foreach (var bucket in Interleaved(tasks))
             {
                 var t = await bucket;
@@ -80,10 +77,12 @@ namespace Moviebase.Core
                     Log.Error(exc);
                 }
             }
+            RunWorkerCompletedCallback();
         }
 
         private async void RunTasks(IEnumerable<Task> tasks)
         {
+            RunWorkerStartedCallback();
             foreach (var bucket in Interleaved(tasks))
             {
                 var t = await bucket;
@@ -99,6 +98,7 @@ namespace Moviebase.Core
                     Log.Error(exc);
                 }
             }
+            RunWorkerCompletedCallback();
         }
 
         private Task<Task<T>>[] Interleaved<T>(IEnumerable<Task<T>> tasks)
