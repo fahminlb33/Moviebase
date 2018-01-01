@@ -4,7 +4,7 @@ using Moviebase.Entities;
 
 namespace Moviebase.Models
 {
-    class SelectPosterModel : ModelBase
+    sealed class SelectPosterModel : ModelBase
     {
         private string _lblStatusText;
         private int _prgStatusValue;

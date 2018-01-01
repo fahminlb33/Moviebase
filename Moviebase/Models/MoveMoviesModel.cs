@@ -5,7 +5,7 @@ using Moviebase.Entities;
 
 namespace Moviebase.Models
 {
-    class MoveMoviesModel : ModelBase
+    sealed class MoveMoviesModel : ModelBase
     {
         private string _lblCountText;
         private string _txtBrowseText;

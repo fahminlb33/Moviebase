@@ -8,7 +8,7 @@ using Moviebase.Entities;
 
 namespace Moviebase.Models
 {
-    class MainModel : ModelBase
+    sealed class MainModel : ModelBase
     { 
         private bool _cmdDirectoriesEnabled;
         private bool _cmdToolsEnabled;
