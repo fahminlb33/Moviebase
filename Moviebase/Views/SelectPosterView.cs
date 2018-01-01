@@ -1,14 +1,9 @@
 ﻿using System;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using BlastMVP;
-using Moviebase.Core;
 using Moviebase.Entities;
-using Moviebase.Entities.Web;
 using Moviebase.Presenters;
-using Ninject;
 
 namespace Moviebase.Views
 {
