@@ -96,6 +96,7 @@
     <Compile Include="Contracts\ICsvExportWorker.cs" />
     <Compile Include="Contracts\IResearchMovieWorker.cs" />
     <Compile Include="Contracts\IThumbnailFolderWorker.cs" />
+    <Compile Include="INetworkObserver.cs" />
     <Compile Include="ITmdbWebRequest.cs" />
     <Compile Include="IWorkerPool.cs" />
     <Compile Include="MovieEntryState.cs" />

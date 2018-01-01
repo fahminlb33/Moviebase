@@ -18,11 +18,12 @@ namespace Moviebase.Core
         public const string AllFilesSearchPattern = "*";
         public const string JpgSearchPattern = "*.jpg";
 
-        public const int TmdbWebRequestTries = 3;
+        public const string ShellClassInfoSection = ".ShellClassInfo";
         public const string TheName = "The";
         public const int MaxDegreeOfParallelism = 1;
-        public const string ShellClassInfoSection = ".ShellClassInfo";
-
+        public const int TmdbWebRequestTries = 3;
+        public const string PingServer = "8.8.8.8";
+        
         public static readonly Bitmap DefaultImage = new Bitmap(1, 1);
         private static readonly string[] SizeSuffix = { "B", "KB", "MB", "GB", "TB", "PB", "EB" }; //Longs run out around EB
 
