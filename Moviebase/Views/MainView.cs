@@ -22,6 +22,7 @@ namespace Moviebase.Views
         {
             var model = _presenter.Model;
             grdMovies.DataSource = model.DataView;
+            grdMovies.Bind(c => c.Enabled).To(model, m => m.GridViewEnabled);
             picPoster.Bind(c => c.Image).To(model, m => m.PicPosterImage);
             lblTitle.Bind(c => c.Text).To(model, m => m.LblTitleText);
             lblExtraInfo.Bind(c => c.Text).To(model, m => m.LblExtraInfoText);

@@ -19,6 +19,10 @@ namespace Moviebase.Models
         private string _lblPercentageText;
         private bool _cmdStopEnabled;
         private Image _picPosterImage;
+        private string _lblTitleText;
+        private bool _gridViewEnabled;
+        private string _lblExtraInfoText;
+        private string _lblPlotText;
 
         public MainModel(SynchronizationContext context) : base(context)
         {
@@ -47,19 +51,57 @@ namespace Moviebase.Models
 
         public BindingList<MovieEntry> DataView { get; private set; }
 
-        public string LblTitleText { get; set; }
+        public bool GridViewEnabled
+        {
+            get => _gridViewEnabled;
+            set
+            {
+                if (value == _gridViewEnabled) return;
+                _gridViewEnabled = value; 
+                OnPropertyChanged();
+            }
+        }
 
-        public string LblExtraInfoText { get; set; }
+        public string LblTitleText
+        {
+            get => _lblTitleText;
+            set
+            {
+                if (value == _lblStatusText) return;
+                _lblTitleText = value; 
+                OnPropertyChanged();
+            }
+        }
 
-        public string LblPlotText { get; set; }
-        
+        public string LblExtraInfoText
+        {
+            get => _lblExtraInfoText;
+            set
+            {
+                if (value == _lblExtraInfoText) return;
+                _lblExtraInfoText = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string LblPlotText
+        {
+            get => _lblPlotText;
+            set
+            {
+                if (value == _lblPlotText) return;
+                _lblPlotText = value; 
+                OnPropertyChanged();
+            }
+        }
+
         public Image PicPosterImage
         {
             get => _picPosterImage;
             set
             {
                 if (value == _picPosterImage) return;
-                _picPosterImage = value;
+                _picPosterImage = value ?? Commons.DefaultImage;
                 OnPropertyChanged();
             }
         }

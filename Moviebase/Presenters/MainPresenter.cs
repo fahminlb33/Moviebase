@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -48,15 +49,20 @@ namespace Moviebase.Presenters
 
         private void Worker_RunWorkerStarted()
         {
+            Debug.Print("TaskRun Started: " + DateTime.Now);
+
             Model.CmdDirectoriesEnabled = false;
             Model.CmdToolsEnabled = false;
             Model.CmdActionsEnabled = false;
             Model.CmdStopEnabled = true;
             Model.LblStatusText = "Working...";
+            Model.GridViewEnabled = false;
         }
 
         private void Worker_RunWorkerCompleted()
         {
+            Debug.Print("TaskRun Finished: " + DateTime.Now);
+
             Model.PrgStatusValue = 0;
             Model.LblPercentageText = "0%";
             Model.PrgStatusStyle = ProgressBarStyle.Blocks;
@@ -66,10 +72,13 @@ namespace Moviebase.Presenters
             Model.CmdToolsEnabled = true;
             Model.CmdActionsEnabled = true;
             Model.CmdStopEnabled = false;
+            Model.GridViewEnabled = true;
         }
 
         private void Worker_ProgressChanged(int progressPercentage, object state)
         {
+            Debug.Print("TaskRun Reported: " + DateTime.Now);
+
             if (progressPercentage == -1)
             {
                 Model.PrgStatusStyle = ProgressBarStyle.Marquee;
