@@ -23,8 +23,7 @@ namespace Moviebase.Core.Workers
                 try
                 {
                     _log.Debug("Task started.");
-                    using (var textStream = new StreamWriter(OutputPath, false))
-                    using (var csvWriter = new CsvWriter(textStream))
+                    using (var csvWriter = new CsvWriter(new StreamWriter(OutputPath, false)))
                     {
                         csvWriter.Configuration.RegisterClassMap<CsvExportMap>();
                         csvWriter.WriteRecords(Movies);
