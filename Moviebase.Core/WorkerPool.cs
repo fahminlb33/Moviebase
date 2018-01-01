@@ -7,7 +7,7 @@ using NLog;
 
 namespace Moviebase.Core
 {
-    public class WorkerPool : IWorkerPool
+    public class WorkerPool : IWorkerPool, IDisposable
     {
         private static Logger _log = LogManager.GetCurrentClassLogger();
         private CancellationTokenSource _cancellationToken;
@@ -150,5 +150,42 @@ namespace Moviebase.Core
 
             return results;
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    if (_cancellationToken != null) _cancellationToken.Dispose();
+                }
+
+                _cancellationToken = null;
+                RunWorkerCompleted = null;
+                RunWorkerStarted = null;
+                ProgressChanged = null;
+
+                disposedValue = true;
+            }
+        }
+
+        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+        // ~WorkerPool() {
+        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        //   Dispose(false);
+        // }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            // TODO: uncomment the following line if the finalizer is overridden above.
+            // GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }
