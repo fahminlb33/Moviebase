@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
-using BlastMVP;
+using Moviebase.Core.MVP;
 using Moviebase.Entities;
 using Moviebase.Presenters;
 
@@ -74,21 +74,7 @@ namespace Moviebase.Views
 
         private void cmdFolderOpen_Click(object sender, EventArgs e)
         {
-            if (_presenter.Model.DataView.Count > 0)
-            {
-                var result = this.ShowMessageBox(StringResources.AlreadyOpenedFolderMessage, StringResources.AppName,
-                    MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
-                if (result == DialogResult.OK)
-                {
-                    _presenter.CloseFolder();
-                }
-                else
-                {
-                    return;
-                }
-            }
-
-            _presenter.OpenDirectory(false);
+            _presenter.OpenDirectory();
         }
 
         private void cmdFolderClose_Click(object sender, EventArgs e)
@@ -98,15 +84,7 @@ namespace Moviebase.Views
 
         private void cmdFolderRecent_Click(object sender, EventArgs e)
         {
-            if (_presenter.Model.DataView.Count > 0)
-            {
-                var result = this.ShowMessageBox(StringResources.AlreadyOpenedFolderMessage, StringResources.AppName, icon: MessageBoxIcon.Question);
-                if (result != DialogResult.OK)
-                    return;
-                _presenter.CloseFolder();
-            }
-
-            _presenter.OpenDirectory(true);
+            _presenter.OpenLastDirectory();
         }
 
         // --------- TOOLS
@@ -120,73 +98,34 @@ namespace Moviebase.Views
             _presenter.ShowMoveMoviesWindow();
         }
 
-        private void mnuExportCsv_Click(object sender, EventArgs e)
+        private async void mnuExportCsv_Click(object sender, EventArgs e)
         {
-            if (_presenter.Model.DataView.Count == 0)
-            {
-                this.ShowMessageBox(StringResources.ExportNoDataMessage, StringResources.AppName, icon: MessageBoxIcon.Exclamation);
-                return;
-            }
-
-            _presenter.ExportCsv();
+            await _presenter.ExportCsv();
         }
 
         // --------- ACTIONS
         private void mnuFetchAll_Click(object sender, EventArgs e)
         {
-            if (_presenter.Model.DataView.Count == 0)
-            {
-                _presenter.View.ShowMessageBox(StringResources.FetchNoDataMessage, StringResources.AppName, icon: MessageBoxIcon.Exclamation);
-                return;
-            }
-
             _presenter.FetchMovieData();
-            //_presenter.SavePresistData();
         }
 
         private void mnuRenameAll_Click(object sender, EventArgs e)
         {
-            if (_presenter.Model.DataView.Count == 0)
-            {
-                _presenter.View.ShowMessageBox(StringResources.RenameNoDataMessage, StringResources.AppName, icon: MessageBoxIcon.Exclamation);
-                return;
-            }
-
-            //_presenter.SavePresistData();
             _presenter.RenameMovieFiles();
         }
 
         private void mnuDownloadAll_Click(object sender, EventArgs e)
         {
-            if (_presenter.Model.DataView.Count == 0)
-            {
-                _presenter.View.ShowMessageBox(StringResources.PosterNoDataMessage, StringResources.AppName, icon: MessageBoxIcon.Exclamation);
-                return;
-            }
-
-            //_presenter.SavePresistData();
             _presenter.DownloadMoviePoster();
         }
 
         private void mnuFolderThumbnail_Click(object sender, EventArgs e)
         {
-            if (_presenter.Model.DataView.Count == 0)
-            {
-                _presenter.View.ShowMessageBox(StringResources.ThumbnailNoDataMessage, StringResources.AppName, icon: MessageBoxIcon.Exclamation);
-                return;
-            }
-
-            _presenter.ThumbnailFolder();
+           _presenter.ThumbnailFolder();
         }
         
         private void mnuSavePresistData_Click(object sender, EventArgs e)
         {
-            if (_presenter.Model.DataView.Count == 0)
-            {
-                _presenter.View.ShowMessageBox(StringResources.PresistNoDataMessage, StringResources.AppName, icon: MessageBoxIcon.Exclamation);
-                return;
-            }
-
             _presenter.SavePresistData();
         }
 
@@ -198,41 +137,33 @@ namespace Moviebase.Views
 
         private void cmdAbout_Click(object sender, EventArgs e)
         {
-            using (var vw = new AboutView()) vw.ShowDialog();
+            _presenter.ShowAboutView();
         }
 
         // --------- DATA GRID
-        private void mnuReSearch_Click(object sender, EventArgs e)
+        private async void mnuReSearch_Click(object sender, EventArgs e)
         {
             if (grdMovies.CurrentRow == null) return;
-            _presenter.ResearchMovie(grdMovies.CurrentRow.Index);
+            await _presenter.ResearchMovie(grdMovies.CurrentRow.Index);
         }
 
         private void mnuIgnore_Click(object sender, EventArgs e)
         {
             if (grdMovies.CurrentRow == null) return;
-            var dataItem = (MovieEntry)grdMovies.CurrentRow.DataBoundItem;
-
-            _presenter.SingleSavePersistData(dataItem);
+            _presenter.SaveIgnoreEntry(grdMovies.CurrentRow.Index);
             this.ShowMessageBox(StringResources.ItemExcludedMessage, StringResources.AppName);
         }
 
         private void mnuSelectPoster_Click(object sender, EventArgs e)
         {
             if (grdMovies.CurrentRow == null) return;
-            var dataItem = (MovieEntry)grdMovies.CurrentRow.DataBoundItem;
-
-            var path = _presenter.ShowSelectPosterWindow(dataItem.InternalMovieData.Id.ToString());
-            if (path != null) dataItem.InternalMovieData.PosterPath = path;
+            _presenter.ShowSelectPosterWindow(grdMovies.CurrentRow.Index);
         }
 
         private void mnuAlternativeNames_Click(object sender, EventArgs e)
         {
             if (grdMovies.CurrentRow == null) return;
-            var dataItem = (MovieEntry)grdMovies.CurrentRow.DataBoundItem;
-
-            var name = _presenter.ShowAlternativeNameWindow(dataItem.InternalMovieData.AlternativeNames);
-            if (name != null) dataItem.Title = name;
+            _presenter.ShowAlternativeNameWindow(grdMovies.CurrentRow.Index);
         }
 
         #endregion
@@ -246,4 +177,3 @@ namespace Moviebase.Views
         }
     }
 }
-

@@ -3,8 +3,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using BlastMVP;
 using Moviebase.Core;
+using Moviebase.Core.Diagnostics;
+using Moviebase.Core.MVP;
 using Moviebase.Entities;
 using Moviebase.Properties;
 using Ninject;
@@ -49,11 +50,10 @@ namespace Moviebase.Views
 
             appSettings.MovieExtensions.Clear();
             appSettings.MovieExtensions.AddRange(lstExtensions.Items.Cast<string>().ToArray());
-
-            Program.RebindAll();
+            
             appSettings.Save();
+            this.ShowMessageBox(StringResources.SettingsRestartMessage, StringResources.AppName);
             DialogResult = DialogResult.OK;
-            Close();
         }
 
         private void SettingsView_Load(object sender, EventArgs e)
@@ -76,40 +76,30 @@ namespace Moviebase.Views
         {
             txtLastOpenDir.Text = "";
         }
-      
+
         private void cmdDetect_Click(object sender, EventArgs e)
         {
             cmdDetect.Enabled = false;
             picPython.Image = Resources.cross;
             picGuessit.Image = Resources.cross;
 
-            Task.Run(() =>
+            Task.Run(async () =>
             {
                 try
                 {
                     var comp = Program.AppKernel.Get<IComponentManager>();
 
-                    var python = comp.CheckPythonInstallation().Result;
-                    Invoke(new  Action(  () => picPython.Image =   python ? Resources.tick : Resources.cross));
+                    var python = await comp.IsPythonInstalled();
+                    Invoke(new Action(() => picPython.Image = python ? Resources.tick : Resources.cross));
 
-                    var guessit = comp.CheckGuessItInstallation().Result;
-                    Invoke(new Action(  () => picGuessit.Image =   guessit ? Resources.tick : Resources.cross));
+                    var guessit = await comp.IsGuessItInstalled();
+                    Invoke(new Action(() => picGuessit.Image = guessit ? Resources.tick : Resources.cross));
                 }
                 catch (Exception er)
                 {
                     Debug.Print(er.ToString());
                 }
-            }).ContinueWith(x =>
-            {
-                try
-                {
-                    Invoke(new Action(() => cmdDetect.Enabled = true));
-                }
-                catch (Exception er)
-                {
-                    Debug.Print(er.ToString());
-                }
-            });
+            }).ContinueWith(x => Invoke(new Action(() => cmdDetect.Enabled = true)));
         }
 
         private void txtFileRenamePattern_TextChanged(object sender, EventArgs e)
@@ -120,7 +110,8 @@ namespace Moviebase.Views
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception);
+                Debug.Print(exception.Message);
+                lblPatternOutput.Text = StringResources.InvalidPatternText;
             }
         }
 

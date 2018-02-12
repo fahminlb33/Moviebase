@@ -76,9 +76,6 @@
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.4.4.12\lib\net45\NLog.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -89,61 +86,37 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AsyncProcess.cs" />
+    <Compile Include="CsvExporter.cs" />
+    <Compile Include="Diagnostics\AsyncProcess.cs" />
     <Compile Include="Commons.cs" />
-    <Compile Include="ComponentManager.cs" />
-    <Compile Include="Contracts\CsvExportMap.cs" />
-    <Compile Include="Contracts\ICsvExportWorker.cs" />
-    <Compile Include="Contracts\IResearchMovieWorker.cs" />
-    <Compile Include="Contracts\IThumbnailFolderWorker.cs" />
-    <Compile Include="INetworkObserver.cs" />
-    <Compile Include="ITmdbWebRequest.cs" />
-    <Compile Include="IWorkerPool.cs" />
-    <Compile Include="MovieEntryState.cs" />
-    <Compile Include="IComponentManager.cs" />
-    <Compile Include="IReturningWorker.cs" />
-    <Compile Include="IThumbnailFolder.cs" />
-    <Compile Include="NetworkObserver.cs" />
-    <Compile Include="ProcessRedirectStream.cs" />
-    <Compile Include="ThumbnailFolder.cs" />
-    <Compile Include="IniFile.cs" />
-    <Compile Include="Native\NativeMethods.cs" />
-    <Compile Include="ResearchMovieEntryState.cs" />
-    <Compile Include="Contracts\IDirectoryAnalyzeWorker.cs" />
-    <Compile Include="IGuessit.cs" />
-    <Compile Include="Contracts\IMoveMovieWorker.cs" />
-    <Compile Include="Contracts\ISavePresistDataWorker.cs" />
-    <Compile Include="INonReturningWorker.cs" />
-    <Compile Include="ITmdb.cs" />
-    <Compile Include="TmdbWebRequest.cs" />
-    <Compile Include="IPersistentDataManager.cs" />
-    <Compile Include="WorkerPool.cs" />
-    <Compile Include="Workers\CsvExportWorker.cs" />
-    <Compile Include="Workers\DirectoryAnalyzeWorker.cs" />
-    <Compile Include="Guessit.cs" />
-    <Compile Include="PersistentDataManager.cs" />
+    <Compile Include="Diagnostics\ComponentManager.cs" />
+    <Compile Include="CsvExportMap.cs" />
+    <Compile Include="MVP\BindingTarget.cs" />
+    <Compile Include="MVP\DataBinderExtensions.cs" />
+    <Compile Include="MVP\FormExtensions.cs" />
+    <Compile Include="MVP\IBindingTarget.cs" />
+    <Compile Include="Services\ITmdbWebRequest.cs" />
+    <Compile Include="Diagnostics\IComponentManager.cs" />
+    <Compile Include="IThumbnailManager.cs" />
+    <Compile Include="Diagnostics\NetworkObserver.cs" />
+    <Compile Include="Diagnostics\ProcessRedirectStream.cs" />
+    <Compile Include="ThumbnailManager.cs" />
+    <Compile Include="Diagnostics\IniFile.cs" />
+    <Compile Include="Natives\NativeMethods.cs" />
+    <Compile Include="Services\IGuessit.cs" />
+    <Compile Include="Services\ITmdb.cs" />
+    <Compile Include="IPersistFileManager.cs" />
+    <Compile Include="ValidationSupport.cs" />
+    <Compile Include="Services\Guessit.cs" />
+    <Compile Include="PersistFileManager.cs" />
     <Compile Include="PowerPath.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tmdb.cs" />
-    <Compile Include="Contracts\IMovieFetchWorker.cs" />
-    <Compile Include="Contracts\IMovieRenameWorker.cs" />
-    <Compile Include="Contracts\IPosterDownloadWorker.cs" />
-    <Compile Include="Workers\MoveMoviesWorker.cs" />
-    <Compile Include="Workers\MovieFetchWorker.cs" />
-    <Compile Include="Workers\MovieRenameWorker.cs" />
-    <Compile Include="Workers\PosterDownloadWorker.cs" />
-    <Compile Include="Workers\ResearchMovieWorker.cs" />
-    <Compile Include="Workers\SavePresistDataWorker.cs" />
-    <Compile Include="Workers\ThumbnailFolderWorker.cs" />
+    <Compile Include="Services\Tmdb.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BlastMVP\BlastMVP.csproj">
-      <Project>{7B0821B7-799C-4993-9264-AFA69E9E3BA0}</Project>
-      <Name>BlastMVP</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Moviebase.Entities\Moviebase.Entities.csproj">
       <Project>{773EBDF7-2CFA-4323-A8F3-E20D92D0E24E}</Project>
       <Name>Moviebase.Entities</Name>

@@ -1,12 +1,13 @@
 ﻿using System;
-using System.Linq;
 using System.Windows.Forms;
 using Moviebase.Core;
-using Moviebase.Core.Contracts;
-using Moviebase.Core.Workers;
+using Moviebase.Core.Diagnostics;
+using Moviebase.Core.Services;
 using Moviebase.Properties;
 using Moviebase.Views;
 using Ninject;
+using Ninject.Extensions.Interception.Planning.Strategies;
+using Ninject.Planning.Strategies;
 
 namespace Moviebase
 {
@@ -33,33 +34,15 @@ namespace Moviebase
         {
             var appSettings = Settings.Default;
 
+            // components
+            AppKernel.Components.Add<IPlanningStrategy, AutoNotifyInterceptorRegistrationStrategy>();
+            
             // services
-            AppKernel.Rebind<IWorkerPool>().To<WorkerPool>();
-
-            AppKernel.Rebind<ITmdb>().To<Tmdb>().InSingletonScope();
-            AppKernel.Rebind<IGuessit>().To<Guessit>().InSingletonScope();
-            AppKernel.Rebind<IPersistentDataManager>().To<PersistentDataManager>().InSingletonScope();
-            AppKernel.Rebind<IThumbnailFolder>().To<ThumbnailFolder>().InSingletonScope();
-            AppKernel.Rebind<IComponentManager>().To<ComponentManager>().InSingletonScope();
-            AppKernel.Rebind<ITmdbWebRequest>().To<TmdbWebRequest>().InSingletonScope()
-                .WithConstructorArgument("apiKey", appSettings.TmdbApiKey);
-
-            // workers
-            AppKernel.Rebind<IMoveMovieWorker>().To<MoveMoviesWorker>();
-            AppKernel.Rebind<IMovieRenameWorker>().To<MovieRenameWorker>();
-            AppKernel.Rebind<IDirectoryAnalyzeWorker>().To<DirectoryAnalyzeWorker>();
-            AppKernel.Rebind<IMovieFetchWorker>().To<MovieFetchWorker>();
-            AppKernel.Rebind<IPosterDownloadWorker>().To<PosterDownloadWorker>();
-            AppKernel.Rebind<ISavePresistDataWorker>().To<SavePresistDataWorker>();
-            AppKernel.Rebind<IResearchMovieWorker>().To<ResearchMovieWorker>();
-            AppKernel.Rebind<ICsvExportWorker>().To<CsvExportWorker>();
-            AppKernel.Rebind<IThumbnailFolderWorker>().To<ThumbnailFolderWorker>();
-
-            // configure 
-            var pdm = AppKernel.Get<IPersistentDataManager>();
-            pdm.FileExtensions = appSettings.MovieExtensions.Cast<string>().ToArray();
-            pdm.PersistentFileName = Commons.PersistentFileName;
-            pdm.HidePresistFile = appSettings.HidePresistFile;
+            AppKernel.Bind<ITmdb>().To<Tmdb>().InSingletonScope().WithConstructorArgument("apiKey", appSettings.TmdbApiKey); 
+            AppKernel.Bind<IGuessit>().To<Guessit>().InSingletonScope();
+            AppKernel.Bind<IPersistFileManager>().To<PersistFileManager>().InSingletonScope().WithConstructorArgument("hideFile", appSettings.HidePresistFile);
+            AppKernel.Bind<IThumbnailManager>().To<ThumbnailManager>().InSingletonScope();
+            AppKernel.Bind<IComponentManager>().To<ComponentManager>().InSingletonScope();
         }
     }
 }

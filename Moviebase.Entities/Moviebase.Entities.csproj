@@ -82,16 +82,16 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>StringResources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Web\AlternativeTitles.cs" />
-    <Compile Include="Web\FindRoot.cs" />
-    <Compile Include="Web\Genre.cs" />
-    <Compile Include="Web\MovieDetailsRoot.cs" />
-    <Compile Include="Web\MovieSearchResult.cs" />
-    <Compile Include="Web\MovieSearchRoot.cs" />
-    <Compile Include="Web\Poster.cs" />
-    <Compile Include="Web\PosterFindRoot.cs" />
-    <Compile Include="Web\PosterSize.cs" />
-    <Compile Include="Web\Title.cs" />
+    <Compile Include="AlternativeTitles.cs" />
+    <Compile Include="FindRoot.cs" />
+    <Compile Include="Genre.cs" />
+    <Compile Include="MovieDetailsRoot.cs" />
+    <Compile Include="MovieSearchResult.cs" />
+    <Compile Include="MovieSearchRoot.cs" />
+    <Compile Include="Poster.cs" />
+    <Compile Include="PosterFindRoot.cs" />
+    <Compile Include="PosterSize.cs" />
+    <Compile Include="Title.cs" />
     <Compile Include="GuessitResult.cs" />
     <Compile Include="MovieEntry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

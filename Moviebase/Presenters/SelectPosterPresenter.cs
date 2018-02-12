@@ -3,11 +3,12 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Moviebase.Core;
+using Moviebase.Core.Services;
 using Moviebase.Entities;
-using Moviebase.Entities.Web;
 using Moviebase.Models;
 using Moviebase.Views;
 using Ninject;
+using Ninject.Parameters;
 
 namespace Moviebase.Presenters
 {
@@ -24,7 +25,7 @@ namespace Moviebase.Presenters
         public SelectPosterPresenter(SelectPosterView view)
         {
             View = view;
-            Model = new SelectPosterModel(SynchronizationContext.Current);
+            Model = Program.AppKernel.Get<SelectPosterModel>(new ConstructorArgument("context", SynchronizationContext.Current));
 
             _tmdbWebRequest = Program.AppKernel.Get<ITmdbWebRequest>();
             _tmdb = Program.AppKernel.Get<ITmdb>();

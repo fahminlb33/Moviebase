@@ -25,9 +25,6 @@
     <Setting Name="SwapThe" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="PosterFileName" Type="System.String" Scope="User">
-      <Value Profile="(Default)">poster</Value>
-    </Setting>
     <Setting Name="HidePresistFile" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>

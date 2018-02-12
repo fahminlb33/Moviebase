@@ -37,7 +37,6 @@
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.mnuSelectPoster = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuAlternativeName = new System.Windows.Forms.ToolStripMenuItem();
-            this.label1 = new System.Windows.Forms.Label();
             this.ctActions = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.mnuFetchAll = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -98,9 +97,9 @@
             this.grdMovies.ContextMenuStrip = this.ctDatagrid;
             this.grdMovies.Dock = System.Windows.Forms.DockStyle.Fill;
             this.grdMovies.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.grdMovies.Location = new System.Drawing.Point(0, 13);
+            this.grdMovies.Location = new System.Drawing.Point(0, 0);
             this.grdMovies.Name = "grdMovies";
-            this.grdMovies.Size = new System.Drawing.Size(532, 302);
+            this.grdMovies.Size = new System.Drawing.Size(532, 315);
             this.grdMovies.TabIndex = 0;
             this.grdMovies.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.grdMovies_CellFormatting);
             this.grdMovies.SelectionChanged += new System.EventHandler(this.grdMovies_SelectionChanged);
@@ -151,17 +150,6 @@
             this.mnuAlternativeName.Size = new System.Drawing.Size(205, 22);
             this.mnuAlternativeName.Text = "Find alternative name(s)";
             this.mnuAlternativeName.Click += new System.EventHandler(this.mnuAlternativeNames_Click);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.label1.Location = new System.Drawing.Point(0, 0);
-            this.label1.Margin = new System.Windows.Forms.Padding(3);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(59, 13);
-            this.label1.TabIndex = 4;
-            this.label1.Text = "Movie list:";
             // 
             // ctActions
             // 
@@ -300,17 +288,18 @@
             this.lblTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblTitle.Location = new System.Drawing.Point(0, 0);
             this.lblTitle.Name = "lblTitle";
-            this.lblTitle.Size = new System.Drawing.Size(232, 20);
+            this.lblTitle.Size = new System.Drawing.Size(230, 20);
             this.lblTitle.TabIndex = 23;
             this.lblTitle.Text = "...";
             this.lblTitle.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.lblTitle.UseMnemonic = false;
             // 
             // lblExtraInfo
             // 
             this.lblExtraInfo.Dock = System.Windows.Forms.DockStyle.Top;
             this.lblExtraInfo.Location = new System.Drawing.Point(0, 20);
             this.lblExtraInfo.Name = "lblExtraInfo";
-            this.lblExtraInfo.Size = new System.Drawing.Size(232, 27);
+            this.lblExtraInfo.Size = new System.Drawing.Size(230, 27);
             this.lblExtraInfo.TabIndex = 24;
             this.lblExtraInfo.Text = "...";
             this.lblExtraInfo.TextAlign = System.Drawing.ContentAlignment.TopCenter;
@@ -327,7 +316,6 @@
             // splitContainer1.Panel1
             // 
             this.splitContainer1.Panel1.Controls.Add(this.grdMovies);
-            this.splitContainer1.Panel1.Controls.Add(this.label1);
             // 
             // splitContainer1.Panel2
             // 
@@ -338,6 +326,7 @@
             // 
             // splitContainer2
             // 
+            this.splitContainer2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitContainer2.Location = new System.Drawing.Point(0, 0);
             this.splitContainer2.Name = "splitContainer2";
@@ -361,7 +350,7 @@
             this.picPoster.Dock = System.Windows.Forms.DockStyle.Fill;
             this.picPoster.Location = new System.Drawing.Point(0, 0);
             this.picPoster.Name = "picPoster";
-            this.picPoster.Size = new System.Drawing.Size(232, 160);
+            this.picPoster.Size = new System.Drawing.Size(230, 158);
             this.picPoster.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.picPoster.TabIndex = 22;
             this.picPoster.TabStop = false;
@@ -376,7 +365,7 @@
             this.txtPlot.Name = "txtPlot";
             this.txtPlot.ReadOnly = true;
             this.txtPlot.ShowSelectionMargin = true;
-            this.txtPlot.Size = new System.Drawing.Size(232, 104);
+            this.txtPlot.Size = new System.Drawing.Size(230, 102);
             this.txtPlot.TabIndex = 25;
             this.txtPlot.Text = "No Summary";
             // 
@@ -617,7 +606,6 @@
             this.ctActions.ResumeLayout(false);
             this.ctTools.ResumeLayout(false);
             this.splitContainer1.Panel1.ResumeLayout(false);
-            this.splitContainer1.Panel1.PerformLayout();
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
@@ -635,7 +623,6 @@
         }
 
         #endregion
-        private System.Windows.Forms.Label label1;
         private DropDownButton cmdActions;
         private System.Windows.Forms.ContextMenuStrip ctActions;
         private System.Windows.Forms.ToolStripMenuItem mnuRenameAll;

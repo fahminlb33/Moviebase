@@ -1,15 +1,16 @@
-﻿using System.IO;
-using System.Linq;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
-using BlastMVP;
-using Moviebase.Core;
-using Moviebase.Core.Contracts;
+using Moviebase.Core.MVP;
 using Moviebase.Entities;
 using Moviebase.Models;
 using Moviebase.Properties;
 using Moviebase.Views;
 using Ninject;
+using Ninject.Parameters;
 
 namespace Moviebase.Presenters
 {
@@ -17,8 +18,15 @@ namespace Moviebase.Presenters
     {
         private readonly StandardKernel _kernel = Program.AppKernel;
         private readonly FolderBrowserDialog _folderBrowser;
-        private readonly IWorkerPool _workerPool;
+        private CancellationTokenSource _cancellationToken;
         private int _processed;
+
+        public enum UiState
+        {
+            Running,
+            Stopped,
+            Update
+        }
 
         public MoveMoviesModel Model { get; }
         public MoveMoviesView View { get; }
@@ -26,52 +34,56 @@ namespace Moviebase.Presenters
         public MoveMoviesPresenter(MoveMoviesView view)
         {
             View = view;
-            Model = new MoveMoviesModel(SynchronizationContext.Current);
-
-            _workerPool = _kernel.Get<IWorkerPool>();
-            _workerPool.RunWorkerStarted = Worker_RunWorkerStarted;
-            _workerPool.ProgressChanged = Worker_ProgressChanged;
-            _workerPool.RunWorkerCompleted = Worker_RunWorkerCompleted;
-
+            Model = _kernel.Get<MoveMoviesModel>(new ConstructorArgument("context", SynchronizationContext.Current));
             _folderBrowser = new FolderBrowserDialog {Description = StringResources.SelectFolderMessage};
         }
 
         #region Worker Subscriber
 
-        private void Worker_RunWorkerStarted()
-        {
-            Model.CmdBrowseEnabled = false;
-            Model.CmdExecuteEnabled = true;
-            Model.CmdExecuteText = StringResources.LiteralStopText;
-        }
-
-        private void Worker_RunWorkerCompleted()
-        {
-            Model.CmdBrowseEnabled = true;
-            Model.CmdExecuteEnabled = true;
-            Model.CmdExecuteText = StringResources.LiteralMoveText;
-        }
-
-        private void Worker_ProgressChanged(int progressPercentage, object state)
-        {
-            var path = new PowerPath(state.ToString());
-
-            Interlocked.Increment(ref _processed);
-            var count = Interlocked.CompareExchange(ref _processed, 0, 0);
-            Model.LblCountText = string.Format(StringResources.MoveMoviesCountPattern, count);
-            Model.Invoke(() => Model.DataView.Add(new MovedMovieEntry
-            {
-                Title = path.GetFileName(),
-                Path = path.GetDirectoryPath()
-            }));
-        }
-
+       
         #endregion
+        private void RecreateCancellationToken()
+        {
+            _cancellationToken?.Dispose();
+            _cancellationToken = new CancellationTokenSource();
+        }
 
         public void BrowseFolder()
         {
             if (_folderBrowser.ShowDialog() != DialogResult.OK) return;
             Model.TxtBrowseText = _folderBrowser.SelectedPath;
+        }
+
+        private void UpdateUi(UiState mode, string path = null)
+        {
+            switch (mode)
+            {
+                case UiState.Running:
+                    Model.CmdBrowseEnabled = false;
+                    Model.CmdExecuteEnabled = true;
+                    Model.CmdExecuteText = StringResources.LiteralStopText;
+                    break;
+
+                case UiState.Stopped:
+                    Model.CmdBrowseEnabled = true;
+                    Model.CmdExecuteEnabled = true;
+                    Model.CmdExecuteText = StringResources.LiteralMoveText;
+                    break;
+
+                case UiState.Update:
+                    Interlocked.Increment(ref _processed);
+                    var count = Interlocked.CompareExchange(ref _processed, 0, 0);
+                    Model.LblCountText = string.Format(StringResources.MoveMoviesCountPattern, count);
+                    Model.Invoke(() => Model.DataView.Add(new MovedMovieEntry
+                    {
+                        Title = Path.GetFileName(path),
+                        Path = Path.GetDirectoryName(path)
+                    }));
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(mode), mode, null);
+            }
         }
 
         public void SearchMovies()
@@ -84,16 +96,46 @@ namespace Moviebase.Presenters
 
             if (Model.CmdExecuteText == StringResources.LiteralMoveText)
             {
-                var worker = Program.AppKernel.Get<IMoveMovieWorker>();
-                worker.AnalyzePath = _folderBrowser.SelectedPath;
-                worker.FileExtensions = Settings.Default.MovieExtensions.Cast<string>().ToList();
-                _workerPool.Start(worker);
+                OrganizeDirectory(_folderBrowser.SelectedPath);
             }
             else
             {
-                _workerPool.Stop();
+                _cancellationToken.Cancel();
                 Model.CmdExecuteEnabled = false;
             }
+        }
+
+        public void OrganizeDirectory(string path)
+        {
+            RecreateCancellationToken();
+            Task.Run(() =>
+            {
+                UpdateUi(UiState.Running);
+                var dirEnumbEnumerable = Directory.EnumerateFiles(path, "*", SearchOption.TopDirectoryOnly);
+                foreach (var basePath in dirEnumbEnumerable)
+                {
+                    var token = _cancellationToken.Token;
+                    token.ThrowIfCancellationRequested();
+
+                    try
+                    {
+                        var currentPath = new PowerPath(basePath);
+                        if (!Settings.Default.MovieExtensions.Contains(currentPath.GetExtension())) return;
+
+                        var newDir = Path.Combine(currentPath.GetDirectoryPath(), currentPath.GetFileNameWithoutExtension());
+                        var newFile = Path.Combine(newDir, currentPath.GetFileName());
+
+                        Directory.CreateDirectory(newDir);
+                        File.Move(currentPath.GetFullPath(), newFile);
+                        UpdateUi(UiState.Update, currentPath);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.Print("Organize error: {0}. {1}", basePath, e.Message);
+                    }
+                }
+                UpdateUi(UiState.Stopped);
+            }, _cancellationToken.Token);
         }
     }
 }

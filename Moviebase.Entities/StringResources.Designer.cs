@@ -79,7 +79,7 @@ namespace Moviebase.Entities {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to There is currently opened folder. Do you want to close it first?.
+        ///   Looks up a localized string similar to There is currently opened folder. Close existing folder and open new one..
         /// </summary>
         public static string AlreadyOpenedFolderMessage {
             get {
@@ -138,6 +138,15 @@ namespace Moviebase.Entities {
         public static string FetchNoDataMessage {
             get {
                 return ResourceManager.GetString("FetchNoDataMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid pattern..
+        /// </summary>
+        public static string InvalidPatternText {
+            get {
+                return ResourceManager.GetString("InvalidPatternText", resourceCulture);
             }
         }
         
@@ -250,6 +259,24 @@ namespace Moviebase.Entities {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not connect to server. Check your internet connection..
+        /// </summary>
+        public static string NoInternetMessage {
+            get {
+                return ResourceManager.GetString("NoInternetMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This item is has no online data..
+        /// </summary>
+        public static string NotFetchedMessage {
+            get {
+                return ResourceManager.GetString("NotFetchedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Not found!.
         /// </summary>
         public static string NotFoundText {
@@ -313,6 +340,16 @@ namespace Moviebase.Entities {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Rename finished. Processed entries: {0}
+        ///Please reanalyze the folder to refresh information..
+        /// </summary>
+        public static string RenameFinishedMessage {
+            get {
+                return ResourceManager.GetString("RenameFinishedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No data to rename..
         /// </summary>
         public static string RenameNoDataMessage {
@@ -327,6 +364,15 @@ namespace Moviebase.Entities {
         public static string SelectFolderMessage {
             get {
                 return ResourceManager.GetString("SelectFolderMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You need to restart this application in order to take effect..
+        /// </summary>
+        public static string SettingsRestartMessage {
+            get {
+                return ResourceManager.GetString("SettingsRestartMessage", resourceCulture);
             }
         }
         

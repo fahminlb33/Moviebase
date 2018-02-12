@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
-using BlastMVP;
+using Moviebase.Core.MVP;
 using Moviebase.Presenters;
 
 namespace Moviebase.Views

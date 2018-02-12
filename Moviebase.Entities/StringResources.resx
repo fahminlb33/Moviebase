@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AlreadyOpenedFolderMessage" xml:space="preserve">
-    <value>There is currently opened folder. Do you want to close it first?</value>
+    <value>There is currently opened folder. Close existing folder and open new one.</value>
   </data>
   <data name="AlternativeNameTitle" xml:space="preserve">
     <value>Select name.</value>
@@ -212,5 +212,21 @@
   </data>
   <data name="NoExtensionToAddMessage" xml:space="preserve">
     <value>No Extension to Add</value>
+  </data>
+  <data name="NoInternetMessage" xml:space="preserve">
+    <value>Could not connect to server. Check your internet connection.</value>
+  </data>
+  <data name="NotFetchedMessage" xml:space="preserve">
+    <value>This item is has no online data.</value>
+  </data>
+  <data name="SettingsRestartMessage" xml:space="preserve">
+    <value>You need to restart this application in order to take effect.</value>
+  </data>
+  <data name="InvalidPatternText" xml:space="preserve">
+    <value>Invalid pattern.</value>
+  </data>
+  <data name="RenameFinishedMessage" xml:space="preserve">
+    <value>Rename finished. Processed entries: {0}
+Please reanalyze the folder to refresh information.</value>
   </data>
 </root>

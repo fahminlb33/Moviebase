@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Forms;
-using BlastMVP;
+using Moviebase.Core.MVP;
 using Moviebase.Entities;
 using Moviebase.Presenters;
 

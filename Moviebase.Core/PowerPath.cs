@@ -22,7 +22,7 @@ namespace System.IO
         #endregion
 
         #region Constructors
-        public PowerPath(string basePath) : this(basePath, !string.IsNullOrWhiteSpace(Path.GetExtension(basePath)) && !Directory.Exists(basePath))
+        public PowerPath(string basePath) : this(basePath, !string.IsNullOrWhiteSpace(Path.GetExtension(basePath)))
         {
         }
 

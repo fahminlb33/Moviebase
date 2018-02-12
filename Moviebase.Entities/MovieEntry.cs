@@ -6,38 +6,40 @@ namespace Moviebase.Entities
     {
         public MovieEntry(TmdbResult data, string fullPath)
         {
-            InternalMovieData = data;
+            Data = data;
             FullPath = fullPath;
         }
 
-        [Browsable(false)] public TmdbResult InternalMovieData;
+        [Browsable(false)] public TmdbResult Data;
 
         [Browsable(false)] public string FullPath;
 
+        [Browsable(false)] public int TmdbId => Data.Id;
+
         public string Title
         {
-            get => InternalMovieData.Title;
-            set => InternalMovieData.Title = value;
+            get => Data.Title;
+            set => Data.Title = value;
         }
         public int Year
         {
-            get => InternalMovieData.Year;
-            set => InternalMovieData.Year = value;
+            get => Data.Year;
+            set => Data.Year = value;
         }
         public string Genre
         {
-            get => InternalMovieData.Genre;
-            set => InternalMovieData.Genre = value;
+            get => Data.Genre;
+            set => Data.Genre = value;
         }
         public string ImdbId
         {
-            get => InternalMovieData.ImdbId;
-            set => InternalMovieData.ImdbId = value;
+            get => Data.ImdbId;
+            set => Data.ImdbId = value;
         }
         public string Plot
         {
-            get => InternalMovieData.Plot;
-            set => InternalMovieData.Plot = value;
+            get => Data.Plot;
+            set => Data.Plot = value;
         }
     }
 }

@@ -3,15 +3,22 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Text;
 using System.Text.RegularExpressions;
+using Moviebase.Core.Diagnostics;
 
 namespace Moviebase.Core
 {
-    public class Commons
+    public static class Commons
     {
+        public static Func<int, bool> IsMovieFetched = x => x > 0;
+        public const int NotFetchedEntryId = -1;
+        public const int IgnoredEntryId = -2;
+
         public const string TempFolderName = "moviebase";
         public const string PersistentFileName = "moviebase.persist";
         public const string ExportFileName = "moviebase.csv";
         public const string IconFileName = "icon.ico";
+        public const string PosterFileName = "poster";
+        public static readonly string DesktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
         public const string JpgFileExtension = ".jpg";
         public const string Mp4FileExtension = ".mp4";

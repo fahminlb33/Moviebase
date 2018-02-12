@@ -1,14 +1,13 @@
 ﻿using System.Threading;
-using BlastMVP;
+using Moviebase.Core.MVP;
 using Moviebase.Entities;
+using Ninject.Extensions.Interception.Attributes;
 
 namespace Moviebase.Models
 {
-    sealed class SelectPosterModel : ModelBase
+    [NotifyOfChanges]
+    public class SelectPosterModel : ModelBase
     {
-        private string _lblStatusText;
-        private int _prgStatusValue;
-
         public SelectPosterModel(SynchronizationContext context) : base(context)
         {
             InitializeValues();
@@ -20,26 +19,8 @@ namespace Moviebase.Models
             PrgStatusValue = 0;
         }
 
-        public string LblStatusText
-        {
-            get => _lblStatusText;
-            set
-            {
-                if (value == _lblStatusText) return;
-                _lblStatusText = value;
-                OnPropertyChanged();
-            }
-        }
+        public virtual string LblStatusText { get; set; }
 
-        public int PrgStatusValue
-        {
-            get => _prgStatusValue;
-            set
-            {
-                if (value == _prgStatusValue) return;
-                _prgStatusValue = value;
-                OnPropertyChanged();
-            }
-        }
+        public virtual int PrgStatusValue { get; set; }
     }
 }
