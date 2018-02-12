@@ -3,10 +3,10 @@
   <Profiles />
   <Settings>
     <Setting Name="LastOpenDirectory" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">E:\Programming\Sandbox\MO</Value>
     </Setting>
     <Setting Name="TmdbApiKey" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">54989087497c2801d6469d34c6f42fc7</Value>
     </Setting>
     <Setting Name="MovieExtensions" Type="System.Collections.Specialized.StringCollection" Scope="User">
       <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
@@ -23,13 +23,13 @@
       <Value Profile="(Default)">{Title} ({Year})</Value>
     </Setting>
     <Setting Name="SwapThe" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="HidePresistFile" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="OverwritePoster" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>
 </SettingsFile>

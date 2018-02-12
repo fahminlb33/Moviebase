@@ -18,7 +18,7 @@ namespace Moviebase.Models
         {
             DataView = new BindingList<MovedMovieEntry>();
             LblCountText = "Count: ";
-            CmdExecuteText = StringResources.LiteralMoveText;
+            CmdExecuteText = Strings.LiteralMoveText;
             CmdExecuteEnabled = true;
             CmdBrowseEnabled = true;
         }

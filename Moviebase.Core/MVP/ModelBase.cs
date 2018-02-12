@@ -24,7 +24,7 @@ namespace Moviebase.Core.MVP
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            Context.Post(_ => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)), null);
+            Context.Send(x => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)), null);
         }
     }
 }

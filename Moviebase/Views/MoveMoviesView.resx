@@ -59,8 +59,8 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+  <xsd:schema id="root" xmlnameSpace="" xmlnameSpace:xsd="http://www.w3.org/2001/XMLSchema" xmlnameSpace:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import nameSpace="http://www.w3.org/XML/1998/nameSpace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
@@ -193,7 +193,7 @@
         AyYIAAV4BCoQuwBnIOkMhTH/JpJF/ymSRe8QgyzIAHgajAB3GD0AeBYPAHcUBAB4GAAAeBgAAAAAADAw
         MOYuLi7iKysr3CkpKdwpKSngLCwstz07PGRXUlc6VVFVO1NOUz5UTVM+R2BTPi2GUT4clk0+FpFGPhOT
         RDsQlUI6ClMlZggvFr4IQBvxC28s/CCRRf9Eo2L/RqJh/SOPQPcNgyvLBn4ifAB5GD8AeBYYAHYTBABx
-        DAEAdxUAMzMz+DExMdkuLi6gLS0toDAwMNs5ODnsS0lL0FZUVsBWVFbBVlJVwVZRVcFIY1TBLodSwR2X
+        DAEAdxUAMzMz+DExMdkuLi6gLS0toDAwMNs5ODnameSpaceS0lL0FZUVsBWVFbBVlJVwVZRVcFIY1TBLodSwR2X
         TsEZkknBFo9FwROPQsAPgzrPC3Iw6xF1NPwhi0b+PqBg/2Ozfv9ms37/RqJh/imSRe4OhCvMAHoakgB5
         GEEAdxYRAHYUBAB4FwA2Njb/NTU12zMzM5YxMTGVMjIy3EBEQP9ZZlv/Z3hp/2h3af9pdmj/anVo/1h+
         Yv8zkFj/JppW/zGdXP82nl//M51c/zCcWf8tnFb/NJ9b/0WlaP9br3n/c7qM/3W7jf9isXv/RaJg/iKQ
@@ -261,7 +261,7 @@
         GrUAeRljAHkVIwB3BggAdQACAHgQAQB4EAAAeBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuLi4NLi4uDSws
         LA0rKysOKSkpDicnJw4mJiYNJCQkCyQkJAgkJCQEJCQkASQkJAAkJCQAAAAAAAAAAAAAAAAAAAAAAAAA
         AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgICAAICAgACAgIAQD/hABKAAABBEgWGQBxH1gAeiGqAH0h6QJ9
-        Iv8FfSL/Bn0i8wd9IbwFfB9yAnsbNgB4FRgAeBMLAHkYBQB0IgAAfBQAAHkZAAB5GQAAeRkAAAAAAAAA
+        Iv8FfSL/Bn0i8wd9IbwFfB9yAnameSpacebNgB4FRgAeBMLAHkYBQB0IgAAfBQAAHkZAAB5GQAAeRkAAAAAAAAA
         AAAuLi5CLS0tRCwsLEgqKipNKSkpUCcnJ00lJSVHIyMjPCIiIioiIiIUIiIiAyIiIgAiIiIAAAAAAAAA
         AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcABAAHAAQABwAEBAoAABIJAAAnBhcKSQJO
         F4AAbR6/AXsj7geBKP8PhC3/FIUw9hOELs0NgCeVA3ocYgB2FT0AdRQgAHcXDAB1EQMAcQoBAHYVAAB2
@@ -270,7 +270,7 @@
         ASwIAAJdBw0IjQM3ErYAYB3bA3om9g+HMv8ejj7/J5FE+iKOPuQThS/EBHsfnwB3F3EAdhZAAHgYGgB3
         FAkAdhIDAHcXAQB3FwAAdxcAAAAAAAAAAAAvLy/NLi4uzy0tLdUrKyvdKSkp4SgoKN4mJibUJiYmuycn
         J4gsLCxIQUFBGH5+fghtbW0KV1dXDlhWVw5ZVVcOVFtXDkZsVQ4zg1MOJJNRDh2XTg4clEwOG5FJDiHN
-        Ywoj/ncID1UqGQoZEEsJDwuPCBkOxwU4FuUDXiHzCH0u/BqOP/8wmVD/PJ1Z/TKXTvcciznsCYAn0wF7
+        Ywoj/ncID1UqGQoZEEsJDwuPCBkOxwU4FuUDXiHzCH0u/BqOP/8wmVD/PJ1Z/TKXTvcciznameSpaceCYAn0wF7
         H6MAeh1nAXsdNgB5GBsAeRcNAHoaBQBnAAAAfSAAAHkZAAB5GQAwMDDrMDAw6C4uLuEsLCzXKioq0Skp
         KdgpKinhKysr2jAwMLU8OjyCTUlNWldRVk5VUFVPUk5SUlNMUlJUS1JST1JSUkJmUlIxf1FSIpJQUhuW
         TFIWkkdSE41DUhGSQk8PlEJNDH83WwlVJYQIPRu6CDsa5QlOIfcMbC38FYY7/iuXT/9EpGP/Uqlt/kai
@@ -345,7 +345,7 @@
         AABZWVncWVlZ1VhYWMRWVlauVVVVolZUVa5ZVVfGW2Bd3F96a+tjmXv2Z6+H/Wm2i/9stYz/bbSL/220
         i/9ttIv/a7SJ/2azh/9gs4X/W7KD/1iygv9Ws4H/VLOB/1O2gv9St4L/Tq17/UWLZ/U5XErqMDk03C03
         MsovSz23MF5Gri1eRb4rV0DVKVI90ilRPJsoUTtKKVE8DSlRPAApUTwAAAAAAAAAAAAAAAAAAAAAAAAA
-        AAAAAAAAAAAAAAAAAABbW1vZW1tb0VpaWrtZWVmfV1dXkFRQU5tTTlG1Vl1Yzl2EbOFns4PxbtOU/HLd
+        AAAAAAAAAAAAAAAAAABbW1vZW1tb0VpaWrtZWVmfV1dXkFRQU5tTTlG1Vl1Yzl2EbOFnameSpace4PxbtOU/HLd
         m/913Zz/d9qd/3fbnP912pv/c9qZ/27Zlf9o2JL/ZNeP/2HXjv9g147/X9eO/1/aj/9e3I7/WtCH/U+n
         cfJAbVHjMzw20S0qLLgtLi6eLDYxkio0L6UoMCzDJy8rxycuKpQnLipHJzIsDCcoKAAnKikALZ1fAC2d
         XwAtnV8AAAAAAAAAAAAAAAAAAAAAAAAAAABdXV3ZXV1d0VxcXLxbW1ugWVlZkFVRVJpTTVGzVF1Xy1qG
@@ -384,7 +384,7 @@
         YPKool32xrpc+NjDYvnlxGv57sJx+fPCc/n2wHL5979w+fq9a/n7vGj58b1u+dbChvmxyaf5k8/F+YXY
         3vl+3+/5ddbr+GavwPdVeIH0SE5P60I+PddBPj7AQUFBtD4+PsY9PT3hPDw84Ds7O6U7OztPOzs7DTs7
         OwA7OzsAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABsbGz9bGxs+2tra/RqamrraWlp5WVm
-        Z+liY2bxbGpl94l+Zvixm2b40bBo9964a/fhuG/34rZx9+O2cffktG/35LNt9+ayaffnsWb33rJs98S3
+        Z+liY2bxbGpl94l+Zvixm2b40bBo9964a/fhuG/34rZx9+O2cffktG/35LNt9+ayaffnameSpaceWb33rJs98S3
         hPehvqX3hsTB933M1fd90eD3esjY92uksflYc3r6Sk9Q9URBQOZDQUDTQkJCyUBAQNk+Pj7vPT096T09
         Pas9PT1SPT09Dj09PQA9PT0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABtbW3/bW1t/Gxs
         bPFra2vhampq2WZnaOBkZWfva2ln+4B2Zv+dh2b/s5Vn/rqaaP66mmn+uZhq/riYaf64l2j+t5Zm/rmV

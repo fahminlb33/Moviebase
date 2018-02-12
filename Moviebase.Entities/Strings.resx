@@ -190,7 +190,7 @@
     <value>Not found!</value>
   </data>
   <data name="ComponentMissingMessage" xml:space="preserve">
-    <value>Some component(s) are missing. Please install before using this application. See Settings.</value>
+    <value>Some component(s) are missing. Please install the required dependencies before using this application.</value>
   </data>
   <data name="MagickNotInstalled" xml:space="preserve">
     <value>ImageMagick is not installed. Can not use this feature.</value>
@@ -228,5 +228,8 @@
   <data name="RenameFinishedMessage" xml:space="preserve">
     <value>Rename finished. Processed entries: {0}
 Please reanalyze the folder to refresh information.</value>
+  </data>
+  <data name="BrowseExportTitle" xml:space="preserve">
+    <value>Select export path.</value>
   </data>
 </root>

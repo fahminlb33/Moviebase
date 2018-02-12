@@ -25,7 +25,7 @@ namespace Moviebase.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("E:\\Programming\\Sandbox\\MO")]
         public string LastOpenDirectory {
             get {
                 return ((string)(this["LastOpenDirectory"]));
@@ -37,7 +37,7 @@ namespace Moviebase.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("54989087497c2801d6469d34c6f42fc7")]
         public string TmdbApiKey {
             get {
                 return ((string)(this["TmdbApiKey"]));
@@ -88,7 +88,7 @@ namespace Moviebase.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool SwapThe {
             get {
                 return ((bool)(this["SwapThe"]));
@@ -100,7 +100,7 @@ namespace Moviebase.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool HidePresistFile {
             get {
                 return ((bool)(this["HidePresistFile"]));
@@ -112,7 +112,7 @@ namespace Moviebase.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool OverwritePoster {
             get {
                 return ((bool)(this["OverwritePoster"]));

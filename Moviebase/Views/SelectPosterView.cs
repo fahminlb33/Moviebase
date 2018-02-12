@@ -44,7 +44,7 @@ namespace Moviebase.Views
         {
             if (picPoster.Image == null)
             {
-                this.ShowMessageBox(StringResources.PosterNotSelectedMessage, StringResources.AppName);
+                this.ShowMessageBox(Strings.PosterNotSelectedMessage, Strings.AppName);
                 return;
             }
 

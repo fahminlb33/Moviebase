@@ -17,10 +17,9 @@ namespace Moviebase.Core
         public const string PersistentFileName = "moviebase.persist";
         public const string ExportFileName = "moviebase.csv";
         public const string IconFileName = "icon.ico";
-        public const string PosterFileName = "poster";
+        public const string PosterFileName = "poster.jpg";
         public static readonly string DesktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-
-        public const string JpgFileExtension = ".jpg";
+        
         public const string Mp4FileExtension = ".mp4";
         public const string AllFilesSearchPattern = "*";
         public const string JpgSearchPattern = "*.jpg";

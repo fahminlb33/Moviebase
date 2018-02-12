@@ -4,11 +4,14 @@ using System.Windows.Forms;
 using Moviebase.Core.MVP;
 using Moviebase.Entities;
 using Moviebase.Presenters;
+using Moviebase.Properties;
 
 namespace Moviebase.Views
 {
     public partial class MainView : Form
     {
+        private readonly FolderSelectDialog _folderBrowserDialog;
+        private readonly SaveFileDialog _saveFileDialog;
         private readonly MainPresenter _presenter;
 
         public MainView()
@@ -16,6 +19,19 @@ namespace Moviebase.Views
             InitializeComponent();
             _presenter = new MainPresenter(this);
             GlueBindings();
+
+            _folderBrowserDialog = new FolderSelectDialog
+            {
+                Title = Strings.BrowseFolderDescription,
+            };
+            _saveFileDialog = new SaveFileDialog
+            {
+                // ReSharper disable once LocalizableElement
+                Filter = "Comma Separated File|*.csv",
+                DefaultExt = "*.csv",
+                FileName = "Moviebase.csv",
+                Title = Strings.BrowseExportTitle
+            };
         }
 
         private void GlueBindings()
@@ -74,7 +90,8 @@ namespace Moviebase.Views
 
         private void cmdFolderOpen_Click(object sender, EventArgs e)
         {
-            _presenter.OpenDirectory();
+            if (!_folderBrowserDialog.ShowDialog()) return;
+            _presenter.OpenDirectory(_folderBrowserDialog.SelectedPath);
         }
 
         private void cmdFolderClose_Click(object sender, EventArgs e)
@@ -84,7 +101,19 @@ namespace Moviebase.Views
 
         private void cmdFolderRecent_Click(object sender, EventArgs e)
         {
-            _presenter.OpenLastDirectory();
+            var settings = Settings.Default;
+            if (string.IsNullOrWhiteSpace(settings.LastOpenDirectory))
+            {
+                this.ShowMessageBox(Strings.OpenDirNoRecord, Strings.AppName, icon: MessageBoxIcon.Exclamation);
+                return;
+            }
+            if (!System.IO.Directory.Exists(settings.LastOpenDirectory))
+            {
+                this.ShowMessageBox(Strings.OpenDirNotExist, Strings.AppName, icon: MessageBoxIcon.Exclamation);
+                return;
+            }
+
+            _presenter.OpenDirectory(settings.LastOpenDirectory);
         }
 
         // --------- TOOLS
@@ -98,9 +127,10 @@ namespace Moviebase.Views
             _presenter.ShowMoveMoviesWindow();
         }
 
-        private async void mnuExportCsv_Click(object sender, EventArgs e)
+        private void mnuExportCsv_Click(object sender, EventArgs e)
         {
-            await _presenter.ExportCsv();
+            if (_saveFileDialog.ShowDialog() != DialogResult.OK) return;
+            _presenter.ExportCsv(_saveFileDialog.FileName);
         }
 
         // --------- ACTIONS
@@ -141,17 +171,17 @@ namespace Moviebase.Views
         }
 
         // --------- DATA GRID
-        private async void mnuReSearch_Click(object sender, EventArgs e)
+        private void mnuReSearch_Click(object sender, EventArgs e)
         {
             if (grdMovies.CurrentRow == null) return;
-            await _presenter.ResearchMovie(grdMovies.CurrentRow.Index);
+            _presenter.ResearchMovie(grdMovies.CurrentRow.Index);
         }
 
         private void mnuIgnore_Click(object sender, EventArgs e)
         {
             if (grdMovies.CurrentRow == null) return;
             _presenter.SaveIgnoreEntry(grdMovies.CurrentRow.Index);
-            this.ShowMessageBox(StringResources.ItemExcludedMessage, StringResources.AppName);
+            this.ShowMessageBox(Strings.ItemExcludedMessage, Strings.AppName);
         }
 
         private void mnuSelectPoster_Click(object sender, EventArgs e)

@@ -12,7 +12,7 @@ namespace Moviebase.Core
         {
             try
             {
-                var posterPath = Path.Combine(path, Commons.PosterFileName + Commons.JpgFileExtension);
+                var posterPath = Path.Combine(path, Commons.PosterFileName);
                 if (!File.Exists(posterPath)) return;
 
                 GenerateIcon(posterPath);

@@ -15,7 +15,7 @@ namespace Moviebase.Models
 
         private void InitializeValues()
         {
-            LblStatusText = StringResources.LiteralDownloadingText;
+            LblStatusText = Strings.LiteralDownloadingText;
             PrgStatusValue = 0;
         }
 

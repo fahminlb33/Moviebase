@@ -11,7 +11,6 @@ using Moviebase.Properties;
 using Moviebase.Views;
 using Moviebase.Entities;
 using Moviebase.Core;
-using Moviebase.Core.Diagnostics;
 using Moviebase.Core.MVP;
 using Moviebase.Core.Services;
 using Moviebase.Models;
@@ -20,22 +19,12 @@ using Ninject.Parameters;
 
 namespace Moviebase.Presenters
 {
-    class MainPresenter
+    class MainPresenter : PresenterBase
     {
         private readonly StandardKernel _kernel = Program.AppKernel;
         private readonly Settings _settings = Settings.Default;
-        private readonly FolderBrowserDialog _folderBrowserDialog;
-        private CancellationTokenSource _cancellationToken;
         private int _lastSelectedIndex;
-
-        public enum UiState
-        {
-            Ready,
-            Working,
-            Cancelling,
-            StatusUpdate,
-        }
-
+        
         public MainModel Model { get; }
         public MainView View { get; }
 
@@ -43,13 +32,6 @@ namespace Moviebase.Presenters
         {
             View = view;
             Model = _kernel.Get<MainModel>(new ConstructorArgument("context", SynchronizationContext.Current));
-
-            CheckComponents();
-            _folderBrowserDialog = new FolderBrowserDialog
-            {
-                Description = StringResources.BrowseFolderDescription,
-                ShowNewFolderButton = false
-            };
         }
         
         #region Event Handlers
@@ -57,8 +39,7 @@ namespace Moviebase.Presenters
         // -------- STOP
         public void StopProcess()
         {
-            _cancellationToken?.Cancel();
-            UpdateUi(UiState.Cancelling);
+            CancelTask();
         }
 
         // -------- WINDOWS
@@ -78,29 +59,62 @@ namespace Moviebase.Presenters
         }
 
         // -------- ACTIONS
-        public void OpenLastDirectory()
+        public void OpenDirectory(string path)
         {
-            var path = _settings.LastOpenDirectory;
-            var validation = CreateValidationSupport()
-                .IsTrue(() => Model.DataView.Count == 0, StringResources.AlreadyOpenedFolderMessage)
-                .IsTrue(() => Directory.Exists(path), StringResources.OpenDirNoRecord)
+            var result = CreateValidationSupport()
+                .IsTrue(() => Model.DataView.Count == 0, Strings.AlreadyOpenedFolderMessage)
                 .Validate();
-            if (!validation) return;
+            if (!result) return;
 
-            InternalAnalyzeDirectory(path);
-        }
-
-        public void OpenDirectory()
-        {
-            var validation = CreateValidationSupport()
-                .IsTrue(() => Model.DataView.Count == 0, StringResources.AlreadyOpenedFolderMessage)
-                .Validate();
-            if (!validation) return;
-
-            if (_folderBrowserDialog.ShowDialog() != DialogResult.OK) return;
-            _settings.LastOpenDirectory = _folderBrowserDialog.SelectedPath;
+            _settings.LastOpenDirectory = path;
             _settings.Save();
-            InternalAnalyzeDirectory(_folderBrowserDialog.SelectedPath);
+
+            Model.DataView.Clear();
+            RecreateCancellationToken();
+            RunTask(async () =>
+            {
+                var tmdb = _kernel.Get<ITmdb>();
+                var persistFileManager = _kernel.Get<IPersistFileManager>();
+                var dirEnumbEnumerable = Directory.EnumerateDirectories(path, "*", SearchOption.TopDirectoryOnly).ToList();
+                var calc = new PercentageCalculator(dirEnumbEnumerable.Count);
+                foreach (var basePath in dirEnumbEnumerable)
+                {
+                    try
+                    {
+                        string currentMoviePath;
+                        var currentFolder = new PowerPath(basePath);
+
+                        // check for ignore pattern
+                        var lastName = currentFolder.GetLastDirectoryName();
+                        if (lastName.StartsWith("[") && lastName.EndsWith("]")) continue;
+
+                        // find first movie
+                        if ((currentMoviePath = InternalFindFirstFile(basePath)) == null) continue;
+
+                        // find metadata
+                        TmdbResult entry;
+                        if (persistFileManager.HasPersistentData(Path.GetDirectoryName(currentMoviePath)))
+                        {
+                            entry = persistFileManager.Load(currentMoviePath);
+                        }
+                        else
+                        {
+                            entry = await tmdb.GetByFilename(Path.GetFileNameWithoutExtension(currentMoviePath));
+                        }
+
+                        // pop to event
+                        Model.Invoke(() => Model.DataView.Add(new MovieEntry(entry, currentMoviePath)));
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.Print("Analyze error: {0}. {1}", basePath, e.Message);
+                    }
+
+                    _lastSelectedIndex = -1;
+                    UpdateUi(UiState.StatusUpdate, calc.Increment());
+                    ThrowIfCancellationRequested();
+                }
+            });
         }
 
         public void CloseFolder()
@@ -109,110 +123,106 @@ namespace Moviebase.Presenters
             ResetDetails();
         }
 
-        public async Task ExportCsv()
+        public void ExportCsv(string path)
         {
             var result = CreateValidationSupport()
-                .IsTrue(() => Model.DataView.Count > 0, StringResources.ExportNoDataMessage)
+                .IsTrue(() => Model.DataView.Count > 0, Strings.ExportNoDataMessage)
                 .Validate();
             if (!result) return;
 
-            UpdateUi(UiState.Working);
-            await Task.Run(() =>
+            RunTask(() =>
             {
-                CsvExporter.ExportCsv(Model.DataView, Path.Combine(Commons.DesktopPath, Commons.ExportFileName));
+                CsvExporter.ExportCsv(Model.DataView, path);
+                View.ShowMessageBox("Expor completed.", Strings.AppName);
             });
-            View.ShowMessageBox("Export success.", StringResources.AppName);
-            UpdateUi(UiState.Ready);
         }
 
         public void RenameMovieFiles()
         {
             var result = CreateValidationSupport()
-                .IsTrue(() => Model.DataView.Count > 0, StringResources.RenameNoDataMessage)
+                .IsTrue(() => Model.DataView.Count > 0, Strings.RenameNoDataMessage)
                 .Validate();
             if (!result) return;
-
-            RecreateCancellationToken();
-            Task.Run(() =>
+            
+            RunTask(() =>
             {
-                var count = 0;
-                foreach (var entry in Model.DataView.Where(x => Commons.IsMovieFetched(x.TmdbId) && !string.IsNullOrWhiteSpace(x.Title)))
+                var entries = Model.DataView.Where(x => Commons.IsMovieFetched(x.TmdbId) &&
+                                                        !string.IsNullOrWhiteSpace(x.Title)).ToList();
+                var calc = new PercentageCalculator(entries.Count);
+                foreach (var entry in entries)
                 {
-                    var token = _cancellationToken.Token;
-                    if (token.IsCancellationRequested) UpdateUi(UiState.Ready);
-                    if (token.IsCancellationRequested) break;
-
                     try
                     {
                         var path = entry.FullPath;
                         InternalRenameFile(path, entry);
                         InternalRenameDirectory(path, entry);
-                        count++;
                     }
                     catch (Exception e)
                     {
                         Debug.Print("Rename error: {0}. {1}", entry.Title, e.Message);
                     }
+
+                    if (IsCancellationRequested) break;
+                    UpdateUi(UiState.StatusUpdate, calc.Increment());
                 }
 
-                View.ShowMessageBox(string.Format(StringResources.RenameFinishedMessage, count), StringResources.AppName);
                 Model.DataView.Clear();
-            }, _cancellationToken.Token);
+            });
         }
 
         public void FetchMovieData()
         {
             var result = CreateValidationSupport()
-                .IsTrue(() => Model.DataView.Count > 0, StringResources.FetchNoDataMessage)
+                .IsTrue(() => Model.DataView.Count > 0, Strings.FetchNoDataMessage)
                 .EnsureInternetConnected()
                 .Validate();
             if (!result) return;
-
-            RecreateCancellationToken();
-            Task.Run(async () =>
+            
+            RunTask(async () =>
             {
-                foreach (var path in Model.DataView.Where(x => !Commons.IsMovieFetched(x.Data.Id)).Select(x => x.FullPath))
+                var paths = Model.DataView.Where(x => !Commons.IsMovieFetched(x.Data.Id))
+                    .Select(x => x.FullPath)
+                    .ToList();
+                var calc = new PercentageCalculator(paths.Count);
+                foreach (var path in paths)
                 {
-                    var token = _cancellationToken.Token;
-                    token.ThrowIfCancellationRequested();
-
                     try
                     {
-                        Model.DataView.SwapItem(x => x.FullPath == path, await InternalFetch(path));
+                        var data = await InternalFetch(path);
+                        Model.Invoke(() => Model.DataView.SwapItem(x => x.FullPath == path, data));
                     }
                     catch (Exception e)
                     {
                         Debug.Print("Fetch error: {0}. {1}", path, e.Message);
                     }
+
+                    ThrowIfCancellationRequested();
+                    UpdateUi(UiState.StatusUpdate, calc.Increment());
                 }
-            }, _cancellationToken.Token);
+            });
         }
 
         public void DownloadMoviePoster()
         {
             var result = CreateValidationSupport()
-                .IsTrue(() => Model.DataView.Count > 0, StringResources.PosterNoDataMessage)
+                .IsTrue(() => Model.DataView.Count > 0, Strings.PosterNoDataMessage)
                 .EnsureInternetConnected()
                 .Validate();
             if (!result) return;
             
-            RecreateCancellationToken();
-            Task.Run(async () =>
+            RunTask(async () =>
             {
                 var tmdb = _kernel.Get<ITmdb>();
-                foreach (var entry in Model.DataView.Where(x => x.Data.PosterPath != null))
+                var entries = Model.DataView.Where(x => x.Data.PosterPath != null).ToList();
+                var calc = new PercentageCalculator(entries.Count);
+                foreach (var entry in entries)
                 {
-                    var token = _cancellationToken.Token;
-                    if (token.IsCancellationRequested) break;
-
                     try
                     {
                         var url = tmdb.BuildPosterUrl(entry.Data.PosterPath, PosterSize.original);
-
-                        var destFolder = Path.GetDirectoryName(entry.FullPath);
-                        Debug.Assert(destFolder != null);
-                        var destFile = Path.Combine(destFolder, Commons.PosterFileName);
-
+                        // ReSharper disable once AssignNullToNotNullAttribute
+                        var destFile = Path.Combine(Path.GetDirectoryName(entry.FullPath), Commons.PosterFileName);
+                        
                         if (File.Exists(destFile)) continue;
                         await tmdb.DownloadFile(url, destFile);
                     }
@@ -220,48 +230,50 @@ namespace Moviebase.Presenters
                     {
                         Debug.Print("Download poster error: {0}. {1}", entry.Title, e.Message);
                     }
+
+                    ThrowIfCancellationRequested();
+                    UpdateUi(UiState.StatusUpdate, calc.Increment());
                 }
-            }, _cancellationToken.Token);
+            });
         }
 
         public void ThumbnailFolder()
         {
             var result = CreateValidationSupport()
-                .IsTrue(() => Model.DataView.Count > 0, StringResources.ThumbnailNoDataMessage)
+                .IsTrue(() => Model.DataView.Count > 0, Strings.ThumbnailNoDataMessage)
                 .Validate();
             if (!result) return;
 
-            RecreateCancellationToken();
-            Task.Run(() =>
+       
+            RunTask(() =>
             {
+                var entries = Model.DataView.Where(x => x.Data.PosterPath != null).ToList();
+                var calc = new PercentageCalculator(entries.Count);
                 var thumbnailManager = _kernel.Get<IThumbnailManager>();
-                foreach (var entry in Model.DataView.Where(x => x.Data.PosterPath != null))
+                foreach (var entry in entries)
                 {
-                    var token = _cancellationToken.Token;
-                    if (token.IsCancellationRequested) break;
-
                     thumbnailManager.CreateThumbnail(Path.GetDirectoryName(entry.FullPath));
+
+                    if (IsCancellationRequested) break;
+                    UpdateUi(UiState.StatusUpdate, calc.Increment());
                 }
-            }, _cancellationToken.Token);
+            });
         }
 
         public void SavePresistData()
         {
             var result = new ValidationSupport()
-                .IsTrue(() => Model.DataView.Count > 0, StringResources.PresistNoDataMessage)
-                .SetCommonFailAction(x => View.ShowMessageBox(x, StringResources.AppName, icon: MessageBoxIcon.Exclamation))
+                .IsTrue(() => Model.DataView.Count > 0, Strings.PresistNoDataMessage)
+                .SetCommonFailAction(x => View.ShowMessageBox(x, Strings.AppName, icon: MessageBoxIcon.Exclamation))
                 .Validate();
             if (!result) return;
-
-            RecreateCancellationToken();
-            Task.Run(() =>
+            
+            RunTask(() =>
             {
                 var persistFileManager = _kernel.Get<IPersistFileManager>();
+                var calc = new PercentageCalculator(Model.DataView.Count);
                 foreach (var entry in Model.DataView)
                 {
-                    var token = _cancellationToken.Token;
-                    token.ThrowIfCancellationRequested();
-
                     try
                     {
                         persistFileManager.Save(Path.GetDirectoryName(entry.FullPath), entry.Data);
@@ -270,15 +282,18 @@ namespace Moviebase.Presenters
                     {
                         Debug.Print("Save error: {0}. {1}", entry.Title, e.Message);
                     }
+
+                    ThrowIfCancellationRequested();
+                    UpdateUi(UiState.StatusUpdate, calc.Increment());
                 }
-            }, _cancellationToken.Token);
+            });
         }
 
         public void ShowSelectPosterWindow(int index)
         {
             var localEntry = Model.DataView[index];
             var result = CreateValidationSupport()
-                .IsTrue(() => Commons.IsMovieFetched(localEntry.Data.Id), StringResources.NotFetchedMessage)
+                .IsTrue(() => Commons.IsMovieFetched(localEntry.Data.Id), Strings.NotFetchedMessage)
                 .EnsureInternetConnected()
                 .Validate();
             if (!result) return;
@@ -296,11 +311,11 @@ namespace Moviebase.Presenters
         {
             var localEntry = Model.DataView[index];
             var validation = CreateValidationSupport()
-                .IsTrue(() => Commons.IsMovieFetched(localEntry.Data.Id), StringResources.NotFetchedMessage)
+                .IsTrue(() => Commons.IsMovieFetched(localEntry.Data.Id), Strings.NotFetchedMessage)
                 .Validate();
             if (!validation) return;
 
-            var result = View.ShowComboBoxInput(StringResources.AlternativeNameTitle, localEntry.Data.AlternativeNames, out string value);
+            var result = View.ShowComboBoxInput(Strings.AlternativeNameTitle, localEntry.Data.AlternativeNames, out string value);
             if (result != DialogResult.OK) return;
 
             localEntry.Title = value;
@@ -316,40 +331,42 @@ namespace Moviebase.Presenters
             manager.Save(Path.GetDirectoryName(entry.FullPath), entry.Data);
         }
 
-        public async Task ResearchMovie(int index)
+        public void ResearchMovie(int index)
         {
             var result = CreateValidationSupport().EnsureInternetConnected().Validate();
             if (!result) return;
-            UpdateUi(UiState.Working);
 
-            // old movie title/path
-            var title = Model.DataView[index].Title;
-            var fullPath = Model.DataView[index].FullPath;
-            var tmdb = _kernel.Get<ITmdb>();
-
-            // find title
-            var foundTitles = new Dictionary<string, TmdbResult>();
-            var ids = await tmdb.SearchMovies(title, 0);
-            foreach (var id in ids)
+            RunTask(async () =>
             {
-                var detail = await tmdb.GetByTmdbId(id);
-                foundTitles.Add(detail.Id.ToString(), detail);
-            }
+                // old movie title/path
+                var title = Model.DataView[index].Title;
+                var fullPath = Model.DataView[index].FullPath;
+                var tmdb = _kernel.Get<ITmdb>();
 
-            // show selection
-            var selections = foundTitles.Values.Select(x => $"{x.Id}: {x.Title} ({x.Year})").ToArray();
-            var dialogResult = View.ShowComboBoxInput("Select metadata.", selections, out string value);
-            if (dialogResult != DialogResult.OK)
-            {
-                UpdateUi(UiState.Ready);
-                return;
-            }
+                // find title
+                var foundTitles = new Dictionary<string, TmdbResult>();
+                var ids = await tmdb.SearchMovies(title, 0);
+                foreach (var id in ids)
+                {
+                    var detail = await tmdb.GetByTmdbId(id);
+                    foundTitles.Add(detail.Id.ToString(), detail);
+                }
 
-            // update
-            var selectedId = value.Split(':')[0];
-            var selected = foundTitles.First(x => x.Value.Id.ToString() == selectedId).Value;
-            Model.DataView.SwapItem(x => x.FullPath == fullPath, new MovieEntry(selected, fullPath));
-            UpdateUi(UiState.Ready);
+                // show selection
+                var selections = foundTitles.Values.Select(x => $"{x.Id}: {x.Title} ({x.Year})").ToArray();
+                var dialogResult = View.ShowComboBoxInput("Select metadata.", selections, out string value);
+                if (dialogResult != DialogResult.OK)
+                {
+                    UpdateUi(UiState.Ready);
+                    return;
+                }
+
+                // update
+                var selectedId = value.Split(':')[0];
+                var selected = foundTitles.First(x => x.Value.Id.ToString() == selectedId).Value;
+                Model.Invoke(() => Model.DataView.SwapItem(x => x.FullPath == fullPath,
+                    new MovieEntry(selected, fullPath)));
+            });
         }
 
         // -------- GRID VIEW
@@ -358,10 +375,10 @@ namespace Moviebase.Presenters
             if (_lastSelectedIndex == index) return;
 
             var dataItem = Model.DataView[index];
-            if (Commons.IsMovieFetched(dataItem.TmdbId))
+            if (dataItem != null && Commons.IsMovieFetched(dataItem.TmdbId))
             {
-                Model.LblTitleText = string.Format(StringResources.MovieTitleInfoPattern, dataItem.Title, dataItem.Year);
-                Model.LblExtraInfoText = string.Format(StringResources.MovieExtraInfoPattern, dataItem.Genre, dataItem.ImdbId);
+                Model.LblTitleText = string.Format(Strings.MovieTitleInfoPattern, dataItem.Title, dataItem.Year);
+                Model.LblExtraInfoText = string.Format(Strings.MovieExtraInfoPattern, dataItem.Genre, dataItem.ImdbId);
                 Model.LblPlotText = dataItem.Plot;
                 LoadImage(dataItem);
             }
@@ -393,184 +410,16 @@ namespace Moviebase.Presenters
 
         public void ResetDetails()
         {
-            Model.LblTitleText = StringResources.LiteralThreeDots;
-            Model.LblExtraInfoText = StringResources.LiteralThreeDots;
+            Model.LblTitleText = Strings.LiteralThreeDots;
+            Model.LblExtraInfoText = Strings.LiteralThreeDots;
             Model.LblPlotText = string.Empty;
             LoadImage(null);
         }
         #endregion
 
         #region Private Methods
-        private void RecreateCancellationToken()
-        {
-            _cancellationToken?.Dispose();
-            _cancellationToken = new CancellationTokenSource();
-        }
 
-        private ValidationSupport CreateValidationSupport()
-        {
-            return new ValidationSupport()
-                .SetCommonFailAction(x => View.ShowMessageBox(x, StringResources.AppName,
-                    icon: MessageBoxIcon.Exclamation));
-        }
-        
-        private void LoadImage(MovieEntry entry)
-        {
-            Task.Run(async () =>
-            {
-                // ReSharper disable once AssignNullToNotNullAttribute
-                var posterPath = Path.Combine(Path.GetDirectoryName(entry.FullPath), Commons.PosterFileName + Commons.JpgFileExtension);
-                var tmdb = _kernel.Get<ITmdb>();
-                if (!File.Exists(posterPath)) posterPath = tmdb.GetPosterUrl(entry.Data.PosterPath, PosterSize.w154);
-
-                // remove old pict
-                if (Model.PicPosterImage != Commons.DefaultImage) Model.PicPosterImage?.Dispose(); 
-                Model.PicPosterImage = Commons.DefaultImage;
-                if (posterPath == null) return;
-
-                // download if not availiable
-                var deleteAfter = false;
-                if (posterPath.ToUpperInvariant().StartsWith("HTTP"))
-                {
-                    deleteAfter = true;
-                    var requester = _kernel.Get<ITmdbWebRequest>();
-                    posterPath = Path.GetTempFileName();
-                    await requester.DownloadFile(posterPath, posterPath);
-                }
-
-                // load from file
-                if (!File.Exists(posterPath)) return;
-                using (var stream = new FileStream(posterPath, FileMode.Open))
-                {
-                    Model.PicPosterImage = Image.FromStream(stream);
-                }
-
-                // delete temp file
-                if (deleteAfter) File.Delete(posterPath);
-            });
-        }
-
-        private void CheckComponents()
-        {
-            Task.Run(() =>
-            {
-                var comp = _kernel.Get<IComponentManager>();
-                if (comp.IsPythonInstalled().Result && comp.IsGuessItInstalled().Result) return;
-
-                View.ShowMessageBox(StringResources.ComponentMissingMessage, StringResources.AppName,
-                    icon: MessageBoxIcon.Exclamation);
-                Model.CmdActionsEnabled = false;
-                Model.CmdDirectoriesEnabled = false;
-            });
-        }
-
-        private void UpdateUi(UiState state, int progressPercentage = -1)
-        {
-            switch (state)
-            {
-                case UiState.Ready:
-                    Model.PrgStatusValue = 0;
-                    Model.LblPercentageText = "0%";
-                    Model.PrgStatusStyle = ProgressBarStyle.Blocks;
-                    Model.LblStatusText = "Ready.";
-
-                    Model.CmdDirectoriesEnabled = true;
-                    Model.CmdToolsEnabled = true;
-                    Model.CmdActionsEnabled = true;
-                    Model.CmdStopEnabled = false;
-                    Model.GridViewEnabled = true;
-                    break;
-
-                case UiState.Working:
-                    Model.PrgStatusValue = 0;
-                    Model.LblPercentageText = "0%";
-                    Model.PrgStatusStyle = ProgressBarStyle.Blocks;
-                    Model.LblStatusText = "Working...";
-
-                    Model.CmdDirectoriesEnabled = false;
-                    Model.CmdToolsEnabled = false;
-                    Model.CmdActionsEnabled = false;
-                    Model.CmdStopEnabled = true;
-                    Model.GridViewEnabled = false;
-                    break;
-
-                case UiState.Cancelling:
-                    Model.CmdStopEnabled = false;
-                    break;
-
-                case UiState.StatusUpdate:
-                    if (progressPercentage == -1)
-                    {
-                        Model.PrgStatusStyle = ProgressBarStyle.Marquee;
-                        Model.PrgStatusValue = 0;
-                        Model.LblPercentageText = "Processing...";
-                    }
-                    else
-                    {
-                        Model.PrgStatusStyle = ProgressBarStyle.Blocks;
-                        Model.PrgStatusValue = progressPercentage;
-                        Model.LblPercentageText = $"{progressPercentage}%";
-                    }
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(state), state, null);
-            }
-        }
-
-        private void InternalAnalyzeDirectory(string path)
-        {
-            Model.DataView.Clear();
-            RecreateCancellationToken();
-            Task.Run(async () =>
-            {
-                UpdateUi(UiState.Working);
-                var persistFileManager = _kernel.Get<IPersistFileManager>();
-                var tmdb = _kernel.Get<ITmdb>();
-                var dirEnumbEnumerable = Directory.EnumerateDirectories(path, "*", SearchOption.TopDirectoryOnly);
-                foreach (var basePath in dirEnumbEnumerable)
-                {
-                    var token = _cancellationToken.Token;
-                    if (token.IsCancellationRequested) UpdateUi(UiState.Ready);
-                    token.ThrowIfCancellationRequested();
-
-                    try
-                    {
-                        string currentMoviePath;
-                        var currentFolder = new PowerPath(basePath);
-
-                        // check for ignore pattern
-                        var lastName = currentFolder.GetLastDirectoryName();
-                        if (lastName.StartsWith("[") && lastName.EndsWith("]")) continue;
-
-                        // find first movie
-                        if ((currentMoviePath = InternalFindFirstFile(basePath)) == null) continue;
-
-                        // find metadata
-                        TmdbResult entry;
-                        if (persistFileManager.HasPersistentData(Path.GetDirectoryName(currentMoviePath)))
-                        {
-                            entry = persistFileManager.Load(currentMoviePath);
-                        }
-                        else
-                        {
-                            entry = await tmdb.GetByFilename(Path.GetFileNameWithoutExtension(currentMoviePath));
-                        }
-
-                        // pop to event
-                        Model.Invoke(() => Model.DataView.Add(new MovieEntry(entry, currentMoviePath)));
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.Print("Analyze error: {0}. {1}", basePath, e.Message);
-                    }
-                }
-
-                _lastSelectedIndex = -1;
-                UpdateUi(UiState.Ready);
-            }, _cancellationToken.Token);
-        }
-        
+        // ------ FINDINGS ---       
         private void InternalRenameFile(string path, MovieEntry entry)
         {
             // store original path
@@ -612,15 +461,15 @@ namespace Moviebase.Presenters
             }
             catch (Exception e)
             {
-                Debug.Print("Using remote poster for: {0}. {1}", dir, e.Message);
+                Debug.Print("No movie found: {0}. {1}", dir, e.Message);
                 return null;
             }
         }
 
         private async Task<MovieEntry> InternalFetch(string path)
         {
-            var guessit = _kernel.Get<IGuessit>();
             var tmdb = _kernel.Get<ITmdb>();
+            var guessit = _kernel.Get<IGuessit>();
             var filename = Path.GetFileName(path);
             TmdbResult newData = null;
             try
@@ -643,6 +492,111 @@ namespace Moviebase.Presenters
 
             return new MovieEntry(newData ?? await tmdb.GetByFilename(filename), path);
         }
+
+        // ------ PRESENTER ---
+        protected override void UpdateUi(UiState state, int progressPercentage = -1)
+        {
+            switch (state)
+            {
+                case UiState.Ready:
+                    Model.PrgStatusValue = 0;
+                    Model.LblPercentageText = "0%";
+                    Model.PrgStatusStyle = ProgressBarStyle.Blocks;
+                    Model.LblStatusText = "Ready.";
+
+                    Model.CmdDirectoriesEnabled = true;
+                    Model.CmdToolsEnabled = true;
+                    Model.CmdActionsEnabled = true;
+                    Model.CmdStopEnabled = false;
+                    Model.GridViewEnabled = true;
+                    break;
+
+                case UiState.Working:
+                    Model.PrgStatusValue = 0;
+                    Model.LblPercentageText = "0%";
+                    Model.PrgStatusStyle = ProgressBarStyle.Marquee;
+                    Model.LblStatusText = "Working...";
+
+                    Model.CmdDirectoriesEnabled = false;
+                    Model.CmdToolsEnabled = false;
+                    Model.CmdActionsEnabled = false;
+                    Model.CmdStopEnabled = true;
+                    Model.GridViewEnabled = false;
+                    break;
+
+                case UiState.Cancelling:
+                    Model.CmdStopEnabled = false;
+                    break;
+
+                case UiState.StatusUpdate:
+                    if (progressPercentage == -1)
+                    {
+                        Model.PrgStatusStyle = ProgressBarStyle.Marquee;
+                        Model.PrgStatusValue = 0;
+                        Model.LblPercentageText = "Processing...";
+                    }
+                    else
+                    {
+                        Model.PrgStatusStyle = ProgressBarStyle.Blocks;
+                        Model.PrgStatusValue = progressPercentage;
+                        Model.LblPercentageText = $"{progressPercentage}%";
+                    }
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(state), state, null);
+            }
+        }
+
+        private ValidationSupport CreateValidationSupport()
+        {
+            return new ValidationSupport()
+                .SetCommonFailAction(x => View.ShowMessageBox(x, Strings.AppName,
+                    icon: MessageBoxIcon.Exclamation));
+        }
+
+        private void LoadImage(MovieEntry entry)
+        {
+            if (entry == null)
+            {
+                //Model.PicPosterImage?.Dispose();
+                Model.PicPosterImage = Commons.DefaultImage;
+                return;
+            }
+
+            Task.Run(async () =>
+            {
+                // remove old pict
+                if (Model.PicPosterImage != Commons.DefaultImage) Model.PicPosterImage?.Dispose();
+                Model.PicPosterImage = Commons.DefaultImage;
+
+                // ReSharper disable once AssignNullToNotNullAttribute
+                var posterPath = Path.Combine(Path.GetDirectoryName(entry.FullPath), Commons.PosterFileName);
+                var tmdb = _kernel.Get<ITmdb>();
+                var deleteAfter = false;
+
+                // download if necessary
+                if (!File.Exists(posterPath))
+                {
+                    deleteAfter = true;
+                    posterPath = Path.GetTempFileName();
+                    var uri = tmdb.GetPosterUrl(entry.Data.PosterPath, PosterSize.w154);
+
+                    await tmdb.DownloadFile(uri, posterPath);
+                }
+
+                // load from file
+                if (!File.Exists(posterPath)) return;
+                using (var stream = new FileStream(posterPath, FileMode.Open))
+                {
+                    Model.PicPosterImage = Image.FromStream(stream);
+                }
+
+                // delete temp file
+                if (deleteAfter) File.Delete(posterPath);
+            });
+        }
+        
         #endregion
     }
 }

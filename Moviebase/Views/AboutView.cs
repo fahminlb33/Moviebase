@@ -19,7 +19,7 @@ namespace Moviebase.Views
             var version = FileVersionInfo.GetVersionInfo(assembly.Location);
 
             var versionPart = version.FileVersion.Split('.');
-            lblVersion.Text = string.Format(StringResources.VersionStringPattern, versionPart[0], versionPart[1], versionPart[2], versionPart[3]);
+            lblVersion.Text = string.Format(Strings.VersionStringPattern, versionPart[0], versionPart[1], versionPart[2], versionPart[3]);
             button1.Focus();
         }
 

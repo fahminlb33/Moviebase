@@ -35,7 +35,7 @@ namespace Moviebase.Presenters
         {
             View = view;
             Model = _kernel.Get<MoveMoviesModel>(new ConstructorArgument("context", SynchronizationContext.Current));
-            _folderBrowser = new FolderBrowserDialog {Description = StringResources.SelectFolderMessage};
+            _folderBrowser = new FolderBrowserDialog {Description = Strings.SelectFolderMessage};
         }
 
         #region Worker Subscriber
@@ -61,19 +61,19 @@ namespace Moviebase.Presenters
                 case UiState.Running:
                     Model.CmdBrowseEnabled = false;
                     Model.CmdExecuteEnabled = true;
-                    Model.CmdExecuteText = StringResources.LiteralStopText;
+                    Model.CmdExecuteText = Strings.LiteralStopText;
                     break;
 
                 case UiState.Stopped:
                     Model.CmdBrowseEnabled = true;
                     Model.CmdExecuteEnabled = true;
-                    Model.CmdExecuteText = StringResources.LiteralMoveText;
+                    Model.CmdExecuteText = Strings.LiteralMoveText;
                     break;
 
                 case UiState.Update:
                     Interlocked.Increment(ref _processed);
                     var count = Interlocked.CompareExchange(ref _processed, 0, 0);
-                    Model.LblCountText = string.Format(StringResources.MoveMoviesCountPattern, count);
+                    Model.LblCountText = string.Format(Strings.MoveMoviesCountPattern, count);
                     Model.Invoke(() => Model.DataView.Add(new MovedMovieEntry
                     {
                         Title = Path.GetFileName(path),
@@ -90,11 +90,11 @@ namespace Moviebase.Presenters
         {
             if (Model.TxtBrowseText == null)
             {
-                View.ShowMessageBox(StringResources.SelectFolderMessage, StringResources.AppName, icon: MessageBoxIcon.Exclamation);
+                View.ShowMessageBox(Strings.SelectFolderMessage, Strings.AppName, icon: MessageBoxIcon.Exclamation);
                 return;
             }
 
-            if (Model.CmdExecuteText == StringResources.LiteralMoveText)
+            if (Model.CmdExecuteText == Strings.LiteralMoveText)
             {
                 OrganizeDirectory(_folderBrowser.SelectedPath);
             }

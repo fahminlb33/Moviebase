@@ -22,16 +22,16 @@ namespace Moviebase.Models
             DataView = new BindingList<MovieEntry>();
 
             PicPosterImage = Commons.DefaultImage;
-            LblTitleText = StringResources.LiteralThreeDots;
-            LblExtraInfoText = StringResources.LiteralThreeDots;
-            LblPlotText = StringResources.LiteralThreeDots;
+            LblTitleText = Strings.LiteralThreeDots;
+            LblExtraInfoText = Strings.LiteralThreeDots;
+            LblPlotText = Strings.LiteralThreeDots;
             
             CmdDirectoriesEnabled = true;
             CmdToolsEnabled = true;
             CmdActionsEnabled = true;
             CmdStopEnabled = false;
 
-            LblStatusText = StringResources.LiteralReadyText;
+            LblStatusText = Strings.LiteralReadyText;
             PrgStatusValue = 0;
             PrgStatusStyle = ProgressBarStyle.Blocks;
             LblPercentageText = "0%";

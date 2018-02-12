@@ -22,14 +22,14 @@ namespace Moviebase.Entities {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class StringResources {
+    public class Strings {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal StringResources() {
+        internal Strings() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Moviebase.Entities {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Moviebase.Entities.StringResources", typeof(StringResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Moviebase.Entities.Strings", typeof(Strings).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -106,6 +106,15 @@ namespace Moviebase.Entities {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Select export path..
+        /// </summary>
+        public static string BrowseExportTitle {
+            get {
+                return ResourceManager.GetString("BrowseExportTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select folder to analyze..
         /// </summary>
         public static string BrowseFolderDescription {
@@ -115,7 +124,7 @@ namespace Moviebase.Entities {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Some component(s) are missing. Please install before using this application. See Settings..
+        ///   Looks up a localized string similar to Some component(s) are missing. Please install the required dependencies before using this application..
         /// </summary>
         public static string ComponentMissingMessage {
             get {

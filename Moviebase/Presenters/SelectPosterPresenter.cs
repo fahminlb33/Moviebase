@@ -59,10 +59,10 @@ namespace Moviebase.Presenters
                 ++processed;
                 var percent = (int) (processed / (double) total * 100);
 
-                Model.LblStatusText = string.Format(StringResources.PercentagePattern, percent);
+                Model.LblStatusText = string.Format(Strings.PercentagePattern, percent);
                 Model.PrgStatusValue = percent;
             }
-            Model.LblStatusText = StringResources.LiteralCompletedText;
+            Model.LblStatusText = Strings.LiteralCompletedText;
 
             var files = Directory.GetFiles(_tempDir, Commons.JpgSearchPattern, SearchOption.TopDirectoryOnly);
             Model.Invoke(() => FindFinishedCallback.Invoke(files));

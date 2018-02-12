@@ -52,7 +52,7 @@ namespace Moviebase.Views
             appSettings.MovieExtensions.AddRange(lstExtensions.Items.Cast<string>().ToArray());
             
             appSettings.Save();
-            this.ShowMessageBox(StringResources.SettingsRestartMessage, StringResources.AppName);
+            this.ShowMessageBox(Strings.SettingsRestartMessage, Strings.AppName);
             DialogResult = DialogResult.OK;
         }
 
@@ -111,7 +111,7 @@ namespace Moviebase.Views
             catch (Exception exception)
             {
                 Debug.Print(exception.Message);
-                lblPatternOutput.Text = StringResources.InvalidPatternText;
+                lblPatternOutput.Text = Strings.InvalidPatternText;
             }
         }
 
@@ -120,7 +120,7 @@ namespace Moviebase.Views
             var ext = txtExt.Text;
             if (string.IsNullOrEmpty(ext))
             {
-                this.ShowMessageBox(StringResources.NoExtensionToAddMessage, StringResources.AppName);
+                this.ShowMessageBox(Strings.NoExtensionToAddMessage, Strings.AppName);
                 return;
             }
             if (!ext.StartsWith(".", StringComparison.Ordinal)) ext = "." + ext;

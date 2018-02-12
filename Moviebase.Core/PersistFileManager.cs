@@ -27,9 +27,10 @@ namespace Moviebase.Core
 
         public void Save(string dirPath, TmdbResult entry)
         {
-            var persistFile = Path.Combine(dirPath, Commons.PersistentFileName);
-            File.WriteAllText(persistFile, JsonConvert.SerializeObject(entry));
-            if (_hideFile) File.SetAttributes(persistFile, FileAttributes.Hidden);
+            var path = Path.Combine(dirPath, Commons.PersistentFileName);
+            if (File.Exists(path)) File.SetAttributes(path, FileAttributes.Normal);
+            File.WriteAllText(path, JsonConvert.SerializeObject(entry));
+            if (_hideFile) File.SetAttributes(path, FileAttributes.Hidden); 
         }
 
         public bool HasPersistentData(string path)
