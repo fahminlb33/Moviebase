@@ -72,6 +72,9 @@
     <Reference Include="CsvHelper, Version=6.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
       <HintPath>..\packages\CsvHelper.6.1.0\lib\net45\CsvHelper.dll</HintPath>
     </Reference>
+    <Reference Include="INIFileParser, Version=2.5.2.0, Culture=neutral, PublicKeyToken=79af7b307b65cf3c, processorArchitecture=MSIL">
+      <HintPath>..\packages\ini-parser.2.5.2\lib\net20\INIFileParser.dll</HintPath>
+    </Reference>
     <Reference Include="Magick.NET-Q16-AnyCPU, Version=7.2.1.0, Culture=neutral, PublicKeyToken=2004825badfa91ec, processorArchitecture=MSIL">
       <HintPath>..\packages\Magick.NET-Q16-AnyCPU.7.2.1\lib\net40\Magick.NET-Q16-AnyCPU.dll</HintPath>
     </Reference>
@@ -121,8 +124,6 @@
     <Compile Include="Diagnostics\NetworkObserver.cs" />
     <Compile Include="Diagnostics\ProcessRedirectStream.cs" />
     <Compile Include="ThumbnailManager.cs" />
-    <Compile Include="Diagnostics\IniFile.cs" />
-    <Compile Include="Natives\NativeMethods.cs" />
     <Compile Include="Services\IGuessit.cs" />
     <Compile Include="Services\ITmdb.cs" />
     <Compile Include="IPersistFileManager.cs" />

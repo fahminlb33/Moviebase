@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using ImageMagick;
+using IniParser.Model;
 using Moviebase.Core.Diagnostics;
 
 namespace Moviebase.Core
@@ -39,6 +40,7 @@ namespace Moviebase.Core
                 Debug.Assert(dirPath != null);
 
                 var outputSquareFile = Path.Combine(dirPath, Commons.IconFileName);
+                ForceDeleteFile(outputSquareFile);
                 InternalGenerateSquareImage(inputFile, outputSquareFile);
             }
             catch (Exception e)
@@ -54,11 +56,16 @@ namespace Moviebase.Core
                 var iniPath = Path.Combine(path, "desktop.ini");
                 var iconPath = Path.Combine(path, Commons.IconFileName);
 
-                var ini = new IniFile(iniPath);
-                ini.Write("ConfirmFileOp", "0", Commons.ShellClassInfoSection);
-                ini.Write("IconFile", Commons.IconFileName, Commons.ShellClassInfoSection);
-                ini.Write("IconIndex", "0", Commons.ShellClassInfoSection);
-                ini.Write("IconResource", $"{Commons.IconFileName},0", Commons.ShellClassInfoSection);
+                var ini = new IniData();
+                ini.Sections.AddSection(Commons.ShellClassInfoSection);
+                ini.Sections[Commons.ShellClassInfoSection].AddKey("ConfirmFileOp", "0");
+                ini.Sections[Commons.ShellClassInfoSection].AddKey("IconFile", Commons.IconFileName);
+                ini.Sections[Commons.ShellClassInfoSection].AddKey("IconIndex", "0");
+                ini.Sections[Commons.ShellClassInfoSection].AddKey("IconResource", $"{Commons.IconFileName},0");
+
+                ForceDeleteFile(iniPath);
+                var iniFile = new IniParser.FileIniDataParser();
+                iniFile.WriteFile(iniPath, ini);
 
                 Commons.RunNoException(() => File.SetAttributes(iconPath, FileAttributes.Hidden | FileAttributes.System));
                 Commons.RunNoException(() => File.SetAttributes(iniPath, FileAttributes.Hidden | FileAttributes.System));
@@ -92,6 +99,13 @@ namespace Moviebase.Core
                 image.Resize(new MagickGeometry(256, 256));
                 image.Write(outputPath);
             }
+        }
+
+        private void ForceDeleteFile(string path)
+        {
+            if (!File.Exists(path)) return;
+            Commons.RunNoException(() => File.SetAttributes(path, FileAttributes.Normal));
+            Commons.RunNoException(() => File.Delete(path));
         }
         #endregion
     }
