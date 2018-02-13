@@ -130,11 +130,7 @@ namespace Moviebase.Presenters
                 .Validate();
             if (!result) return;
 
-            RunTask(() =>
-            {
-                CsvExporter.ExportCsv(Model.DataView, path);
-                View.ShowMessageBox("Expor completed.", Strings.AppName);
-            });
+            RunTask(() => CsvExporter.ExportCsv(Model.DataView, path));
         }
 
         public void RenameMovieFiles()
@@ -529,6 +525,7 @@ namespace Moviebase.Presenters
                     break;
 
                 case UiState.StatusUpdate:
+                    Model.LblStatusText = "Working...";
                     if (progressPercentage == -1)
                     {
                         Model.PrgStatusStyle = ProgressBarStyle.Marquee;
