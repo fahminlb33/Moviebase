@@ -162,7 +162,11 @@ namespace Moviebase.Presenters
                     UpdateUi(UiState.StatusUpdate, calc.Increment());
                 }
 
-                Model.DataView.Clear();
+                Model.Invoke(() =>
+                {
+                    Model.DataView.Clear();
+                    View.ShowMessageBox("Rename completed. Please re-analyze the folder.", Strings.AppName);
+                });
             });
         }
 
