@@ -102,6 +102,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\MoviebaseAssemblyInfo.cs">
+      <Link>Properties\MoviebaseAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="CsvExporter.cs" />
     <Compile Include="Diagnostics\AsyncProcess.cs" />
     <Compile Include="Commons.cs" />

@@ -99,6 +99,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\MoviebaseAssemblyInfo.cs">
+      <Link>Properties\MoviebaseAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Models\MoveMoviesModel.cs" />
     <Compile Include="Models\SelectPosterModel.cs" />
     <Compile Include="Presenters\MoveMoviesPresenter.cs" />
@@ -176,9 +179,6 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <Content Include="icon.ico" />
-    <Content Include="NLog.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

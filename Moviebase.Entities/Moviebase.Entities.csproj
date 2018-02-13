@@ -76,6 +76,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\MoviebaseAssemblyInfo.cs">
+      <Link>Properties\MoviebaseAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="MovedMovieEntry.cs" />
     <Compile Include="Strings.Designer.cs">
       <AutoGen>True</AutoGen>
