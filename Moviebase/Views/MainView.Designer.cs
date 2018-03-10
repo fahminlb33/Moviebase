@@ -34,6 +34,8 @@
             this.ctDatagrid = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.mnuReSearch = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuIgnore = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnuFetchInclude = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnuFetchIgnore = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.mnuSelectPoster = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuAlternativeName = new System.Windows.Forms.ToolStripMenuItem();
@@ -69,7 +71,6 @@
             this.cmdStop = new System.Windows.Forms.Button();
             this.cmdActions = new Moviebase.Views.DropDownButton();
             this.cmdTools = new Moviebase.Views.DropDownButton();
-            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.grdMovies)).BeginInit();
             this.ctDatagrid.SuspendLayout();
             this.ctActions.SuspendLayout();
@@ -116,38 +117,54 @@
             this.mnuAlternativeName});
             this.ctDatagrid.Name = "ctDatagrid";
             this.ctDatagrid.ShowImageMargin = false;
-            this.ctDatagrid.Size = new System.Drawing.Size(206, 98);
+            this.ctDatagrid.Size = new System.Drawing.Size(177, 120);
             // 
             // mnuReSearch
             // 
             this.mnuReSearch.Name = "mnuReSearch";
-            this.mnuReSearch.Size = new System.Drawing.Size(205, 22);
-            this.mnuReSearch.Text = "Search movie metadata again";
+            this.mnuReSearch.Size = new System.Drawing.Size(176, 22);
+            this.mnuReSearch.Text = "Manual search...";
             this.mnuReSearch.Click += new System.EventHandler(this.mnuReSearch_Click);
             // 
             // mnuIgnore
             // 
+            this.mnuIgnore.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mnuFetchInclude,
+            this.mnuFetchIgnore});
             this.mnuIgnore.Name = "mnuIgnore";
-            this.mnuIgnore.Size = new System.Drawing.Size(205, 22);
-            this.mnuIgnore.Text = "Ignore this file from fetch";
-            this.mnuIgnore.Click += new System.EventHandler(this.mnuIgnore_Click);
+            this.mnuIgnore.Size = new System.Drawing.Size(176, 22);
+            this.mnuIgnore.Text = "Fetch";
+            // 
+            // mnuFetchInclude
+            // 
+            this.mnuFetchInclude.Name = "mnuFetchInclude";
+            this.mnuFetchInclude.Size = new System.Drawing.Size(152, 22);
+            this.mnuFetchInclude.Text = "Included";
+            this.mnuFetchInclude.Click += new System.EventHandler(this.mnuFetchInclude_Click);
+            // 
+            // mnuFetchIgnore
+            // 
+            this.mnuFetchIgnore.Name = "mnuFetchIgnore";
+            this.mnuFetchIgnore.Size = new System.Drawing.Size(152, 22);
+            this.mnuFetchIgnore.Text = "Ignored";
+            this.mnuFetchIgnore.Click += new System.EventHandler(this.mnuFetchIgnore_Click);
             // 
             // toolStripSeparator5
             // 
             this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(202, 6);
+            this.toolStripSeparator5.Size = new System.Drawing.Size(173, 6);
             // 
             // mnuSelectPoster
             // 
             this.mnuSelectPoster.Name = "mnuSelectPoster";
-            this.mnuSelectPoster.Size = new System.Drawing.Size(205, 22);
+            this.mnuSelectPoster.Size = new System.Drawing.Size(176, 22);
             this.mnuSelectPoster.Text = "Select poster";
             this.mnuSelectPoster.Click += new System.EventHandler(this.mnuSelectPoster_Click);
             // 
             // mnuAlternativeName
             // 
             this.mnuAlternativeName.Name = "mnuAlternativeName";
-            this.mnuAlternativeName.Size = new System.Drawing.Size(205, 22);
+            this.mnuAlternativeName.Size = new System.Drawing.Size(176, 22);
             this.mnuAlternativeName.Text = "Find alternative name(s)";
             this.mnuAlternativeName.Click += new System.EventHandler(this.mnuAlternativeNames_Click);
             // 
@@ -385,7 +402,6 @@
             this.cmdAbout.TabIndex = 27;
             this.cmdAbout.Text = "?";
             this.cmdAbout.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.toolTip1.SetToolTip(this.cmdAbout, "About Moviebase");
             this.cmdAbout.UseVisualStyleBackColor = false;
             this.cmdAbout.Click += new System.EventHandler(this.cmdAbout_Click);
             // 
@@ -430,7 +446,6 @@
             this.button1.TabIndex = 32;
             this.button1.Text = "Settings";
             this.button1.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.toolTip1.SetToolTip(this.button1, "Settings Window");
             this.button1.UseVisualStyleBackColor = false;
             this.button1.Click += new System.EventHandler(this.mnuSettings_Click);
             // 
@@ -478,7 +493,6 @@
             this.cmdFolderRecent.TabIndex = 35;
             this.cmdFolderRecent.Text = "Recent";
             this.cmdFolderRecent.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.toolTip1.SetToolTip(this.cmdFolderRecent, "Open Recent Directory");
             this.cmdFolderRecent.UseVisualStyleBackColor = false;
             this.cmdFolderRecent.Click += new System.EventHandler(this.cmdFolderRecent_Click);
             // 
@@ -497,7 +511,6 @@
             this.cmdFolderClose.TabIndex = 34;
             this.cmdFolderClose.Text = "Close";
             this.cmdFolderClose.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.toolTip1.SetToolTip(this.cmdFolderClose, "Close Directory");
             this.cmdFolderClose.UseVisualStyleBackColor = false;
             this.cmdFolderClose.Click += new System.EventHandler(this.cmdFolderClose_Click);
             // 
@@ -516,7 +529,6 @@
             this.cmdFolderOpen.TabIndex = 33;
             this.cmdFolderOpen.Text = "Open";
             this.cmdFolderOpen.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.toolTip1.SetToolTip(this.cmdFolderOpen, "Open Directory");
             this.cmdFolderOpen.UseVisualStyleBackColor = false;
             this.cmdFolderOpen.Click += new System.EventHandler(this.cmdFolderOpen_Click);
             // 
@@ -536,7 +548,6 @@
             this.cmdStop.Size = new System.Drawing.Size(75, 26);
             this.cmdStop.TabIndex = 21;
             this.cmdStop.Text = "Stop";
-            this.toolTip1.SetToolTip(this.cmdStop, "Stop current Operation");
             this.cmdStop.UseVisualStyleBackColor = false;
             this.cmdStop.Click += new System.EventHandler(this.cmdStop_Click);
             // 
@@ -557,7 +568,6 @@
             this.cmdActions.Size = new System.Drawing.Size(116, 26);
             this.cmdActions.TabIndex = 10;
             this.cmdActions.Text = "Actions ";
-            this.toolTip1.SetToolTip(this.cmdActions, "Actions List");
             this.cmdActions.UseVisualStyleBackColor = false;
             // 
             // cmdTools
@@ -575,15 +585,7 @@
             this.cmdTools.TabIndex = 12;
             this.cmdTools.Text = "Tools ";
             this.cmdTools.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.toolTip1.SetToolTip(this.cmdTools, "Tool Collections");
             this.cmdTools.UseVisualStyleBackColor = true;
-            // 
-            // toolTip1
-            // 
-            this.toolTip1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(28)))), ((int)(((byte)(28)))));
-            this.toolTip1.ForeColor = System.Drawing.Color.White;
-            this.toolTip1.OwnerDraw = true;
-            this.toolTip1.Draw += new System.Windows.Forms.DrawToolTipEventHandler(this.toolTip1_Draw);
             // 
             // MainView
             // 
@@ -661,8 +663,9 @@
         private System.Windows.Forms.Button cmdFolderRecent;
         private System.Windows.Forms.Button cmdFolderClose;
         private System.Windows.Forms.Button cmdFolderOpen;
-        private System.Windows.Forms.ToolTip toolTip1;
         internal System.Windows.Forms.DataGridView grdMovies;
+        private System.Windows.Forms.ToolStripMenuItem mnuFetchInclude;
+        private System.Windows.Forms.ToolStripMenuItem mnuFetchIgnore;
     }
 }
 

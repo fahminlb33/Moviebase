@@ -1,45 +1,97 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
+using System.IO;
 
 namespace Moviebase.Entities
 {
-    public class MovieEntry
+    public class MovieEntry : ICloneable
     {
-        public MovieEntry(TmdbResult data, string fullPath)
+        private static readonly string[] SizeSuffix = { "B", "KB", "MB", "GB", "TB", "PB", "EB" }; //Longs run out around EB
+
+        private static string BytesToString(long byteCount)
         {
-            Data = data;
+            if (byteCount == 0) return $"0{SizeSuffix[0]}";
+            var bytes = Math.Abs(byteCount);
+            var place = Convert.ToInt32(Math.Floor(Math.Log(bytes, 1024)));
+            var num = Math.Round(bytes / Math.Pow(1024, place), 1);
+            return $"{Math.Sign(byteCount) * num}{SizeSuffix[place]}";
+        }
+
+        public void SetFullPath(string fullPath)
+        {
+            if (fullPath == null) return;
             FullPath = fullPath;
+            Size = BytesToString(new FileInfo(fullPath).Length);
         }
 
-        [Browsable(false)] public TmdbResult Data;
+        public void SetData(TmdbResult tmdb)
+        {
+            TmdbId = tmdb.TmdbId;
+            AlternativeNames = tmdb.AlternativeNames;
+            PosterPath = tmdb.PosterPath;
+            Title = tmdb.Title;
+            Year = tmdb.Year;
+            Genre = tmdb.Genre;
+            ImdbId = tmdb.ImdbId;
+            Plot = tmdb.Plot;
+        }
 
-        [Browsable(false)] public string FullPath;
+        public void SetData(GuessitResult guessit)
+        {
+            Quality = guessit.ScreenSize;
+            Source = guessit.ReleaseGroup;
+        }
 
-        [Browsable(false)] public int TmdbId => Data.Id;
+        public void SetData(MovieEntry data)
+        {
+            TmdbId = data.TmdbId;
+            AlternativeNames = data.AlternativeNames;
+            PosterPath = data.PosterPath;
+            Title = data.Title;
+            Year = data.Year;
+            Genre = data.Genre;
+            ImdbId = data.ImdbId;
+            Plot = data.Plot;
+            Quality = data.Quality;
+            Source = data.Source;
+            FullPath = data.FullPath;
+            Size = data.Size;
+        }
 
-        public string Title
+        public object Clone()
         {
-            get => Data.Title;
-            set => Data.Title = value;
+            return MemberwiseClone();
         }
-        public int Year
+
+        [Browsable(false)] public int TmdbId;
+
+        [Browsable(false)] public string[] AlternativeNames;
+
+        [Browsable(false)] public string PosterPath;
+
+        [Browsable(false), NonSerialized] public string FullPath;
+
+        public string Title { get; set; }
+
+        public int Year { get; set; }
+
+        public string Genre { get; set; }
+
+        public string ImdbId { get; set; }
+
+        public string Plot { get; set; }
+        
+        public string Quality { get; set; }
+        
+        public string Source { get; set; }
+        
+        public string Size { get; internal set; }
+
+        public string Subtitle { get; set; }
+
+        public override string ToString()
         {
-            get => Data.Year;
-            set => Data.Year = value;
-        }
-        public string Genre
-        {
-            get => Data.Genre;
-            set => Data.Genre = value;
-        }
-        public string ImdbId
-        {
-            get => Data.ImdbId;
-            set => Data.ImdbId = value;
-        }
-        public string Plot
-        {
-            get => Data.Plot;
-            set => Data.Plot = value;
+            return $"{TmdbId}: {Title} ({Year})";
         }
     }
 }

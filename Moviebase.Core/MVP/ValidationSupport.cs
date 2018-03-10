@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Moviebase.Core.Diagnostics;
+using Moviebase.Entities;
 
-namespace Moviebase.Core
+namespace Moviebase.Core.MVP
 {
     public class ValidationSupport
     {
@@ -13,6 +14,11 @@ namespace Moviebase.Core
         {
             _conditionDictionary = new Dictionary<Func<bool>, string>();
         }
+        
+        public void SetCommonFailAction(Action<string> action)
+        {
+            _failAction = action;
+        }
 
         public ValidationSupport IsTrue(Func<bool> condition, string failMessage)
         {
@@ -20,10 +26,9 @@ namespace Moviebase.Core
             return this;
         }
 
-        public ValidationSupport SetCommonFailAction(Action<string> msgBox)
+        public ValidationSupport EnsureInternetConnected()
         {
-            _failAction = msgBox;
-            return this;
+            return IsTrue(() => NetworkObserver.Instance.IsInternetConnected(), Strings.NoInternetMessage);
         }
 
         public bool Validate()
@@ -31,7 +36,7 @@ namespace Moviebase.Core
             foreach (var condition in _conditionDictionary)
             {
                 if (condition.Key.Invoke()) continue;
-                _failAction.Invoke(condition.Value);
+                if (condition.Value != null) _failAction.Invoke(condition.Value);
                 return false;
             }
             return true;

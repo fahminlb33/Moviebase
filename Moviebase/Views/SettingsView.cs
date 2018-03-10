@@ -3,9 +3,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Moviebase.Core;
 using Moviebase.Core.Diagnostics;
 using Moviebase.Core.MVP;
+using Moviebase.Core.Natives;
 using Moviebase.Entities;
 using Moviebase.Properties;
 using Ninject;
@@ -14,19 +14,22 @@ namespace Moviebase.Views
 {
     public partial class SettingsView : Form
     {
-        private static readonly MovieEntry TryitData = new MovieEntry(new TmdbResult
-        {
-            Genre = "Science Fiction",
-            Id = 1134,
-            ImdbId = "tt172845369",
-            Plot = "There is...",
-            Title = "Star Trek Beyond",
-            Year = 2017
-        }, null);
+        private readonly MovieEntry _tryitData;
 
         public SettingsView()
         {
             InitializeComponent();
+
+            _tryitData = new MovieEntry();
+            _tryitData.SetData(new TmdbResult
+            {
+                Genre = "Science Fiction",
+                TmdbId = 1134,
+                ImdbId = "tt172845369",
+                Plot = "There is...",
+                Title = "Star Trek Beyond",
+                Year = 2017
+            });
         }
 
         private void cmdCancel_Click(object sender, EventArgs e)
@@ -48,8 +51,7 @@ namespace Moviebase.Views
             appSettings.FileRenamePattern = txtFileRenamePattern.Text;
             appSettings.FolderRenamePattern = txtFolderRenamePattern.Text;
 
-            appSettings.MovieExtensions.Clear();
-            appSettings.MovieExtensions.AddRange(lstExtensions.Items.Cast<string>().ToArray());
+            appSettings.MovieExtensions = string.Join(";", lstExtensions.Items.Cast<string>().ToArray());
             
             appSettings.Save();
             this.ShowMessageBox(Strings.SettingsRestartMessage, Strings.AppName);
@@ -69,7 +71,7 @@ namespace Moviebase.Views
             txtFileRenamePattern.Text = appSettings.FileRenamePattern;
             txtFolderRenamePattern.Text = appSettings.FolderRenamePattern;
 
-            lstExtensions.Items.AddRange(appSettings.MovieExtensions.Cast<object>().ToArray());
+            lstExtensions.Items.AddRange(appSettings.MovieExtensions.Split(';').Cast<object>().ToArray());
         }
 
         private void cmdClearLastDir_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -106,7 +108,7 @@ namespace Moviebase.Views
         {
             try
             {
-                lblPatternOutput.Text = Commons.PatternRename(txtFileRenamePattern.Text, TryitData) + Commons.Mp4FileExtension;
+                lblPatternOutput.Text = Commons.PatternRename(txtFileRenamePattern.Text, _tryitData) + Commons.Mp4FileExtension;
             }
             catch (Exception exception)
             {

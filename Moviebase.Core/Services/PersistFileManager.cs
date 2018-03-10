@@ -1,9 +1,10 @@
 ﻿using System.Diagnostics;
 using System.IO;
+using Moviebase.Core.Natives;
 using Moviebase.Entities;
 using Newtonsoft.Json;
 
-namespace Moviebase.Core
+namespace Moviebase.Core.Services
 {
     public class PersistFileManager : IPersistFileManager
     {
@@ -14,18 +15,20 @@ namespace Moviebase.Core
             _hideFile = hideFile;
         }
         
-        public TmdbResult Load(string path)
+        public MovieEntry Load(string path)
         {
             var dirPath = Path.GetDirectoryName(path);
             Debug.Assert(dirPath != null);
+            if (!HasPersistentData(dirPath)) return null;
 
             var persistFile = Path.Combine(dirPath, Commons.PersistentFileName);
-            return HasPersistentData(dirPath)
-                ? JsonConvert.DeserializeObject<TmdbResult>(File.ReadAllText(persistFile))
-                : null;
+            var contents = File.ReadAllText(persistFile);
+            var serialized = JsonConvert.DeserializeObject<MovieEntry>(contents);
+            serialized.SetFullPath(path);
+            return serialized;
         }
 
-        public void Save(string dirPath, TmdbResult entry)
+        public void Save(string dirPath, MovieEntry entry)
         {
             var path = Path.Combine(dirPath, Commons.PersistentFileName);
             if (File.Exists(path)) File.SetAttributes(path, FileAttributes.Normal);

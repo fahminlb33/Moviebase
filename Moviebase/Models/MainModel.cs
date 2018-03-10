@@ -4,6 +4,7 @@ using System.Threading;
 using System.Windows.Forms;
 using Moviebase.Core;
 using Moviebase.Core.MVP;
+using Moviebase.Core.Natives;
 using Moviebase.Entities;
 using Ninject.Extensions.Interception.Attributes;
 
@@ -21,7 +22,7 @@ namespace Moviebase.Models
         {
             DataView = new BindingList<MovieEntry>();
 
-            PicPosterImage = Commons.DefaultImage;
+            PicPosterImage = Commons.DefaultImage();
             LblTitleText = Strings.LiteralThreeDots;
             LblExtraInfoText = Strings.LiteralThreeDots;
             LblPlotText = Strings.LiteralThreeDots;

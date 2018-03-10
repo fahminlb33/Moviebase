@@ -3,9 +3,9 @@ using System.Diagnostics;
 using System.IO;
 using ImageMagick;
 using IniParser.Model;
-using Moviebase.Core.Diagnostics;
+using Moviebase.Core.Natives;
 
-namespace Moviebase.Core
+namespace Moviebase.Core.Services
 {
     public class ThumbnailManager : IThumbnailManager
     {

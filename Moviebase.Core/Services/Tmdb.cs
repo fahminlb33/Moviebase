@@ -6,9 +6,9 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Moviebase.Core.Natives;
 using Moviebase.Entities;
 using Newtonsoft.Json;
 
@@ -50,8 +50,8 @@ namespace Moviebase.Core.Services
             await Task.Yield();
             return new TmdbResult
             {
-                Title = filename,
-                Id = Commons.NotFetchedEntryId
+                Title = Path.GetFileNameWithoutExtension(filename),
+                TmdbId = Commons.NotFetchedEntryId
             };
         }
 
@@ -67,7 +67,7 @@ namespace Moviebase.Core.Services
             var response = await GetRequestBody<MovieDetailsRoot>(string.Format(MoviePath, id), col);
             var data = new TmdbResult
             {
-                Id = response.id,
+                TmdbId = response.id,
                 Genre = string.Join(", ", response.genres.Select(x => x.name)),
                 ImdbId = response.imdb_id,
                 Plot = response.overview,

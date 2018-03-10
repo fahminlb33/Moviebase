@@ -8,13 +8,8 @@
     <Setting Name="TmdbApiKey" Type="System.String" Scope="User">
       <Value Profile="(Default)">54989087497c2801d6469d34c6f42fc7</Value>
     </Setting>
-    <Setting Name="MovieExtensions" Type="System.Collections.Specialized.StringCollection" Scope="User">
-      <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
-&lt;ArrayOfString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
-  &lt;string&gt;.mkv&lt;/string&gt;
-  &lt;string&gt;.mp4&lt;/string&gt;
-  &lt;string&gt;.avi&lt;/string&gt;
-&lt;/ArrayOfString&gt;</Value>
+    <Setting Name="MovieExtensions" Type="System.String" Scope="User">
+      <Value Profile="(Default)">.mp4;.mkv</Value>
     </Setting>
     <Setting Name="FileRenamePattern" Type="System.String" Scope="User">
       <Value Profile="(Default)">{Title} ({Year})</Value>

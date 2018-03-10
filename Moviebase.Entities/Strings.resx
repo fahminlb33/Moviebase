@@ -232,4 +232,7 @@ Please reanalyze the folder to refresh information.</value>
   <data name="BrowseExportTitle" xml:space="preserve">
     <value>Select export path.</value>
   </data>
+  <data name="ItemIncludedMessage" xml:space="preserve">
+    <value>Item included from fetch.</value>
+  </data>
 </root>

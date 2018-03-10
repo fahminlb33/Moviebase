@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using CsvHelper;
 
-namespace Moviebase.Core
+namespace Moviebase.Core.Services
 {
     public static class CsvExporter
     {

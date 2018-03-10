@@ -92,7 +92,6 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
@@ -118,6 +117,12 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Models\MainModel.cs" />
     <Compile Include="Presenters\MainPresenter.cs" />
+    <Compile Include="Views\ResearchMovieView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\ResearchMovieView.Designer.cs">
+      <DependentUpon>ResearchMovieView.cs</DependentUpon>
+    </Compile>
     <Compile Include="Views\SelectPosterView.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -144,6 +149,8 @@
     <Compile Include="Views\SettingsView.Designer.cs">
       <DependentUpon>SettingsView.cs</DependentUpon>
     </Compile>
+    <Compile Include="Presenters\MainPresenter.Internals.cs" />
+    <Compile Include="Presenters\MainPresenter.Helpers.cs" />
     <None Include="Resources\tmdb_powered.png" />
     <None Include="Resources\app_icon.png" />
     <None Include="Resources\information.png" />
@@ -160,6 +167,10 @@
     </Compile>
     <EmbeddedResource Include="Views\AboutView.resx">
       <DependentUpon>AboutView.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\ResearchMovieView.resx">
+      <DependentUpon>ResearchMovieView.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Views\SelectPosterView.resx">

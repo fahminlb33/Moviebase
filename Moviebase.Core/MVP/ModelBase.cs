@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Ninject.Extensions.Interception;
@@ -24,7 +25,10 @@ namespace Moviebase.Core.MVP
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            Context.Send(x => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)), null);
+            Context.Post(x =>
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }, null);
         }
     }
 }

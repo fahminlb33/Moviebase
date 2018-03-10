@@ -2,18 +2,12 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-using Moviebase.Core.Diagnostics;
+// ReSharper disable LocalizableElement
 
 namespace Moviebase.Core.MVP
 {
     public static class FormExtensions
     {
-        public static ValidationSupport EnsureInternetConnected(this ValidationSupport support)
-        {
-            support.IsTrue(() => NetworkObserver.Instance.IsInternetConnected(), "Internet is not connected.");
-            return support;
-        }
-
         public static int FindIndex<T>(this IList<T> list, Predicate<T> predicate)
         {
             int i = 0;

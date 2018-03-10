@@ -2,11 +2,14 @@
 using System.Windows.Forms;
 using Moviebase.Core;
 using Moviebase.Core.Diagnostics;
+using Moviebase.Core.MVP;
 using Moviebase.Core.Services;
 using Moviebase.Entities;
+using Moviebase.Presenters;
 using Moviebase.Properties;
 using Moviebase.Views;
 using Ninject;
+using Ninject.Extensions.Interception.Infrastructure.Language;
 using Ninject.Extensions.Interception.Planning.Strategies;
 using Ninject.Planning.Strategies;
 

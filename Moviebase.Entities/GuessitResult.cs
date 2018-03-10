@@ -10,5 +10,9 @@ namespace Moviebase.Entities
         public int Year { get; set; }
         [JsonProperty("imdbId")]
         public string ImdbId { get; set; }
+        [JsonProperty("screen_size")]
+        public string ScreenSize { get; set; }
+        [JsonProperty("release_group")]
+        public string ReleaseGroup { get; set; }
     }
 }

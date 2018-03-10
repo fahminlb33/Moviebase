@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Drawing;
 using System.Windows.Forms;
 using Moviebase.Core.MVP;
+using Moviebase.Core.Natives;
 using Moviebase.Entities;
 using Moviebase.Presenters;
 using Moviebase.Properties;
+// ReSharper disable LocalizableElement
 
 namespace Moviebase.Views
 {
@@ -13,6 +14,7 @@ namespace Moviebase.Views
         private readonly FolderSelectDialog _folderBrowserDialog;
         private readonly SaveFileDialog _saveFileDialog;
         private readonly MainPresenter _presenter;
+        private readonly ValidationSupportFactory _validationFactory;
 
         public MainView()
         {
@@ -20,13 +22,14 @@ namespace Moviebase.Views
             _presenter = new MainPresenter(this);
             GlueBindings();
 
+            _validationFactory = new ValidationSupportFactory(x => this.ShowMessageBox(x, Strings.AppName,
+                MessageBoxButtons.OK, MessageBoxIcon.Exclamation));
             _folderBrowserDialog = new FolderSelectDialog
             {
                 Title = Strings.BrowseFolderDescription,
             };
             _saveFileDialog = new SaveFileDialog
             {
-                // ReSharper disable once LocalizableElement
                 Filter = "Comma Separated File|*.csv",
                 DefaultExt = "*.csv",
                 FileName = "Moviebase.csv",
@@ -56,7 +59,7 @@ namespace Moviebase.Views
             lblStatus.Bind(c => c.Text).To(model, m => m.LblStatusText);
             lblPercentage.Bind(c => c.Text).To(model, m => m.LblPercentageText);
         }
-
+        
         #region Data Grid
 
         private void grdMovies_SelectionChanged(object sender, EventArgs e)
@@ -88,9 +91,17 @@ namespace Moviebase.Views
 
         #region Event Subscribers
 
+        // --------- DIRS
         private void cmdFolderOpen_Click(object sender, EventArgs e)
         {
-            if (!_folderBrowserDialog.ShowDialog()) return;
+            var validate = _validationFactory.Create()
+                .IsTrue(() => _presenter.Model.DataView.Count == 0, Strings.AlreadyOpenedFolderMessage)
+                .IsTrue(() => _folderBrowserDialog.ShowDialog(), null);
+            if (!validate.Validate())
+            {
+                return;
+            }
+
             _presenter.OpenDirectory(_folderBrowserDialog.SelectedPath);
         }
 
@@ -102,16 +113,11 @@ namespace Moviebase.Views
         private void cmdFolderRecent_Click(object sender, EventArgs e)
         {
             var settings = Settings.Default;
-            if (string.IsNullOrWhiteSpace(settings.LastOpenDirectory))
-            {
-                this.ShowMessageBox(Strings.OpenDirNoRecord, Strings.AppName, icon: MessageBoxIcon.Exclamation);
-                return;
-            }
-            if (!System.IO.Directory.Exists(settings.LastOpenDirectory))
-            {
-                this.ShowMessageBox(Strings.OpenDirNotExist, Strings.AppName, icon: MessageBoxIcon.Exclamation);
-                return;
-            }
+            var validate = _validationFactory.Create()
+                .IsTrue(() => _presenter.Model.DataView.Count == 0, Strings.AlreadyOpenedFolderMessage)
+                .IsTrue(() => !string.IsNullOrWhiteSpace(settings.LastOpenDirectory), Strings.OpenDirNoRecord)
+                .IsTrue(() => System.IO.Directory.Exists(settings.LastOpenDirectory), Strings.OpenDirNotExist);
+            if (!validate.Validate()) return;
 
             _presenter.OpenDirectory(settings.LastOpenDirectory);
         }
@@ -136,26 +142,48 @@ namespace Moviebase.Views
         // --------- ACTIONS
         private void mnuFetchAll_Click(object sender, EventArgs e)
         {
+            var validate = _validationFactory.Create()
+                .IsTrue(() => _presenter.Model.DataView.Count > 0, Strings.FetchNoDataMessage)
+                .EnsureInternetConnected();
+            if (!validate.Validate()) return;
+
             _presenter.FetchMovieData();
         }
 
         private void mnuRenameAll_Click(object sender, EventArgs e)
         {
+            var validate = _validationFactory.Create()
+                .IsTrue(() => _presenter.Model.DataView.Count > 0, Strings.RenameNoDataMessage);
+            if (!validate.Validate()) return;
+
             _presenter.RenameMovieFiles();
         }
 
         private void mnuDownloadAll_Click(object sender, EventArgs e)
         {
+            var validate = _validationFactory.Create()
+                .IsTrue(() => _presenter.Model.DataView.Count > 0, Strings.PosterNoDataMessage)
+                .EnsureInternetConnected();
+            if (!validate.Validate()) return;
+
             _presenter.DownloadMoviePoster();
         }
 
         private void mnuFolderThumbnail_Click(object sender, EventArgs e)
         {
-           _presenter.ThumbnailFolder();
+            var validate = _validationFactory.Create()
+                .IsTrue(() => _presenter.Model.DataView.Count > 0, Strings.ThumbnailNoDataMessage);
+            if (!validate.Validate()) return;
+
+            _presenter.ThumbnailFolder();
         }
         
         private void mnuSavePresistData_Click(object sender, EventArgs e)
         {
+            var validate = _validationFactory.Create()
+                .IsTrue(() => _presenter.Model.DataView.Count > 0, Strings.PresistNoDataMessage);
+            if (!validate.Validate()) return;
+
             _presenter.SavePresistData();
         }
 
@@ -174,36 +202,50 @@ namespace Moviebase.Views
         private void mnuReSearch_Click(object sender, EventArgs e)
         {
             if (grdMovies.CurrentRow == null) return;
+            var validate = _validationFactory.Create().EnsureInternetConnected();
+            if (!validate.Validate()) return;
+
             _presenter.ResearchMovie(grdMovies.CurrentRow.Index);
         }
 
-        private void mnuIgnore_Click(object sender, EventArgs e)
+        private void mnuFetchInclude_Click(object sender, EventArgs e)
         {
             if (grdMovies.CurrentRow == null) return;
-            _presenter.SaveIgnoreEntry(grdMovies.CurrentRow.Index);
+            _presenter.SaveEntryId(grdMovies.CurrentRow.Index, Commons.NotFetchedEntryId);
+            this.ShowMessageBox(Strings.ItemIncludedMessage, Strings.AppName);
+        }
+
+        private void mnuFetchIgnore_Click(object sender, EventArgs e)
+        {
+            if (grdMovies.CurrentRow == null) return;
+            _presenter.SaveEntryId(grdMovies.CurrentRow.Index, Commons.IgnoredEntryId);
             this.ShowMessageBox(Strings.ItemExcludedMessage, Strings.AppName);
         }
 
         private void mnuSelectPoster_Click(object sender, EventArgs e)
         {
             if (grdMovies.CurrentRow == null) return;
+            var currentId = _presenter.Model.DataView[grdMovies.CurrentRow.Index].TmdbId;
+            var validate = _validationFactory.Create()
+                .IsTrue(() => Commons.IsMovieFetched(currentId), Strings.PresistNoDataMessage)
+                .EnsureInternetConnected();
+            if (!validate.Validate()) return;
+
             _presenter.ShowSelectPosterWindow(grdMovies.CurrentRow.Index);
         }
 
         private void mnuAlternativeNames_Click(object sender, EventArgs e)
         {
             if (grdMovies.CurrentRow == null) return;
+            var currentId = _presenter.Model.DataView[grdMovies.CurrentRow.Index].TmdbId;
+            var validate = _validationFactory.Create()
+                .IsTrue(() => Commons.IsMovieFetched(currentId), Strings.PresistNoDataMessage)
+                .EnsureInternetConnected();
+            if (!validate.Validate()) return;
+
             _presenter.ShowAlternativeNameWindow(grdMovies.CurrentRow.Index);
         }
 
         #endregion
-
-        private void toolTip1_Draw(object sender, DrawToolTipEventArgs e)
-        {
-            e.Graphics.Clear(Color.FromArgb(255, 32, 32, 32));
-            e.Graphics.DrawRectangle(new Pen(new SolidBrush(Color.FromArgb(255,32, 32, 32))), e.Bounds);
-            e.DrawBorder();
-            e.DrawText(); 
-        }
     }
 }

@@ -1,43 +1,52 @@
 ﻿using System;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Moviebase.Core.MVP
 {
-    public abstract class PresenterBase
+    public abstract class PresenterBase : IDisposable
     {
-        private CancellationTokenSource _cancellationToken;
+        protected CancellationTokenSource CancellationToken;
 
-        protected bool IsCancellationRequested => _cancellationToken != null && _cancellationToken.IsCancellationRequested;
+        protected bool IsCancellationRequested => CancellationToken != null && CancellationToken.IsCancellationRequested;
 
         protected void RecreateCancellationToken()
         {
-            _cancellationToken?.Dispose();
-            _cancellationToken = new CancellationTokenSource();
+            CancellationToken?.Dispose();
+            CancellationToken = new CancellationTokenSource();
         }
 
-        protected abstract void UpdateUi(UiState state, int progressPercentage = -1);
+        public abstract void UpdateUi(UiState state, int progressPercentage = -1);
 
         protected void CancelTask()
         {
-            _cancellationToken?.Cancel();
+            CancellationToken?.Cancel();
             UpdateUi(UiState.Cancelling);
         }
 
         protected void ThrowIfCancellationRequested()
         {
-            _cancellationToken?.Token.ThrowIfCancellationRequested();
+            CancellationToken?.Token.ThrowIfCancellationRequested();
         }
 
-        protected void RunTask(Action action)
+        #region IDisposable Support
+        private bool _disposedValue; 
+
+        protected virtual void Dispose(bool disposing)
         {
-            RecreateCancellationToken();
-            Task.Run(() =>
+            if (_disposedValue) return;
+            if (disposing)
             {
-                UpdateUi(UiState.Working);
-                action.Invoke();
-                UpdateUi(UiState.Ready);
-            }, _cancellationToken.Token);
+                if (CancellationToken != null) CancellationToken.Dispose();
+            }
+
+            CancellationToken = null;
+            _disposedValue = true;
         }
+        
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+        #endregion
     }
 }

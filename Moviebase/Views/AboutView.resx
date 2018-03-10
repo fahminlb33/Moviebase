@@ -121,23 +121,29 @@
     <value>Logo by GraphicLoads
 Freeware, http://www.iconarchive.com/show/assemblyNamedroid-settings-icons-by-graphicloads/movie-icon.html
 
+Castle Windsor by Castle Project
+Licensed under Apache License Version 2.0.
+
 CsvHelper by Josh Close
-Dual licensing under MS-PL assemblyNamed Apache 2.0
+Dual licensed under MS-PL assemblyNamed Apache 2.0.
 
 GuessIt by GuessIt.io
-Licensed under GNU Lesser General Public License v3.0
+Licensed under GNU Lesser General Public License v3.0.
 
 ImageListView by Ozgur Ozcitak
-Licensed under Apache License version 2
+Licensed under Apache License version 2.
 
 ImageMagick by ImageMagick Studio LLC
-Licensed under ImageMagick License
+Licensed under ImageMagick License.
+
+ini-parser by Ricardo Amores Hernández
+Licensed under MIT License.
 
 Newtonsoft.Json by James Newton-King
-Licensed under MIT License
+Licensed under MIT License.
 
 Ninject by Enkari, Ltd.
-Licensed under Apache License version 2
+Licensed under Apache License version 2.
 
 TMDb API by The Movie Database
 This product uses the TMDb API but is not endorsed or certified by TMDb.

@@ -99,10 +99,10 @@
             this.tabPage1.Controls.Add(this.label2);
             this.tabPage1.Controls.Add(this.label1);
             this.tabPage1.ImageIndex = 0;
-            this.tabPage1.Location = new System.Drawing.Point(4, 23);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(426, 295);
+            this.tabPage1.Size = new System.Drawing.Size(426, 296);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "General";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -293,7 +293,7 @@
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(192, 26);
             this.label11.TabIndex = 13;
-            this.label11.Text = "{Title},  {Year},  {ImdbId}\r\nBe aware of long path is not supported!";
+            this.label11.Text = "{Title}, {Year}, {ImdbId}, {Quality}\r\nBe aware of long path is not supported!";
             // 
             // label9
             // 

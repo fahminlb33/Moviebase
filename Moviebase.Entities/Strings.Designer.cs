@@ -169,6 +169,15 @@ namespace Moviebase.Entities {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Item included from fetch..
+        /// </summary>
+        public static string ItemIncludedMessage {
+            get {
+                return ResourceManager.GetString("ItemIncludedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Completed..
         /// </summary>
         public static string LiteralCompletedText {

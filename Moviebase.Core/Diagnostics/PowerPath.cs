@@ -257,7 +257,7 @@ namespace System.IO
 
         private string InternalSwapName(string input, string swapText)
         {
-            if (!input.Contains(swapText)) return null;
+            if (input.LastIndexOf(swapText, StringComparison.Ordinal) > 0) return null;
 
             var removed = input.Replace(swapText, "");
             return removed.Trim() + ", " + swapText;

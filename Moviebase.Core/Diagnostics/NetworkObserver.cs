@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.NetworkInformation;
+using Moviebase.Core.Natives;
 
 namespace Moviebase.Core.Diagnostics
 {

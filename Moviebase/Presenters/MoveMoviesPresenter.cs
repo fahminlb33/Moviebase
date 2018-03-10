@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -14,19 +15,12 @@ using Ninject.Parameters;
 
 namespace Moviebase.Presenters
 {
-    class MoveMoviesPresenter
+    class MoveMoviesPresenter : PresenterBase
     {
         private readonly StandardKernel _kernel = Program.AppKernel;
         private readonly FolderBrowserDialog _folderBrowser;
-        private CancellationTokenSource _cancellationToken;
         private int _processed;
-
-        public enum UiState
-        {
-            Running,
-            Stopped,
-            Update
-        }
+        
 
         public MoveMoviesModel Model { get; }
         public MoveMoviesView View { get; }
@@ -37,53 +31,11 @@ namespace Moviebase.Presenters
             Model = _kernel.Get<MoveMoviesModel>(new ConstructorArgument("context", SynchronizationContext.Current));
             _folderBrowser = new FolderBrowserDialog {Description = Strings.SelectFolderMessage};
         }
-
-        #region Worker Subscriber
-
-       
-        #endregion
-        private void RecreateCancellationToken()
-        {
-            _cancellationToken?.Dispose();
-            _cancellationToken = new CancellationTokenSource();
-        }
-
+        
         public void BrowseFolder()
         {
             if (_folderBrowser.ShowDialog() != DialogResult.OK) return;
             Model.TxtBrowseText = _folderBrowser.SelectedPath;
-        }
-
-        private void UpdateUi(UiState mode, string path = null)
-        {
-            switch (mode)
-            {
-                case UiState.Running:
-                    Model.CmdBrowseEnabled = false;
-                    Model.CmdExecuteEnabled = true;
-                    Model.CmdExecuteText = Strings.LiteralStopText;
-                    break;
-
-                case UiState.Stopped:
-                    Model.CmdBrowseEnabled = true;
-                    Model.CmdExecuteEnabled = true;
-                    Model.CmdExecuteText = Strings.LiteralMoveText;
-                    break;
-
-                case UiState.Update:
-                    Interlocked.Increment(ref _processed);
-                    var count = Interlocked.CompareExchange(ref _processed, 0, 0);
-                    Model.LblCountText = string.Format(Strings.MoveMoviesCountPattern, count);
-                    Model.Invoke(() => Model.DataView.Add(new MovedMovieEntry
-                    {
-                        Title = Path.GetFileName(path),
-                        Path = Path.GetDirectoryName(path)
-                    }));
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(mode), mode, null);
-            }
         }
 
         public void SearchMovies()
@@ -96,46 +48,85 @@ namespace Moviebase.Presenters
 
             if (Model.CmdExecuteText == Strings.LiteralMoveText)
             {
-                OrganizeDirectory(_folderBrowser.SelectedPath);
+                RecreateCancellationToken();
+                Task.Run(() => InternalOrganizeDirectory(Model.TxtBrowseText), CancellationToken.Token);
             }
             else
             {
-                _cancellationToken.Cancel();
+                CancelTask();
                 Model.CmdExecuteEnabled = false;
             }
         }
 
-        public void OrganizeDirectory(string path)
+        public void InternalOrganizeDirectory(string path)
         {
-            RecreateCancellationToken();
-            Task.Run(() =>
+            // enumerate
+            UpdateUi(UiState.Working);
+            var extensions = new List<string>(Settings.Default.MovieExtensions.Split(';'));
+            var dirEnumbEnumerable = Directory.EnumerateFiles(path, "*", SearchOption.TopDirectoryOnly);
+
+            // walk
+            foreach (var basePath in dirEnumbEnumerable)
             {
-                UpdateUi(UiState.Running);
-                var dirEnumbEnumerable = Directory.EnumerateFiles(path, "*", SearchOption.TopDirectoryOnly);
-                foreach (var basePath in dirEnumbEnumerable)
+                try
                 {
-                    var token = _cancellationToken.Token;
-                    token.ThrowIfCancellationRequested();
+                    var currentPath = new PowerPath(basePath);
+                    if (!extensions.Contains(currentPath.GetExtension())) return;
 
-                    try
+                    var newDir = Path.Combine(currentPath.GetDirectoryPath(), currentPath.GetFileNameWithoutExtension());
+                    var newFile = Path.Combine(newDir, currentPath.GetFileName());
+
+                    Directory.CreateDirectory(newDir);
+                    File.Move(currentPath.GetFullPath(), newFile);
+                    Model.Invoke(() => Model.DataView.Add(new MovedMovieEntry
                     {
-                        var currentPath = new PowerPath(basePath);
-                        if (!Settings.Default.MovieExtensions.Contains(currentPath.GetExtension())) return;
-
-                        var newDir = Path.Combine(currentPath.GetDirectoryPath(), currentPath.GetFileNameWithoutExtension());
-                        var newFile = Path.Combine(newDir, currentPath.GetFileName());
-
-                        Directory.CreateDirectory(newDir);
-                        File.Move(currentPath.GetFullPath(), newFile);
-                        UpdateUi(UiState.Update, currentPath);
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.Print("Organize error: {0}. {1}", basePath, e.Message);
-                    }
+                        Title = Path.GetFileName(path),
+                        Path = Path.GetDirectoryName(path)
+                    }));
                 }
-                UpdateUi(UiState.Stopped);
-            }, _cancellationToken.Token);
+                catch (Exception e)
+                {
+                    Debug.Print("Organize error: {0}. {1}", basePath, e.Message);
+                }
+
+                if (CancellationToken.IsCancellationRequested) break;
+            }
+
+            // finish
+            UpdateUi(UiState.Ready);
+        }
+
+        public override void UpdateUi(UiState state, int progressPercentage = -1)
+        {
+            switch (state)
+            {
+                case UiState.Working:
+                    Model.CmdBrowseEnabled = false;
+                    Model.CmdExecuteEnabled = true;
+                    Model.CmdExecuteText = Strings.LiteralStopText;
+                    break;
+
+                case UiState.Ready:
+                    Model.CmdBrowseEnabled = true;
+                    Model.CmdExecuteEnabled = true;
+                    Model.CmdExecuteText = Strings.LiteralMoveText;
+                    break;
+
+                case UiState.StatusUpdate:
+                    Interlocked.Increment(ref _processed);
+                    var count = Interlocked.CompareExchange(ref _processed, 0, 0);
+                    Model.LblCountText = string.Format(Strings.MoveMoviesCountPattern, count);
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(state), state, null);
+            }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (_folderBrowser != null) _folderBrowser.Dispose();
+            base.Dispose(disposing);
         }
     }
 }

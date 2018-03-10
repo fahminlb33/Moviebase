@@ -1,11 +1,11 @@
 using Moviebase.Entities;
 
-namespace Moviebase.Core
+namespace Moviebase.Core.Services
 {
     public interface IPersistFileManager
     {
-        TmdbResult Load(string path);
-        void Save(string outputPath, TmdbResult entry);
+        MovieEntry Load(string path);
+        void Save(string outputPath, MovieEntry entry);
         bool HasPersistentData(string path);
     }
 }

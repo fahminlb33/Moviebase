@@ -1,4 +1,4 @@
-﻿namespace Moviebase.Core
+﻿namespace Moviebase.Core.Services
 {
     public interface IThumbnailManager
     {

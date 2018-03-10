@@ -105,11 +105,11 @@
     <Compile Include="..\MoviebaseAssemblyInfo.cs">
       <Link>Properties\MoviebaseAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="CsvExporter.cs" />
+    <Compile Include="Services\CsvExporter.cs" />
     <Compile Include="Diagnostics\AsyncProcess.cs" />
-    <Compile Include="Commons.cs" />
+    <Compile Include="Natives\Commons.cs" />
     <Compile Include="Diagnostics\ComponentManager.cs" />
-    <Compile Include="CsvExportMap.cs" />
+    <Compile Include="Services\CsvExportMap.cs" />
     <Compile Include="MVP\BindingTarget.cs" />
     <Compile Include="MVP\DataBinderExtensions.cs" />
     <Compile Include="MVP\FolderSelectDialog.cs" />
@@ -119,21 +119,22 @@
     <Compile Include="MVP\PresenterBase.cs" />
     <Compile Include="MVP\UiState.cs" />
     <Compile Include="MVP\PercentageCalculator.cs" />
+    <Compile Include="MVP\ValidationSupportFactory.cs" />
     <Compile Include="Natives\Reflector.cs" />
     <Compile Include="Natives\WindowWrapper.cs" />
     <Compile Include="Services\ITmdbWebRequest.cs" />
     <Compile Include="Diagnostics\IComponentManager.cs" />
-    <Compile Include="IThumbnailManager.cs" />
+    <Compile Include="Services\IThumbnailManager.cs" />
     <Compile Include="Diagnostics\NetworkObserver.cs" />
     <Compile Include="Diagnostics\ProcessRedirectStream.cs" />
-    <Compile Include="ThumbnailManager.cs" />
+    <Compile Include="Services\ThumbnailManager.cs" />
     <Compile Include="Services\IGuessit.cs" />
     <Compile Include="Services\ITmdb.cs" />
-    <Compile Include="IPersistFileManager.cs" />
-    <Compile Include="ValidationSupport.cs" />
+    <Compile Include="Services\IPersistFileManager.cs" />
+    <Compile Include="MVP\ValidationSupport.cs" />
     <Compile Include="Services\Guessit.cs" />
-    <Compile Include="PersistFileManager.cs" />
-    <Compile Include="PowerPath.cs" />
+    <Compile Include="Services\PersistFileManager.cs" />
+    <Compile Include="Diagnostics\PowerPath.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\Tmdb.cs" />
   </ItemGroup>
