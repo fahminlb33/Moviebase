@@ -38,3 +38,8 @@ Kaskus Thread: https://www.kaskus.co.id/thread/593f6264d675d48e4a8b4567/moviebas
 How to install: https://github.com/fahminlb33/Moviebase/wiki/How-to-install
 
 How to use: https://www.youtube.com/watch?v=MZhJvWPLdFk
+
+
+## Update
+Information is out of date and was not able to install packages required for pip and python.
+Update the links able for us to download and update the system.
