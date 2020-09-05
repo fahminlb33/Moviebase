@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30413.136
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moviebase.Core", "src\Moviebase.Core\Moviebase.Core.csproj", "{703FE910-F5BB-47E1-91B4-420D855BA94A}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{813F88F7-3494-4CC8-AE43-371E6694BCA7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{C5A5EEC1-AA05-40F4-B565-55F20D68EBD2}"
@@ -17,22 +15,24 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "files", "files", "{0FDC2E01
 		README.MD = README.MD
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moviebase.Services", "src\Moviebase.Services\Moviebase.Services.csproj", "{9EA0E1E4-020C-4769-B9A4-87121E29E31A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{703FE910-F5BB-47E1-91B4-420D855BA94A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{703FE910-F5BB-47E1-91B4-420D855BA94A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{703FE910-F5BB-47E1-91B4-420D855BA94A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{703FE910-F5BB-47E1-91B4-420D855BA94A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9EA0E1E4-020C-4769-B9A4-87121E29E31A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EA0E1E4-020C-4769-B9A4-87121E29E31A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EA0E1E4-020C-4769-B9A4-87121E29E31A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9EA0E1E4-020C-4769-B9A4-87121E29E31A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{703FE910-F5BB-47E1-91B4-420D855BA94A} = {813F88F7-3494-4CC8-AE43-371E6694BCA7}
+		{9EA0E1E4-020C-4769-B9A4-87121E29E31A} = {813F88F7-3494-4CC8-AE43-371E6694BCA7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8C2DBD51-0EC8-48E0-8A5F-513F9EC65C97}
