@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Moviebase.Services.Providers
 {
-    class SubtitleService
+    class SubsceneService
     {
     }
 }

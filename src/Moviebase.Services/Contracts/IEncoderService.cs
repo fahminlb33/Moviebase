@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Moviebase.Services.Providers
+namespace Moviebase.Services.Contracts
 {
-    class MovieDataService
+    public interface IEncoderService
     {
+
     }
 }

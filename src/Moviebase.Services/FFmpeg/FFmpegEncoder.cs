@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Moviebase.Services.Providers
+namespace Moviebase.Services.FFmpeg
 {
-    class EncoderService
+    class FFmpegEncoder
     {
     }
 }
