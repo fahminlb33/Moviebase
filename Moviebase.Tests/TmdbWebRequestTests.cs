@@ -1,4 +1,5 @@
 ﻿using Moviebase.Core;
+using Moviebase.Core.Services;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -12,12 +13,13 @@ namespace Moviebase.Tests
     [TestFixture]
     public class TmdbWebRequestTests
     {
-        private TmdbWebRequest _tmdbWebRequest;
+        private ITmdbWebRequest _tmdbWebRequest;
 
         [SetUp]
         public void Setup()
         {
             _tmdbWebRequest = new TmdbWebRequest("DDD");
+
         }
 
         [Test]
@@ -31,6 +33,8 @@ namespace Moviebase.Tests
             var result = _tmdbWebRequest.BuildQueryString(col);
 
             Assert.AreEqual("ked=dd&kesd=ddd", result);
+
+
         }
 
         [Test]
