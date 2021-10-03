@@ -1,8 +1,8 @@
 # Moviebase
 
-![version](https://img.shields.io/badge/version-2.1-brightgreen.svg) 
-![build](https://img.shields.io/badge/build-38805-brightgreen.svg)
-[![Build Status](https://travis-ci.org/fahminlb33/Moviebase.svg?branch=master)](https://travis-ci.org/fahminlb33/Moviebase)
+> This repository has not been maintained for a long time.
+> Some of the features might not working properly.
+> The development of this tool is now halted and might not be continued as I don't have spare time to work with this repo.
 
 Moviebase is all-in-one movie management tool. Simply organize, rename, 
 download poster, and create folder thumbnail.
@@ -23,23 +23,4 @@ download poster, and create folder thumbnail.
 - [ ] Automatic subtitle download from Subscene
 - [ ] Create hardsub movie (burn video+subtitle)
 
-## Release
-
-Download: Moviebase_v1.2_b38808_xx-bit
-
-32-bit: https://drive.google.com/open?id=1Dqw-YqUD7tDnUVhccO_vmIpGMSpMfB-R
-
-64-bit: https://drive.google.com/open?id=1Q-Ir9SRz693HsBdmNLnuqrEprmR_YKjm
-
-## Resources
-
-Kaskus Thread: https://www.kaskus.co.id/thread/593f6264d675d48e4a8b4567/moviebase-aplikasi-untuk-organisir-film-agan
-
 How to install: https://github.com/fahminlb33/Moviebase/wiki/How-to-install
-
-How to use: https://www.youtube.com/watch?v=MZhJvWPLdFk
-
-
-## Update
-Information is out of date and was not able to install packages required for pip and python.
-Update the links able for us to download and update the system.
